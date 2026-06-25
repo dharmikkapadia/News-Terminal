@@ -13,10 +13,33 @@ file, so the list **grows over time** and the app **still shows stored history
 even if a live fetch fails**. The DB path is the `MARKETWIRE_DB` env var (default
 `marketwire.db` beside the app).
 
-⚠️ **Streamlit Cloud caveat:** Community Cloud storage is **ephemeral** — the DB
-accumulates while the app is awake but **resets when it sleeps / redeploys**. For
-durable history run on an always-on **VM** (point `MARKETWIRE_DB` at a persistent
-path), or swap the sqlite3 layer for a hosted DB (Turso/Postgres) — the SQL is standard.
+⚠️ **Streamlit Cloud caveat:** Community Cloud storage is **ephemeral** — a sqlite
+file accumulates while the app is awake but **resets when it sleeps / redeploys**.
+On an always-on **VM**, a plain sqlite path is already durable. For durable history
+**on Cloud**, point `MARKETWIRE_DB` at a hosted Postgres or Turso DB (below).
+
+### Durable history: Postgres or Turso
+
+`store.py` picks the backend from the `MARKETWIRE_DB` connection string — sqlite by
+default, no config needed. To use a hosted DB, uncomment its driver in
+`requirements.txt` and set the connection string (locally as an env var; on
+Streamlit Cloud under **Settings → Secrets**, which the app mirrors into the env):
+
+**Postgres** (Neon / Supabase / RDS) — uncomment `psycopg[binary]`:
+```toml
+# .streamlit/secrets.toml  (or env var)
+MARKETWIRE_DB = "postgresql://USER:PASSWORD@HOST:5432/DBNAME"
+```
+
+**Turso** (libSQL) — uncomment `libsql-experimental`:
+```toml
+MARKETWIRE_DB = "libsql://YOUR-DB-ORG.turso.io"
+MARKETWIRE_DB_AUTH_TOKEN = "your-turso-token"
+```
+
+The schema is created automatically on first run. All three backends were tested
+for accumulate + dedupe + ordering; Postgres against a live server, Turso via the
+libSQL driver (only the remote hop differs from the local check).
 
 The wire **auto-refreshes every 5 minutes** on its own (no clicking) via a
 Streamlit fragment, and there's a **⟳ Refresh** button for an immediate pull.

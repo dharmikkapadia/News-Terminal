@@ -21,8 +21,18 @@ import feedparser
 import requests
 import streamlit as st
 
+# Mirror Streamlit Cloud Secrets into the environment so the same config keys work
+# whether set as env vars (VM / Actions) or via the Cloud Secrets UI — needed for
+# MARKETWIRE_DB / MARKETWIRE_DB_AUTH_TOKEN (durable history on Cloud).
+try:
+    for _k, _v in st.secrets.items():
+        if isinstance(_v, str):
+            os.environ.setdefault(_k, _v)
+except Exception:
+    pass  # no secrets configured — fine
+
 import rbi_archive  # best-effort scraper for older releases (beyond the RSS ~10)
-import store        # SQLite history so the wire accumulates over time
+import store        # durable history (sqlite / Postgres / Turso) — accumulates over time
 
 RBI_FEED = "https://rbi.org.in/pressreleases_rss.xml"
 # Override to point at a mirror/cache (or for local testing) without code changes.
