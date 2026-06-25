@@ -5,6 +5,11 @@ server-side (browsers can't read most RSS directly — CORS), strips the HTML, a
 shows it newest-first with a keyword filter. No database, no scheduler — just the
 wire. More feeds can be added later.
 
+**Themes:** pick a data-terminal palette in the sidebar — Bloomberg, Reuters
+Carbon, Amber/Green phosphor, Ice (cyan), a high-contrast light **Paper**, or
+**High Contrast**. Every palette is tuned so all text stays legible, and your
+choice is remembered in the URL (`?theme=…`), so it sticks and is shareable.
+
 ## Run locally
 
 ```bash
@@ -21,4 +26,5 @@ streamlit run streamlit_app.py    # opens at http://localhost:8501
 > Note: government sites occasionally block datacenter IPs. The RBI feed works
 > from a normal desk/VM but may 403 from Streamlit Cloud — if so, run it locally.
 
-Feed: `https://rbi.org.in/pressreleases_rss.xml`
+Feed: `https://rbi.org.in/pressreleases_rss.xml` — override with the
+`MARKETWIRE_FEED` env var to point at a mirror/cache without code changes.
