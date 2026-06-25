@@ -1,9 +1,22 @@
 # ◢ MarketWire
 
 A minimal Streamlit reader for **RBI Press Releases**. It fetches the feed
-server-side (browsers can't read most RSS directly — CORS), strips the HTML, and
-shows it newest-first with a keyword filter. No database, no scheduler — just the
-wire. More feeds can be added later.
+server-side (browsers can't read most RSS directly — CORS), strips the HTML,
+**remembers releases in a small SQLite store so the wire accumulates over time**,
+and shows them newest-first with a keyword filter. More feeds can be added later.
+
+### History store
+
+RBI's RSS only carries the latest ~10, and replaces them as new ones publish.
+`store.py` keeps every release the app has fetched (deduped by `prid`) in a SQLite
+file, so the list **grows over time** and the app **still shows stored history
+even if a live fetch fails**. The DB path is the `MARKETWIRE_DB` env var (default
+`marketwire.db` beside the app).
+
+⚠️ **Streamlit Cloud caveat:** Community Cloud storage is **ephemeral** — the DB
+accumulates while the app is awake but **resets when it sleeps / redeploys**. For
+durable history run on an always-on **VM** (point `MARKETWIRE_DB` at a persistent
+path), or swap the sqlite3 layer for a hosted DB (Turso/Postgres) — the SQL is standard.
 
 The wire **auto-refreshes every 5 minutes** on its own (no clicking) via a
 Streamlit fragment, and there's a **⟳ Refresh** button for an immediate pull.
