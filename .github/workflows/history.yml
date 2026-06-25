@@ -10,14 +10,11 @@ name: MarketWire history
 
 on:
   schedule:
-    - cron: "*/15 * * * *"   # every 15 minutes (UTC); GitHub cron is best-effort.
+    - cron: "*/30 * * * *"   # every 30 minutes (UTC); GitHub cron is best-effort.
                              # Runs independently of the app — keeps building history
-                             # even while the Streamlit app is asleep. NOTE: on a
-                             # PRIVATE repo this uses ~2900 Actions min/month (each
-                             # run bills as 1 min), which exceeds the 2,000-min free
-                             # tier — make the repo public (Actions free) or widen the
-                             # interval to stay under it. Only commits when something
-                             # actually changed.
+                             # even while the Streamlit app is asleep. ~1,460 Actions
+                             # min/month, comfortably under the 2,000-min private-repo
+                             # free tier. Only commits when something actually changed.
   workflow_dispatch: {}       # allow manual runs (Actions tab → Run workflow)
 
 permissions:

@@ -27,12 +27,12 @@ and writes **`data/history.jsonl`** (deduped by `prid`, JSON-lines so each updat
 a small git diff), then commits it. The app reads that committed file and merges it
 with the live feed — so history survives Streamlit Cloud restarts with no DB.
 
-- The Action runs every 15 minutes (and on demand via **Actions → Run workflow**),
+- The Action runs every 30 minutes (and on demand via **Actions → Run workflow**),
   **independently of the app** — it keeps building history even while the Streamlit
   app is asleep. It only commits when something changed. Tune the `cron` in the workflow.
-  ⚠️ On a **private** repo, every-15-min uses ~2,900 Actions minutes/month (each run
-  bills as a full minute), which exceeds the 2,000-min free tier — make the repo
-  **public** (Actions are free) or widen the interval (~20–30 min) to stay under it.
+  At 30 min it uses ~1,460 Actions minutes/month, comfortably under the 2,000-min
+  private-repo free tier. (Going faster on a private repo can exceed it — each run
+  bills as a full minute — so make the repo **public** for free unlimited Actions first.)
 - Run it yourself anytime: `python poll.py` (writes `data/history.jsonl`).
 - **Trade-offs:** history grows at the Action's cadence (not instant — the *live*
   view is still real-time); and because each commit updates the tracked branch,
