@@ -26,6 +26,9 @@ RBI_FEED = "https://rbi.org.in/pressreleases_rss.xml"
 FEED_URL = os.environ.get("MARKETWIRE_FEED", RBI_FEED)
 UA = "Mozilla/5.0 (compatible; MarketWire/1.0; RSS reader)"
 IST = timezone(timedelta(hours=5, minutes=30))
+# The wire re-runs itself on this interval (seconds) with no clicks; override via env.
+REFRESH_SECONDS = int(os.environ.get("MARKETWIRE_REFRESH", "300"))
+CACHE_TTL = max(REFRESH_SECONDS - 30, 15)  # just under the interval so each tick re-fetches
 
 # --------------------------------------------------------------------------- #
 # Themes — data-terminal palettes. Each key is tuned for contrast so that ALL
@@ -63,9 +66,9 @@ def strip_html(s: str) -> str:
     return re.sub(r"\s+", " ", html.unescape(s)).strip()
 
 
-@st.cache_data(ttl=300, show_spinner=False)
+@st.cache_data(ttl=CACHE_TTL, show_spinner=False)
 def fetch_feed(url):
-    """Fetch + parse the feed. Returns (items, error). Cached for 5 min per URL."""
+    """Fetch + parse the feed. Returns (items, error). Cached per URL (see CACHE_TTL)."""
     try:
         resp = requests.get(url, headers={"User-Agent": UA}, timeout=20)
         resp.raise_for_status()
@@ -181,35 +184,48 @@ if refresh.button("⟳ Refresh", use_container_width=True):
     fetch_feed.clear()
     st.rerun()
 
-items, error = fetch_feed(FEED_URL)
+@st.fragment(run_every=REFRESH_SECONDS)
+def wire():
+    """The live wire. As a fragment with run_every, it re-runs itself every
+    REFRESH_SECONDS with no clicks — only this part of the page, so the theme and
+    header stay put. fetch_feed is cached just under the interval, so each tick
+    pulls fresh data. (st.stop() can't be used in a fragment, so we return.)"""
+    items, error = fetch_feed(FEED_URL)
+    if error:
+        st.error(f"Couldn't fetch the feed: {error}")
+        st.caption(
+            "Government sites sometimes block datacenter IPs (e.g. Streamlit Cloud). "
+            "Try Refresh, or run it locally where the feed is reachable."
+        )
+        return
+    if not items:
+        st.info("The feed returned no items.")
+        return
 
-if error:
-    st.error(f"Couldn't fetch the feed: {error}")
+    q = st.text_input("Filter", placeholder="filter by keyword…", label_visibility="collapsed")
+    shown = [it for it in items if q.lower() in (it["title"] + " " + it["summary"]).lower()] if q.strip() else items
+    mins = REFRESH_SECONDS // 60
+    every = f"{mins} min" if mins else f"{REFRESH_SECONDS}s"
+    checked = datetime.now(IST).strftime("%H:%M:%S")
     st.caption(
-        "Government sites sometimes block datacenter IPs (e.g. Streamlit Cloud). "
-        "Try Refresh, or run it locally where the feed is reachable."
+        f"{len(shown)} of {len(items)} press releases · newest first · "
+        f"auto-refresh every {every} · last checked {checked} IST"
     )
-    st.stop()
 
-if not items:
-    st.info("The feed returned no items.")
-    st.stop()
+    for it in shown:
+        when = (
+            datetime.fromtimestamp(it["ts"], IST).strftime("%d %b %Y · %H:%M IST")
+            if it["ts"] else (it["published"] or "—")
+        )
+        st.markdown(
+            f"**{it['title']}**  \n<span class='mw-time'>{when}</span>",
+            unsafe_allow_html=True,
+        )
+        with st.expander("details"):
+            st.write(it["summary"] or "(no summary in feed)")
+            if it["link"].startswith("http"):
+                st.markdown(f"[Open original ↗]({it['link']})")
+        st.divider()
 
-q = st.text_input("Filter", placeholder="filter by keyword…", label_visibility="collapsed")
-shown = [it for it in items if q.lower() in (it["title"] + " " + it["summary"]).lower()] if q.strip() else items
-st.caption(f"{len(shown)} of {len(items)} press releases · newest first")
 
-for it in shown:
-    when = (
-        datetime.fromtimestamp(it["ts"], IST).strftime("%d %b %Y · %H:%M IST")
-        if it["ts"] else (it["published"] or "—")
-    )
-    st.markdown(
-        f"**{it['title']}**  \n<span class='mw-time'>{when}</span>",
-        unsafe_allow_html=True,
-    )
-    with st.expander("details"):
-        st.write(it["summary"] or "(no summary in feed)")
-        if it["link"].startswith("http"):
-            st.markdown(f"[Open original ↗]({it['link']})")
-    st.divider()
+wire()

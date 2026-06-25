@@ -5,6 +5,10 @@ server-side (browsers can't read most RSS directly — CORS), strips the HTML, a
 shows it newest-first with a keyword filter. No database, no scheduler — just the
 wire. More feeds can be added later.
 
+The wire **auto-refreshes every 5 minutes** on its own (no clicking) via a
+Streamlit fragment, and there's a **⟳ Refresh** button for an immediate pull.
+Override the interval with the `MARKETWIRE_REFRESH` env var (seconds).
+
 **Themes:** pick a data-terminal palette in the sidebar — Bloomberg, Reuters
 Carbon, Amber/Green phosphor, Ice (cyan), a high-contrast light **Paper**, or
 **High Contrast**. Every palette is tuned so all text stays legible, and your
