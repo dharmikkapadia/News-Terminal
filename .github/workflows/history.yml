@@ -1,0 +1,52 @@
+name: MarketWire history
+
+# Keeps durable press-release history IN THE REPO: fetches RBI on a schedule and
+# commits data/history.jsonl. The Streamlit app reads that committed file, so
+# history survives Streamlit Cloud restarts with no external database.
+#
+# Note: committing updates the tracked branch, so Streamlit Cloud redeploys (a
+# brief restart) whenever history changes — tune the cron below to taste. The
+# run only commits when there's actually something new.
+
+on:
+  schedule:
+    - cron: "17 */3 * * *"   # every ~3 hours (UTC); GitHub cron is best-effort
+  workflow_dispatch: {}       # allow manual runs (Actions tab → Run workflow)
+
+permissions:
+  contents: write             # needed to push the updated history file
+
+concurrency:
+  group: marketwire-history
+  cancel-in-progress: false
+
+jobs:
+  poll:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: pip install feedparser requests beautifulsoup4
+
+      - name: Fetch RBI and update history
+        env:
+          # Optional: set repo variable MARKETWIRE_ARCHIVE_URLS to also backfill
+          # older releases from RBI's listing page(s).
+          MARKETWIRE_ARCHIVE_URLS: ${{ vars.MARKETWIRE_ARCHIVE_URLS }}
+        run: python poll.py
+
+      - name: Commit history if it changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/history.jsonl
+          if git diff --cached --quiet; then
+            echo "No history changes."
+          else
+            git commit -m "history: update $(date -u +%FT%TZ)"
+            git push
+          fi

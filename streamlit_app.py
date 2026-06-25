@@ -11,14 +11,9 @@ Run locally:   streamlit run streamlit_app.py
 Deploy:        Streamlit Community Cloud, main file = streamlit_app.py
 """
 
-import calendar
-import html
 import os
-import re
 from datetime import datetime, timezone, timedelta
 
-import feedparser
-import requests
 import streamlit as st
 
 # Mirror Streamlit Cloud Secrets into the environment so the same config keys work
@@ -31,13 +26,13 @@ try:
 except Exception:
     pass  # no secrets configured — fine
 
+import feed         # pure RSS fetch/parse (shared with the poller)
+import history      # durable history kept as JSONL in the repo (maintained by the Action)
 import rbi_archive  # best-effort scraper for older releases (beyond the RSS ~10)
-import store        # durable history (sqlite / Postgres / Turso) — accumulates over time
+import store        # durable history backend (sqlite / Postgres / Turso)
 
-RBI_FEED = "https://rbi.org.in/pressreleases_rss.xml"
 # Override to point at a mirror/cache (or for local testing) without code changes.
-FEED_URL = os.environ.get("MARKETWIRE_FEED", RBI_FEED)
-UA = "Mozilla/5.0 (compatible; MarketWire/1.0; RSS reader)"
+FEED_URL = os.environ.get("MARKETWIRE_FEED", feed.RBI_FEED)
 IST = timezone(timedelta(hours=5, minutes=30))
 # The wire re-runs itself on this interval (seconds) with no clicks; override via env.
 REFRESH_SECONDS = int(os.environ.get("MARKETWIRE_REFRESH", "300"))
@@ -73,42 +68,17 @@ THEMES = {
 }
 DEFAULT_THEME = "Bloomberg"
 
-_TAG_RE = re.compile(r"<[^>]+>")
-
-
-def strip_html(s: str) -> str:
-    """Turn an RSS HTML summary into plain, single-spaced text."""
-    if not s:
-        return ""
-    s = _TAG_RE.sub(" ", s)
-    return re.sub(r"\s+", " ", html.unescape(s)).strip()
-
-
 @st.cache_data(ttl=CACHE_TTL, show_spinner=False)
 def fetch_feed(url):
-    """Fetch + parse the feed. Returns (items, error). Cached per URL (see CACHE_TTL)."""
-    try:
-        resp = requests.get(url, headers={"User-Agent": UA}, timeout=20)
-        resp.raise_for_status()
-    except Exception as ex:
-        return [], f"{type(ex).__name__}: {ex}"
+    """Cached wrapper around feed.fetch_rss. Returns (items, error)."""
+    return feed.fetch_rss(url)
 
-    parsed = feedparser.parse(resp.content)
-    if parsed.bozo and not parsed.entries:
-        return [], f"not a readable feed ({getattr(parsed, 'bozo_exception', 'unknown')})"
 
-    items = []
-    for e in parsed.entries:
-        st_time = e.get("published_parsed") or e.get("updated_parsed")
-        items.append({
-            "title": (e.get("title") or "(untitled)").strip(),
-            "link": e.get("link") or "",
-            "summary": strip_html(e.get("summary") or e.get("description") or ""),
-            "published": e.get("published") or e.get("updated") or "",
-            "ts": calendar.timegm(st_time) if st_time else None,
-        })
-    items.sort(key=lambda x: x["ts"] or 0, reverse=True)
-    return items, None
+@st.cache_data(ttl=600, show_spinner=False)
+def load_history():
+    """Durable history from the repo: the committed JSONL, or a raw URL via
+    MARKETWIRE_HISTORY_URL. Cached; the Refresh button clears it."""
+    return history.load_durable()
 
 
 @st.cache_data(ttl=CACHE_TTL, show_spinner=False)
@@ -221,6 +191,7 @@ head.markdown("## ◢ MarketWire — RBI Press Releases")
 if refresh.button("⟳ Refresh", use_container_width=True):
     fetch_feed.clear()
     fetch_archive.clear()
+    load_history.clear()
     st.rerun()
 
 @st.fragment(run_every=REFRESH_SECONDS)
@@ -233,11 +204,11 @@ def wire():
     archive_on = st.session_state.get("archive", True)
     arch_items, arch_err = fetch_archive(ARCHIVE_URLS) if archive_on else ([], None)
 
-    # Persist everything we just fetched (deduped by prid in the store), then read
-    # back the full accumulated history. This is what makes the wire grow over time
-    # and keep working even when a live fetch fails.
-    new_count = store.upsert((rss_items or []) + (arch_items or []))
-    items = store.load(limit=1000)
+    fetched = (rss_items or []) + (arch_items or [])
+    new_count = store.upsert(fetched)  # accumulate in the DB (sqlite / Postgres / Turso)
+    # Merge every durable source + the live fetch, deduped by prid: the DB store,
+    # the repo's committed history (maintained by the GitHub Action), and live items.
+    items = history.dedupe(store.load(limit=5000) + load_history() + fetched)
 
     if not items:
         if error:
