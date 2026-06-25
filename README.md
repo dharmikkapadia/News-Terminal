@@ -80,11 +80,18 @@ Open **`feeds.py`** and add a line to `FEEDS`:
 `weight` nudges priority; `enabled` toggles it. Restart the app to pick up changes.
 
 **About the shipped sources:** RBI Press Releases is confirmed working. SEBI, PIB,
-NSE, MCA, and the news feeds are standard public endpoints, but government and
+and the news feeds are standard public endpoints, but government and
 exchange sites occasionally change paths or block datacenter IPs. If one shows an
 error in the **Sources** tab, that's expected — fix the URL or set `enabled: False`.
 A failing feed never breaks the rest. (NSE in particular usually rejects
-non-browser clients; leave it off unless you have a working endpoint.)
+non-browser clients; leave it off unless you have a working endpoint. MCA ships
+only an RSS *landing page*, not a direct `.xml`, so it's off by default.)
+
+**Checking URLs without the UI:** run `python verify_feeds.py` to probe every feed
+(enabled *and* disabled) and print a status table — no DB writes, no alerts. Run it
+from your desk or the VM: these sites 403 datacenter IPs, so a cloud/CI runner will
+report everything down, RBI included. `--enabled` limits it to enabled feeds and
+exits non-zero if any fail.
 
 ---
 
