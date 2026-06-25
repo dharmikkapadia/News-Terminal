@@ -33,18 +33,41 @@ def main():
         _annotate("warning", "RBI fetch failed", err)
 
     arch = []
-    for url in [u.strip() for u in os.environ.get("MARKETWIRE_ARCHIVE_URLS", "").split(",") if u.strip()]:
+    archive_urls = [u.strip() for u in
+                    os.environ.get("MARKETWIRE_ARCHIVE_URLS", rbi_archive.LISTING_URL).split(",") if u.strip()]
+    for url in archive_urls:
         got, aerr = rbi_archive.scrape_listing(url)
         if aerr:
             _annotate("warning", "Archive fetch failed", f"{url}: {aerr}")
         arch += got
+
+    # Enrich archive stubs (the listing has title+date+link only) with the full
+    # body from each release's detail page — only for items we don't already have
+    # full text for, capped per run to bound requests. RBI's detail page exposes no
+    # time, so enriched items keep a date-only (midnight) timestamp.
+    have_full = {history._key(it) for it in existing + rss if (it.get("summary") or "").strip()}
+    cap = int(os.environ.get("MARKETWIRE_ENRICH_LIMIT", "30"))
+    enriched = 0
+    for a in arch:
+        if enriched >= cap:
+            break
+        if (a.get("summary") or "").strip() or history._key(a) in have_full:
+            continue
+        det = rbi_archive.fetch_detail(a["link"], a.get("title", ""))
+        if det and det.get("summary"):
+            a["summary"] = det["summary"]
+            if det.get("ts") is not None:
+                a["ts"] = det["ts"]
+            if det.get("published"):
+                a["published"] = det["published"]
+            enriched += 1
 
     before = len(existing)
     merged = history.dedupe(existing + rss + arch)
     history.save_file(merged)
     after = len(merged)
     print(f"[poll] existing={before} rss={len(rss)} archive={len(arch)} "
-          f"total={after} new={after - before}")
+          f"enriched={enriched} total={after} new={after - before}")
 
     # Hard-fail (red run + failure email) only if we ended up with nothing at all.
     if after == 0:
