@@ -1,0 +1,48 @@
+name: MarketWire poller
+
+# Runs the poller on a schedule so alerts fire even when no one has the app open.
+# Note: GitHub's cron is best-effort (often a few minutes late) and the cached DB
+# can occasionally be evicted (which may re-alert recent items). For strict
+# reliability, run the poller on a small always-on VM instead (see README).
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"   # every 15 minutes (UTC)
+  workflow_dispatch: {}        # allow manual runs
+
+concurrency:
+  group: marketwire-poller
+  cancel-in-progress: false
+
+jobs:
+  poll:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: pip install -r requirements.txt
+
+      # Persist the SQLite DB across runs so 'alerted' dedupe survives.
+      - name: Restore database
+        uses: actions/cache@v4
+        with:
+          path: marketwire.db
+          key: marketwire-db-${{ github.run_id }}
+          restore-keys: marketwire-db-
+
+      - name: Poll feeds and send alerts
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          ALERT_EMAIL_TO: ${{ secrets.ALERT_EMAIL_TO }}
+          ALERT_EMAIL_FROM: ${{ secrets.ALERT_EMAIL_FROM }}
+        run: python poller.py

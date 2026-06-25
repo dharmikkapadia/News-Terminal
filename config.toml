@@ -1,0 +1,14 @@
+# Theme — amber phosphor on ink, to match the MarketWire identity.
+[theme]
+base = "dark"
+primaryColor = "#FFB23E"
+backgroundColor = "#0B0E15"
+secondaryBackgroundColor = "#10141E"
+textColor = "#E7EAF1"
+font = "sans serif"
+
+[server]
+headless = true
+# When deploying on a VM behind your own domain, set these as needed:
+# port = 8501
+# address = "0.0.0.0"
