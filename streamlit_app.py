@@ -158,16 +158,20 @@ def theme_css(p):
 
 st.set_page_config(page_title="MarketWire · RBI", page_icon="◢", layout="wide")
 
-# --- theme selection (persists in the URL so it's shareable / sticky) --------
+# --- theme selection ---------------------------------------------------------
+# Bind the selectbox to session_state via `key` and seed it once from the URL.
+# (Passing index= from the query param fought the widget's own state, so a new
+# pick only applied on the *next* rerun — i.e. you had to click twice.) Reading
+# st.session_state["theme"] means the choice takes effect on the first click.
 names = list(THEMES)
-_qp = st.query_params.get("theme")
-_idx = names.index(_qp) if _qp in names else names.index(DEFAULT_THEME)
+if "theme" not in st.session_state:
+    _qp = st.query_params.get("theme")
+    st.session_state["theme"] = _qp if _qp in names else DEFAULT_THEME
 with st.sidebar:
     st.markdown("### ◢ MarketWire")
-    theme = st.selectbox("Theme", names, index=_idx, help="Data-terminal palettes — all text stays legible in each.")
+    theme = st.selectbox("Theme", names, key="theme", help="Data-terminal palettes — all text stays legible in each.")
     st.caption("Switch the look to suit your screen / lighting.")
-if st.query_params.get("theme") != theme:
-    st.query_params["theme"] = theme
+st.query_params["theme"] = theme  # keep the URL in sync (shareable / sticky)
 st.markdown(theme_css(THEMES[theme]), unsafe_allow_html=True)
 
 # --- header ------------------------------------------------------------------
