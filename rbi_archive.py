@@ -111,6 +111,45 @@ def scrape_listing(url=LISTING_URL, timeout=20):
         return [], f"parse error: {type(ex).__name__}: {ex}"
 
 
+_DATE_LABEL_RE = re.compile(r"Date\s*:\s*([A-Za-z]{3,9}\s+\d{1,2},\s+\d{4})", re.I)
+
+
+def fetch_detail(url, title="", timeout=20):
+    """Fetch one press-release DETAIL page and pull the full body + date.
+
+    RBI puts the release in <div class="text1"> as "... Date : <date> <title> <body>"
+    and exposes only a DATE (no time), so the returned ts is that date at midnight.
+    Returns {"summary","published","ts"} or None. Never raises.
+    """
+    if not _HAVE_BS4:
+        return None
+    try:
+        resp = requests.get(url, headers={"User-Agent": UA}, timeout=timeout)
+        resp.raise_for_status()
+    except Exception:
+        return None
+    try:
+        soup = BeautifulSoup(resp.content, "html.parser")
+        node = soup.find("div", class_="text1")
+        if node is None:
+            return None
+        txt = re.sub(r"\s+", " ", node.get_text(" ", strip=True)).strip()
+        published, ts = "", None
+        m = _DATE_LABEL_RE.search(txt)
+        if m:
+            published = m.group(1)
+            ts, _ = _parse_date(published)
+            txt = txt[m.end():].strip()
+        txt = re.sub(r"^\(\s*\d+\s*kb\s*\)\s*", "", txt)  # drop a leading "( 142 kb )"
+        if title and txt.startswith(title):              # drop a duplicated headline
+            txt = txt[len(title):].strip()
+        if not txt:
+            return None
+        return {"summary": txt[:1500], "published": published, "ts": ts}
+    except Exception:
+        return None
+
+
 if __name__ == "__main__":
     url = sys.argv[1] if len(sys.argv) > 1 else LISTING_URL
     print(f"Scraping {url} …\n")

@@ -246,21 +246,26 @@ def wire():
     )
 
     for it in shown:
-        # Archive-backfilled stubs (from RBI's listing page) carry only a title,
-        # date and link — no body, no time. RSS items always have a summary.
-        archived = not (it.get("summary") or "").strip()
-        fmt = "%d %b %Y" if archived else "%d %b %Y · %H:%M IST"
-        when = datetime.fromtimestamp(it["ts"], IST).strftime(fmt) if it["ts"] else (it["published"] or "—")
-        tag = " <span class='mw-tag'>ARCHIVE</span>" if archived else ""
+        summary = (it.get("summary") or "").strip()
+        is_stub = not summary  # archive stub not yet enriched: title + date + link only
+        ts = it.get("ts")
+        dt = datetime.fromtimestamp(ts, IST) if ts else None
+        if dt and (dt.hour or dt.minute or dt.second):
+            when = dt.strftime("%d %b %Y · %H:%M IST")   # has a real time (live RSS)
+        elif dt:
+            when = dt.strftime("%d %b %Y")               # midnight => date only (RBI's page has no time)
+        else:
+            when = it.get("published") or "—"
+        tag = " <span class='mw-tag'>ARCHIVE</span>" if is_stub else ""
         st.markdown(
             f"**{it['title']}**  \n<span class='mw-time'>{when}</span>{tag}",
             unsafe_allow_html=True,
         )
         with st.expander("details"):
-            if archived:
+            if is_stub:
                 st.caption("Backfilled from RBI's listing — title, date and link only. Full text at the link below.")
             else:
-                st.write(it["summary"])
+                st.write(summary)
             if it["link"].startswith("http"):
                 st.markdown(f"[Open original ↗]({it['link']})")
         st.divider()
