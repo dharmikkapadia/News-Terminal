@@ -1,8 +1,8 @@
 """MarketWire — a minimal RBI press-release reader.
 
-A single-file Streamlit app that fetches the RBI Press Releases RSS feed
-server-side (browsers can't read most RSS directly because of CORS) and shows
-it newest-first. No database, no scheduler — just the wire.
+A small Streamlit app that fetches the RBI Press Releases RSS feed server-side
+(browsers can't read most RSS directly because of CORS), remembers releases in a
+small SQLite store so the wire accumulates over time, and shows them newest-first.
 
 Look & feel: pick a data-terminal theme in the sidebar (Bloomberg, Reuters,
 green/amber phosphor, etc.). Every palette is tuned so all text stays legible.
@@ -22,6 +22,7 @@ import requests
 import streamlit as st
 
 import rbi_archive  # best-effort scraper for older releases (beyond the RSS ~10)
+import store        # SQLite history so the wire accumulates over time
 
 RBI_FEED = "https://rbi.org.in/pressreleases_rss.xml"
 # Override to point at a mirror/cache (or for local testing) without code changes.
@@ -98,12 +99,6 @@ def fetch_feed(url):
         })
     items.sort(key=lambda x: x["ts"] or 0, reverse=True)
     return items, None
-
-
-def _key(it):
-    """Dedupe key: RBI prid if present in the link, else the link itself."""
-    m = re.search(r"prid=(\d+)", it.get("link", ""), re.I)
-    return m.group(1) if m else it.get("link", "")
 
 
 @st.cache_data(ttl=CACHE_TTL, show_spinner=False)
@@ -186,6 +181,7 @@ def theme_css(p):
 
 
 st.set_page_config(page_title="MarketWire · RBI", page_icon="◢", layout="wide")
+store.init_db()
 
 # --- theme selection ---------------------------------------------------------
 # Bind the selectbox to session_state via `key` and seed it once from the URL.
@@ -214,6 +210,7 @@ head, refresh = st.columns([6, 1])
 head.markdown("## ◢ MarketWire — RBI Press Releases")
 if refresh.button("⟳ Refresh", use_container_width=True):
     fetch_feed.clear()
+    fetch_archive.clear()
     st.rerun()
 
 @st.fragment(run_every=REFRESH_SECONDS)
@@ -222,44 +219,43 @@ def wire():
     REFRESH_SECONDS with no clicks — only this part of the page, so the theme and
     header stay put. fetch_feed is cached just under the interval, so each tick
     pulls fresh data. (st.stop() can't be used in a fragment, so we return.)"""
-    items, error = fetch_feed(FEED_URL)
-    if error:
-        st.error(f"Couldn't fetch the feed: {error}")
-        st.caption(
-            "Government sites sometimes block datacenter IPs (e.g. Streamlit Cloud). "
-            "Try Refresh, or run it locally where the feed is reachable."
-        )
-        return
+    rss_items, error = fetch_feed(FEED_URL)
+    archive_on = st.session_state.get("archive", True)
+    arch_items, arch_err = fetch_archive(ARCHIVE_URLS) if archive_on else ([], None)
+
+    # Persist everything we just fetched (deduped by prid in the store), then read
+    # back the full accumulated history. This is what makes the wire grow over time
+    # and keep working even when a live fetch fails.
+    new_count = store.upsert((rss_items or []) + (arch_items or []))
+    items = store.load(limit=1000)
+
     if not items:
-        st.info("The feed returned no items.")
+        if error:
+            st.error(f"Couldn't fetch the feed: {error}")
+            st.caption(
+                "Government sites sometimes block datacenter IPs (e.g. Streamlit Cloud). "
+                "Try Refresh, or run it locally where the feed is reachable."
+            )
+        else:
+            st.info("No press releases stored yet — try ⟳ Refresh.")
         return
 
-    # Optionally merge in older releases scraped from RBI's listing page (deduped
-    # by prid). Isolated + non-fatal: if it's blocked/unavailable, show RSS only.
-    note = ""
-    if st.session_state.get("archive", True):
-        arch_items, arch_err = fetch_archive(ARCHIVE_URLS)
-        if arch_err and not arch_items:
-            note = " · archive unavailable"
-        else:
-            keys = {_key(it) for it in items}
-            added = 0
-            for a in arch_items:
-                k = _key(a)
-                if k not in keys:
-                    keys.add(k)
-                    items.append(a)
-                    added += 1
-            items.sort(key=lambda x: x["ts"] or 0, reverse=True)
-            note = f" · +{added} older from archive" if added else " · archive: no older items"
+    bits = []
+    if new_count:
+        bits.append(f"{new_count} new this fetch")
+    if error:
+        bits.append("live feed unreachable — showing stored")
+    elif archive_on and arch_err and not arch_items:
+        bits.append("archive unavailable")
+    note = (" · " + " · ".join(bits)) if bits else ""
 
     q = st.text_input("Filter", placeholder="filter by keyword…", label_visibility="collapsed")
-    shown = [it for it in items if q.lower() in (it["title"] + " " + it["summary"]).lower()] if q.strip() else items
+    shown = [it for it in items if q.lower() in (it["title"] + " " + (it["summary"] or "")).lower()] if q.strip() else items
     mins = REFRESH_SECONDS // 60
     every = f"{mins} min" if mins else f"{REFRESH_SECONDS}s"
     checked = datetime.now(IST).strftime("%H:%M:%S")
     st.caption(
-        f"{len(shown)} of {len(items)} press releases · newest first{note} · "
+        f"{len(shown)} of {len(items)} stored press releases · newest first{note} · "
         f"auto-refresh every {every} · last checked {checked} IST"
     )
 

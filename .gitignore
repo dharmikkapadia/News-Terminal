@@ -6,3 +6,8 @@ venv/
 
 # Streamlit secrets (never commit real secrets)
 .streamlit/secrets.toml
+
+# SQLite history store (runtime data, path via MARKETWIRE_DB)
+*.db
+*.db-wal
+*.db-shm
