@@ -148,6 +148,11 @@ def theme_css(p):
       li[role="option"]:hover,
       [role="option"][aria-selected="true"] {{ background-color: {p['border']} !important; color: {p['accent']} !important; }}
 
+      /* help (?) tooltips — also portaled outside .stApp; without this the popup
+         is dark-on-dark on light themes. Force theme bg + text on the content. */
+      [data-testid="stTooltipContent"] {{ background-color: {p['panel']} !important; border: 1px solid {p['border']} !important; }}
+      [data-testid="stTooltipContent"], [data-testid="stTooltipContent"] * {{ color: {p['text']} !important; }}
+
       /* buttons */
       .stButton > button {{ background-color: {p['panel']}; color: {p['text']}; border: 1px solid {p['border']}; }}
       .stButton > button:hover {{ color: {p['accent']}; border-color: {p['accent']}; }}
