@@ -1,5 +1,7 @@
 # ◢ MarketWire
 
+[![MarketWire history](https://github.com/dharmikkapadia/News-Terminal/actions/workflows/history.yml/badge.svg)](https://github.com/dharmikkapadia/News-Terminal/actions/workflows/history.yml)
+
 A minimal Streamlit reader for **RBI Press Releases**. It fetches the feed
 server-side (browsers can't read most RSS directly — CORS), strips the HTML,
 **remembers releases in a small SQLite store so the wire accumulates over time**,
