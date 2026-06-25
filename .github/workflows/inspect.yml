@@ -18,5 +18,6 @@ jobs:
       - run: pip install requests beautifulsoup4
       - run: |
           python inspect_detail.py \
-            "https://www.rbi.org.in/scripts/BS_PressReleaseDisplay.aspx?prid=63023" \
-            "https://www.rbi.org.in/scripts/BS_PressReleaseDisplay.aspx?prid=63021"
+            "https://www.rbi.org.in/Scripts/BS_PressReleaseDisplay.aspx" \
+            "https://www.rbi.org.in/scripts/BS_ViewBulletin.aspx" \
+            "https://www.rbi.org.in/Scripts/BS_PressReleaseDisplay.aspx?fromdate=06/01/2026&todate=06/25/2026"
