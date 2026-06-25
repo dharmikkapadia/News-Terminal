@@ -49,7 +49,7 @@ def main():
     # full text for, capped per run to bound requests. RBI's detail page exposes no
     # time, so enriched items keep a date-only (midnight) timestamp.
     have_full = {history._key(it) for it in existing + rss if (it.get("summary") or "").strip()}
-    cap = int(os.environ.get("MARKETWIRE_ENRICH_LIMIT", "30"))
+    cap = int(os.environ.get("MARKETWIRE_ENRICH_LIMIT", "120"))
     enriched = 0
     for a in arch:
         if enriched >= cap:
