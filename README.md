@@ -16,7 +16,28 @@ even if a live fetch fails**. The DB path is the `MARKETWIRE_DB` env var (defaul
 ⚠️ **Streamlit Cloud caveat:** Community Cloud storage is **ephemeral** — a sqlite
 file accumulates while the app is awake but **resets when it sleeps / redeploys**.
 On an always-on **VM**, a plain sqlite path is already durable. For durable history
-**on Cloud**, point `MARKETWIRE_DB` at a hosted Postgres or Turso DB (below).
+**on Cloud with no external database**, use the in-repo history below; or point
+`MARKETWIRE_DB` at a hosted Postgres / Turso DB (further below).
+
+### Durable history in the repo (GitHub Action, no external DB)
+
+History can live **in this repo** instead of an external database. A scheduled
+GitHub Action (`.github/workflows/history.yml`) runs the poller, which fetches RBI
+and writes **`data/history.jsonl`** (deduped by `prid`, JSON-lines so each update is
+a small git diff), then commits it. The app reads that committed file and merges it
+with the live feed — so history survives Streamlit Cloud restarts with no DB.
+
+- The Action runs every ~3 hours (and on demand via **Actions → Run workflow**);
+  tune the `cron` in the workflow. It only commits when something changed.
+- Run it yourself anytime: `python poll.py` (writes `data/history.jsonl`).
+- **Trade-offs:** history grows at the Action's cadence (not instant — the *live*
+  view is still real-time); and because each commit updates the tracked branch,
+  Streamlit Cloud briefly **redeploys** when history changes. (A no-redeploy variant
+  — commit to a side branch + read via a raw URL with `MARKETWIRE_HISTORY_URL` — is
+  easy to switch to if the restarts bother you.)
+- One unknown until the first run: RBI must answer GitHub's runner IPs (gov sites
+  sometimes block datacenter IPs). If it 403s there, run the poller from your own
+  machine / a self-hosted runner instead.
 
 ### Durable history: Postgres or Turso
 
