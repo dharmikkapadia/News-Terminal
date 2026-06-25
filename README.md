@@ -157,11 +157,31 @@ Or, with plain cron instead of systemd:
 
 ### Option B — Streamlit Community Cloud  *(fastest to share; good for a trial)*
 
-Push this folder to GitHub, deploy at share.streamlit.io, and add your alert keys
-under the app's **Secrets**. Caveat: Community Cloud storage is **ephemeral** and
-apps **sleep when idle** — so the SQLite history resets on restart and scheduled
-alerting isn't reliable there. Pair it with Option C (or a hosted DB like Turso /
-Postgres) if you need durability.
+1. Push this repo to GitHub (already done if you're reading this there).
+2. Go to [share.streamlit.io](https://share.streamlit.io) → **Create app** → **Deploy
+   from GitHub**, sign in with GitHub, and authorize the repo.
+3. Set:
+   - **Repository:** your fork/repo
+   - **Branch:** the branch you want to serve (e.g. `main`)
+   - **Main file path:** `app.py`
+   - **Python version** (Advanced): 3.11 or 3.12
+4. *(Optional)* Open **Advanced settings → Secrets** and paste the keys you want,
+   in TOML (the format mirrors [`.streamlit/secrets.toml.example`](.streamlit/secrets.toml.example)):
+   ```toml
+   MARKETWIRE_ALERT_SCORE = "9"
+   # SLACK_WEBHOOK_URL = "https://hooks.slack.com/services/…"
+   ```
+   `app.py` mirrors these into the environment at startup, so the same keys work
+   here and on a VM. Click **Deploy**. First build installs `requirements.txt`
+   (~1–2 min); then hit **⟳ Fetch now** in the sidebar to populate the wire.
+
+**Caveats (by design on the free tier):** Community Cloud storage is **ephemeral**
+and the app **sleeps when idle** — so the SQLite history resets on restart and
+*alerting does not run* (there's no always-on poller). It's great for a shared
+read-only trial. For persistent history + reliable alerts, pair with Option C
+(GitHub Actions poller) or a hosted DB (Turso / Postgres), or use Option A.
+Also note these gov/exchange feeds often **403 from datacenter IPs** — some feeds
+that work from your desk may show errors in the **Sources** tab on Cloud.
 
 ### Option C — GitHub Actions poller (no VM)
 
