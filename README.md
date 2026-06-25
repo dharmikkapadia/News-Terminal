@@ -80,11 +80,18 @@ Open **`feeds.py`** and add a line to `FEEDS`:
 `weight` nudges priority; `enabled` toggles it. Restart the app to pick up changes.
 
 **About the shipped sources:** RBI Press Releases is confirmed working. SEBI, PIB,
-NSE, MCA, and the news feeds are standard public endpoints, but government and
+and the news feeds are standard public endpoints, but government and
 exchange sites occasionally change paths or block datacenter IPs. If one shows an
 error in the **Sources** tab, that's expected — fix the URL or set `enabled: False`.
 A failing feed never breaks the rest. (NSE in particular usually rejects
-non-browser clients; leave it off unless you have a working endpoint.)
+non-browser clients; leave it off unless you have a working endpoint. MCA ships
+only an RSS *landing page*, not a direct `.xml`, so it's off by default.)
+
+**Checking URLs without the UI:** run `python verify_feeds.py` to probe every feed
+(enabled *and* disabled) and print a status table — no DB writes, no alerts. Run it
+from your desk or the VM: these sites 403 datacenter IPs, so a cloud/CI runner will
+report everything down, RBI included. `--enabled` limits it to enabled feeds and
+exits non-zero if any fail.
 
 ---
 
@@ -150,11 +157,31 @@ Or, with plain cron instead of systemd:
 
 ### Option B — Streamlit Community Cloud  *(fastest to share; good for a trial)*
 
-Push this folder to GitHub, deploy at share.streamlit.io, and add your alert keys
-under the app's **Secrets**. Caveat: Community Cloud storage is **ephemeral** and
-apps **sleep when idle** — so the SQLite history resets on restart and scheduled
-alerting isn't reliable there. Pair it with Option C (or a hosted DB like Turso /
-Postgres) if you need durability.
+1. Push this repo to GitHub (already done if you're reading this there).
+2. Go to [share.streamlit.io](https://share.streamlit.io) → **Create app** → **Deploy
+   from GitHub**, sign in with GitHub, and authorize the repo.
+3. Set:
+   - **Repository:** your fork/repo
+   - **Branch:** the branch you want to serve (e.g. `main`)
+   - **Main file path:** `app.py`
+   - **Python version** (Advanced): 3.11 or 3.12
+4. *(Optional)* Open **Advanced settings → Secrets** and paste the keys you want,
+   in TOML (the format mirrors [`.streamlit/secrets.toml.example`](.streamlit/secrets.toml.example)):
+   ```toml
+   MARKETWIRE_ALERT_SCORE = "9"
+   # SLACK_WEBHOOK_URL = "https://hooks.slack.com/services/…"
+   ```
+   `app.py` mirrors these into the environment at startup, so the same keys work
+   here and on a VM. Click **Deploy**. First build installs `requirements.txt`
+   (~1–2 min); then hit **⟳ Fetch now** in the sidebar to populate the wire.
+
+**Caveats (by design on the free tier):** Community Cloud storage is **ephemeral**
+and the app **sleeps when idle** — so the SQLite history resets on restart and
+*alerting does not run* (there's no always-on poller). It's great for a shared
+read-only trial. For persistent history + reliable alerts, pair with Option C
+(GitHub Actions poller) or a hosted DB (Turso / Postgres), or use Option A.
+Also note these gov/exchange feeds often **403 from datacenter IPs** — some feeds
+that work from your desk may show errors in the **Sources** tab on Cloud.
 
 ### Option C — GitHub Actions poller (no VM)
 

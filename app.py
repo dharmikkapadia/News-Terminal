@@ -7,10 +7,22 @@ watchlist, and one-click export. Run with:  streamlit run app.py
 
 import io
 import csv
+import os
 import time
 from datetime import date, datetime, timedelta
 
 import streamlit as st
+
+# On Streamlit Community Cloud, configuration lives in st.secrets, not the process
+# environment. Mirror it into os.environ *before* importing core — which reads
+# MARKETWIRE_DB / MARKETWIRE_ALERT_SCORE at import time — so the same keys work
+# whether they come from env vars (VM / GitHub Actions) or Secrets (Cloud).
+try:
+    for _k, _v in st.secrets.items():
+        if isinstance(_v, str):
+            os.environ.setdefault(_k, _v)
+except Exception:
+    pass  # no secrets configured (e.g. a plain local run) — that's fine
 
 import core
 from core import (

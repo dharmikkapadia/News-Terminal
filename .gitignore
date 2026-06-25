@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# MarketWire runtime data (path set via MARKETWIRE_DB; not source)
+marketwire.db
+*.db
+*.db-journal
+*.db-wal
+
+# Secrets (commit secrets.toml.example, never the real one)
+.streamlit/secrets.toml
+alerts.env
+.env
