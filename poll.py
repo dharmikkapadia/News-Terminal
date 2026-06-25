@@ -33,13 +33,16 @@ def main():
         _annotate("warning", "RBI fetch failed", err)
 
     arch = []
-    archive_urls = [u.strip() for u in
-                    os.environ.get("MARKETWIRE_ARCHIVE_URLS", rbi_archive.LISTING_URL).split(",") if u.strip()]
+    # Note: an unset GitHub repo variable injects an EMPTY env var, so use `or`
+    # (not the get() default) to fall back to the listing URL.
+    archive_env = os.environ.get("MARKETWIRE_ARCHIVE_URLS", "").strip() or rbi_archive.LISTING_URL
+    archive_urls = [u.strip() for u in archive_env.split(",") if u.strip()]
     for url in archive_urls:
         got, aerr = rbi_archive.scrape_listing(url)
         if aerr:
             _annotate("warning", "Archive fetch failed", f"{url}: {aerr}")
         arch += got
+    raw_archive = len(arch)
 
     # Enrich archive stubs (the listing has title+date+link only) with the full
     # body from each release's detail page — only for items we don't already have
@@ -62,12 +65,13 @@ def main():
                 a["published"] = det["published"]
             enriched += 1
 
+    arch = [a for a in arch if (a.get("summary") or "").strip()]  # store only full (enriched) archive items
     before = len(existing)
     merged = history.dedupe(existing + rss + arch)
     history.save_file(merged)
     after = len(merged)
-    print(f"[poll] existing={before} rss={len(rss)} archive={len(arch)} "
-          f"enriched={enriched} total={after} new={after - before}")
+    print(f"[poll] existing={before} rss={len(rss)} archive={raw_archive} "
+          f"enriched={enriched} stored_archive={len(arch)} total={after} new={after - before}")
 
     # Hard-fail (red run + failure email) only if we ended up with nothing at all.
     if after == 0:
