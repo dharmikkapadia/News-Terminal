@@ -39,9 +39,8 @@ REFRESH_SECONDS = int(os.environ.get("MARKETWIRE_REFRESH", "300"))
 CACHE_TTL = max(REFRESH_SECONDS - 30, 15)  # just under the interval so each tick re-fetches
 # Archive listing URL(s) to backfill history (comma-separated). Add month/year
 # archive URLs here once you've confirmed RBI's pattern from a reachable machine.
-ARCHIVE_URLS = tuple(
-    u.strip() for u in os.environ.get("MARKETWIRE_ARCHIVE_URLS", rbi_archive.LISTING_URL).split(",") if u.strip()
-)
+_archive_env = os.environ.get("MARKETWIRE_ARCHIVE_URLS", "").strip() or rbi_archive.LISTING_URL
+ARCHIVE_URLS = tuple(u.strip() for u in _archive_env.split(",") if u.strip())
 
 # --------------------------------------------------------------------------- #
 # Themes — data-terminal palettes. Each key is tuned for contrast so that ALL
