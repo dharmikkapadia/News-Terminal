@@ -1,0 +1,22 @@
+name: inspect-detail (temporary)
+
+# TEMPORARY diagnostic: dumps an RBI detail page's structure so we can write the
+# body/date parser. Manual trigger only. Delete this file + inspect_detail.py
+# once the parser is in place.
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install requests beautifulsoup4
+      - run: |
+          python inspect_detail.py \
+            "https://www.rbi.org.in/scripts/BS_PressReleaseDisplay.aspx?prid=63023" \
+            "https://www.rbi.org.in/scripts/BS_PressReleaseDisplay.aspx?prid=63021"
