@@ -28,7 +28,6 @@ except Exception:
 
 import feed         # pure RSS fetch/parse (shared with the poller)
 import history      # durable history kept as JSONL in the repo (maintained by the Action)
-import rbi_archive  # best-effort scraper for older releases (beyond the RSS ~10)
 import store        # durable history backend (sqlite / Postgres / Turso)
 
 # Override to point at a mirror/cache (or for local testing) without code changes.
@@ -37,10 +36,15 @@ IST = timezone(timedelta(hours=5, minutes=30))
 # The wire re-runs itself on this interval (seconds) with no clicks; override via env.
 REFRESH_SECONDS = int(os.environ.get("MARKETWIRE_REFRESH", "300"))
 CACHE_TTL = max(REFRESH_SECONDS - 30, 15)  # just under the interval so each tick re-fetches
-# Archive listing URL(s) to backfill history (comma-separated). Add month/year
-# archive URLs here once you've confirmed RBI's pattern from a reachable machine.
-_archive_env = os.environ.get("MARKETWIRE_ARCHIVE_URLS", "").strip() or rbi_archive.LISTING_URL
-ARCHIVE_URLS = tuple(u.strip() for u in _archive_env.split(",") if u.strip())
+
+
+def _is_archived(it):
+    """Archive-sourced (date-only, no precise time) iff its ts is midnight IST."""
+    ts = it.get("ts")
+    if not ts:
+        return False
+    dt = datetime.fromtimestamp(ts, IST)
+    return not (dt.hour or dt.minute or dt.second)
 
 # --------------------------------------------------------------------------- #
 # Themes — data-terminal palettes. Each key is tuned for contrast so that ALL
@@ -78,19 +82,6 @@ def load_history():
     """Durable history from the repo: the committed JSONL, or a raw URL via
     MARKETWIRE_HISTORY_URL. Cached; the Refresh button clears it."""
     return history.load_durable()
-
-
-@st.cache_data(ttl=CACHE_TTL, show_spinner=False)
-def fetch_archive(urls):
-    """Scrape RBI's listing page(s) for older releases. Returns (items, error).
-    Isolated: any failure yields ([], error) so the RSS view still works."""
-    all_items, errors = [], []
-    for u in urls:
-        got, err = rbi_archive.scrape_listing(u)
-        all_items.extend(got)
-        if err:
-            errors.append(err)
-    return all_items, ("; ".join(errors) if errors and not all_items else None)
 
 
 def theme_css(p):
@@ -187,9 +178,9 @@ with st.sidebar:
     st.caption("Switch the look to suit your screen / lighting.")
     st.divider()
     st.checkbox(
-        "Include archive (beyond latest 10)", value=True, key="archive",
-        help="Also scrape RBI's press-release listing for older items. Works where "
-             "RBI is reachable (your desk / VM); often blocked on Streamlit Cloud.",
+        "Show archive (older, date-only)", value=True, key="archive",
+        help="Show older releases backfilled from RBI's listing — full text, but date "
+             "only (RBI's pages don't expose a publish time). Off = live RSS items only.",
     )
 st.query_params["theme"] = theme  # keep the URL in sync (shareable / sticky)
 st.markdown(theme_css(THEMES[theme]), unsafe_allow_html=True)
@@ -199,7 +190,6 @@ head, refresh = st.columns([6, 1])
 head.markdown("## ◢ MarketWire — RBI Press Releases")
 if refresh.button("⟳ Refresh", use_container_width=True):
     fetch_feed.clear()
-    fetch_archive.clear()
     load_history.clear()
     st.rerun()
 
@@ -210,14 +200,13 @@ def wire():
     header stay put. fetch_feed is cached just under the interval, so each tick
     pulls fresh data. (st.stop() can't be used in a fragment, so we return.)"""
     rss_items, error = fetch_feed(FEED_URL)
-    archive_on = st.session_state.get("archive", True)
-    arch_items, arch_err = fetch_archive(ARCHIVE_URLS) if archive_on else ([], None)
-
-    fetched = (rss_items or []) + (arch_items or [])
-    new_count = store.upsert(fetched)  # accumulate in the DB (sqlite / Postgres / Turso)
-    # Merge every durable source + the live fetch, deduped by prid: the DB store,
-    # the repo's committed history (maintained by the GitHub Action), and live items.
-    items = history.dedupe(store.load(limit=5000) + load_history() + fetched)
+    new_count = store.upsert(rss_items or [])  # accumulate live RSS in the DB
+    # Merge durable sources + the live RSS, deduped by prid. Archive items (older,
+    # date-only, full body) come pre-enriched from the repo history the Action
+    # maintains — the app no longer scrapes the listing live (that only made stubs).
+    items = history.dedupe(store.load(limit=5000) + load_history() + (rss_items or []))
+    if not st.session_state.get("archive", True):
+        items = [it for it in items if not _is_archived(it)]
 
     if not items:
         if error:
@@ -235,8 +224,6 @@ def wire():
         bits.append(f"{new_count} new this fetch")
     if error:
         bits.append("live feed unreachable — showing stored")
-    elif archive_on and arch_err and not arch_items:
-        bits.append("archive unavailable")
     note = (" · " + " · ".join(bits)) if bits else ""
 
     q = st.text_input("Filter", placeholder="filter by keyword…", label_visibility="collapsed")
@@ -251,25 +238,22 @@ def wire():
 
     for it in shown:
         summary = (it.get("summary") or "").strip()
-        is_stub = not summary  # archive stub not yet enriched: title + date + link only
         ts = it.get("ts")
         dt = datetime.fromtimestamp(ts, IST) if ts else None
-        if dt and (dt.hour or dt.minute or dt.second):
-            when = dt.strftime("%d %b %Y · %H:%M IST")   # has a real time (live RSS)
+        archived = dt is not None and not (dt.hour or dt.minute or dt.second)
+        if dt and not archived:
+            when = dt.strftime("%d %b %Y · %H:%M IST")   # real time (live RSS)
         elif dt:
-            when = dt.strftime("%d %b %Y")               # midnight => date only (RBI's page has no time)
+            when = dt.strftime("%d %b %Y")               # date only (archive — RBI's page has no time)
         else:
             when = it.get("published") or "—"
-        tag = " <span class='mw-tag'>ARCHIVE</span>" if is_stub else ""
+        tag = " <span class='mw-tag'>ARCHIVE</span>" if archived else ""
         st.markdown(
             f"**{it['title']}**  \n<span class='mw-time'>{when}</span>{tag}",
             unsafe_allow_html=True,
         )
         with st.expander("details"):
-            if is_stub:
-                st.caption("Backfilled from RBI's listing — title, date and link only. Full text at the link below.")
-            else:
-                st.write(summary)
+            st.write(summary or "(full text at the link below)")
             if it["link"].startswith("http"):
                 st.markdown(f"[Open original ↗]({it['link']})")
         st.divider()
