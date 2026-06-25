@@ -118,6 +118,11 @@ def theme_css(p):
         color: {p['muted']}; font-family: ui-monospace, Menlo, Consolas, monospace;
         font-size: 12px; letter-spacing: .02em;
       }}
+      [data-testid="stMarkdownContainer"] .mw-tag {{
+        font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 10px;
+        letter-spacing: .08em; color: {p['muted']}; border: 1px solid {p['border']};
+        border-radius: 3px; padding: 0 4px; margin-left: 8px; vertical-align: 1px;
+      }}
 
       /* links */
       .stApp a, [data-testid="stMarkdownContainer"] a {{ color: {p['link']} !important; text-decoration: none; }}
@@ -241,16 +246,21 @@ def wire():
     )
 
     for it in shown:
-        when = (
-            datetime.fromtimestamp(it["ts"], IST).strftime("%d %b %Y · %H:%M IST")
-            if it["ts"] else (it["published"] or "—")
-        )
+        # Archive-backfilled stubs (from RBI's listing page) carry only a title,
+        # date and link — no body, no time. RSS items always have a summary.
+        archived = not (it.get("summary") or "").strip()
+        fmt = "%d %b %Y" if archived else "%d %b %Y · %H:%M IST"
+        when = datetime.fromtimestamp(it["ts"], IST).strftime(fmt) if it["ts"] else (it["published"] or "—")
+        tag = " <span class='mw-tag'>ARCHIVE</span>" if archived else ""
         st.markdown(
-            f"**{it['title']}**  \n<span class='mw-time'>{when}</span>",
+            f"**{it['title']}**  \n<span class='mw-time'>{when}</span>{tag}",
             unsafe_allow_html=True,
         )
         with st.expander("details"):
-            st.write(it["summary"] or "(no summary in feed)")
+            if archived:
+                st.caption("Backfilled from RBI's listing — title, date and link only. Full text at the link below.")
+            else:
+                st.write(it["summary"])
             if it["link"].startswith("http"):
                 st.markdown(f"[Open original ↗]({it['link']})")
         st.divider()
