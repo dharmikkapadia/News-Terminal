@@ -1,0 +1,128 @@
+#!/usr/bin/env python3
+"""rbi_archive.py — best-effort scraper for RBI's Press Releases *listing* page,
+to backfill releases beyond the ~10 the RSS feed exposes.
+
+WHY "best-effort": it parses HTML from rbi.org.in, whose markup can change and
+which blocks datacenter IPs. It was written WITHOUT live access to the site, so
+VALIDATE IT FROM A MACHINE THAT CAN REACH RBI (your desk / VM):
+
+    python rbi_archive.py                  # scrape the default listing, print rows
+    python rbi_archive.py "<listing-url>"  # try an archive / month URL
+
+It returns items in the same shape as the RSS reader (title, link, summary,
+published, ts), so the app can merge them with the feed (deduped by prid/link).
+On any failure it returns (items=[], error=str) and NEVER raises, so the app
+keeps working on the RSS feed alone.
+
+Heuristics (resilient to class/layout changes):
+  - a press release is any <a> whose href contains "prid=" (the detail page);
+  - its title is the link text; its date is the first date found by walking a
+    few ancestors (handles both per-row dates and date-grouped sections).
+"""
+
+import calendar
+import re
+import sys
+from datetime import datetime, timezone, timedelta
+
+import requests
+
+try:
+    from bs4 import BeautifulSoup
+    _HAVE_BS4 = True
+except Exception:
+    _HAVE_BS4 = False
+
+LISTING_URL = "https://www.rbi.org.in/Scripts/BS_PressReleaseDisplay.aspx"
+UA = "Mozilla/5.0 (compatible; MarketWire/1.0; RSS reader)"
+IST = timezone(timedelta(hours=5, minutes=30))
+
+# Dates as RBI tends to show them, most specific first.
+_DATE_PATTERNS = [
+    ("%b %d, %Y", re.compile(r"[A-Z][a-z]{2}\s+\d{1,2},\s+\d{4}")),
+    ("%B %d, %Y", re.compile(r"[A-Z][a-z]+\s+\d{1,2},\s+\d{4}")),
+    ("%d %b %Y",  re.compile(r"\d{1,2}\s+[A-Z][a-z]{2}\s+\d{4}")),
+    ("%d %B %Y",  re.compile(r"\d{1,2}\s+[A-Z][a-z]+\s+\d{4}")),
+    ("%d-%m-%Y",  re.compile(r"\d{1,2}-\d{1,2}-\d{4}")),
+    ("%d/%m/%Y",  re.compile(r"\d{1,2}/\d{1,2}/\d{4}")),
+]
+
+
+def _parse_date(text):
+    """Return (epoch_ts, matched_string) for the first date found, else (None, '')."""
+    for fmt, rx in _DATE_PATTERNS:
+        m = rx.search(text or "")
+        if m:
+            try:
+                dt = datetime.strptime(m.group(0), fmt).replace(tzinfo=IST)
+                return calendar.timegm(dt.utctimetuple()), m.group(0)
+            except ValueError:
+                continue
+    return None, ""
+
+
+def _prid(link):
+    m = re.search(r"prid=(\d+)", link, re.I)
+    return m.group(1) if m else None
+
+
+def scrape_listing(url=LISTING_URL, timeout=20):
+    """Return (items, error). Never raises."""
+    if not _HAVE_BS4:
+        return [], "beautifulsoup4 not installed (pip install beautifulsoup4)"
+    try:
+        resp = requests.get(url, headers={"User-Agent": UA}, timeout=timeout)
+        resp.raise_for_status()
+    except Exception as ex:
+        return [], f"{type(ex).__name__}: {ex}"
+
+    try:
+        soup = BeautifulSoup(resp.content, "html.parser")
+        items, seen = [], set()
+        for a in soup.find_all("a", href=True):
+            if "prid=" not in a["href"].lower():
+                continue
+            title = " ".join(a.get_text(" ", strip=True).split())
+            if not title:
+                continue
+            link = requests.compat.urljoin(url, a["href"])
+            key = _prid(link) or link
+            if key in seen:
+                continue
+            seen.add(key)
+            ts, raw = None, ""
+            node = a
+            for _ in range(4):  # climb ancestors looking for a nearby date
+                node = node.parent
+                if node is None:
+                    break
+                # Drop the title text first, so a date inside the headline
+                # (e.g. "Money Market Operations as on July 02") isn't mistaken
+                # for the publication date in the adjacent cell.
+                ctx = node.get_text(" ", strip=True).replace(title, " ", 1)
+                ts, raw = _parse_date(ctx)
+                if ts:
+                    break
+            items.append({"title": title, "link": link, "summary": "",
+                          "published": raw, "ts": ts})
+        items.sort(key=lambda x: x["ts"] or 0, reverse=True)
+        return items, None
+    except Exception as ex:
+        return [], f"parse error: {type(ex).__name__}: {ex}"
+
+
+if __name__ == "__main__":
+    url = sys.argv[1] if len(sys.argv) > 1 else LISTING_URL
+    print(f"Scraping {url} …\n")
+    items, error = scrape_listing(url)
+    if error:
+        print("ERROR:", error)
+        sys.exit(1)
+    for it in items[:50]:
+        print(f"  {(it['published'] or '(no date)'):>18}  {it['title'][:80]}")
+        print(f"  {'':18}  {it['link']}")
+    dated = sum(1 for i in items if i["ts"])
+    print(f"\n{len(items)} press-release links found; {dated} with a parsed date.")
+    if not items:
+        print("Nothing parsed — the page structure may differ. Share a snippet "
+              "of the listing HTML and the parser can be tuned.")

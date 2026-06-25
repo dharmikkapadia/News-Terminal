@@ -21,6 +21,8 @@ import feedparser
 import requests
 import streamlit as st
 
+import rbi_archive  # best-effort scraper for older releases (beyond the RSS ~10)
+
 RBI_FEED = "https://rbi.org.in/pressreleases_rss.xml"
 # Override to point at a mirror/cache (or for local testing) without code changes.
 FEED_URL = os.environ.get("MARKETWIRE_FEED", RBI_FEED)
@@ -29,6 +31,11 @@ IST = timezone(timedelta(hours=5, minutes=30))
 # The wire re-runs itself on this interval (seconds) with no clicks; override via env.
 REFRESH_SECONDS = int(os.environ.get("MARKETWIRE_REFRESH", "300"))
 CACHE_TTL = max(REFRESH_SECONDS - 30, 15)  # just under the interval so each tick re-fetches
+# Archive listing URL(s) to backfill history (comma-separated). Add month/year
+# archive URLs here once you've confirmed RBI's pattern from a reachable machine.
+ARCHIVE_URLS = tuple(
+    u.strip() for u in os.environ.get("MARKETWIRE_ARCHIVE_URLS", rbi_archive.LISTING_URL).split(",") if u.strip()
+)
 
 # --------------------------------------------------------------------------- #
 # Themes — data-terminal palettes. Each key is tuned for contrast so that ALL
@@ -91,6 +98,25 @@ def fetch_feed(url):
         })
     items.sort(key=lambda x: x["ts"] or 0, reverse=True)
     return items, None
+
+
+def _key(it):
+    """Dedupe key: RBI prid if present in the link, else the link itself."""
+    m = re.search(r"prid=(\d+)", it.get("link", ""), re.I)
+    return m.group(1) if m else it.get("link", "")
+
+
+@st.cache_data(ttl=CACHE_TTL, show_spinner=False)
+def fetch_archive(urls):
+    """Scrape RBI's listing page(s) for older releases. Returns (items, error).
+    Isolated: any failure yields ([], error) so the RSS view still works."""
+    all_items, errors = [], []
+    for u in urls:
+        got, err = rbi_archive.scrape_listing(u)
+        all_items.extend(got)
+        if err:
+            errors.append(err)
+    return all_items, ("; ".join(errors) if errors and not all_items else None)
 
 
 def theme_css(p):
@@ -174,6 +200,12 @@ with st.sidebar:
     st.markdown("### ◢ MarketWire")
     theme = st.selectbox("Theme", names, key="theme", help="Data-terminal palettes — all text stays legible in each.")
     st.caption("Switch the look to suit your screen / lighting.")
+    st.divider()
+    st.checkbox(
+        "Include archive (beyond latest 10)", value=True, key="archive",
+        help="Also scrape RBI's press-release listing for older items. Works where "
+             "RBI is reachable (your desk / VM); often blocked on Streamlit Cloud.",
+    )
 st.query_params["theme"] = theme  # keep the URL in sync (shareable / sticky)
 st.markdown(theme_css(THEMES[theme]), unsafe_allow_html=True)
 
@@ -202,13 +234,32 @@ def wire():
         st.info("The feed returned no items.")
         return
 
+    # Optionally merge in older releases scraped from RBI's listing page (deduped
+    # by prid). Isolated + non-fatal: if it's blocked/unavailable, show RSS only.
+    note = ""
+    if st.session_state.get("archive", True):
+        arch_items, arch_err = fetch_archive(ARCHIVE_URLS)
+        if arch_err and not arch_items:
+            note = " · archive unavailable"
+        else:
+            keys = {_key(it) for it in items}
+            added = 0
+            for a in arch_items:
+                k = _key(a)
+                if k not in keys:
+                    keys.add(k)
+                    items.append(a)
+                    added += 1
+            items.sort(key=lambda x: x["ts"] or 0, reverse=True)
+            note = f" · +{added} older from archive" if added else " · archive: no older items"
+
     q = st.text_input("Filter", placeholder="filter by keyword…", label_visibility="collapsed")
     shown = [it for it in items if q.lower() in (it["title"] + " " + it["summary"]).lower()] if q.strip() else items
     mins = REFRESH_SECONDS // 60
     every = f"{mins} min" if mins else f"{REFRESH_SECONDS}s"
     checked = datetime.now(IST).strftime("%H:%M:%S")
     st.caption(
-        f"{len(shown)} of {len(items)} press releases · newest first · "
+        f"{len(shown)} of {len(items)} press releases · newest first{note} · "
         f"auto-refresh every {every} · last checked {checked} IST"
     )
 
