@@ -127,11 +127,18 @@ def theme_css(p):
       .stTextInput input::placeholder {{ color: {p['muted']} !important; -webkit-text-fill-color: {p['muted']}; opacity: 1; }}
       [data-testid="InputInstructions"] {{ color: {p['muted']} !important; }}
 
-      /* selectbox (closed control + open menu) */
-      [data-baseweb="select"] > div {{ background-color: {p['panel']}; border-color: {p['border']}; color: {p['text']}; }}
-      [data-baseweb="select"] div {{ color: {p['text']}; }}
-      [data-baseweb="popover"] [role="listbox"] {{ background-color: {p['panel']}; }}
-      [role="option"] {{ color: {p['text']}; }}
+      /* selectbox — closed control */
+      [data-baseweb="select"] > div {{ background-color: {p['panel']} !important; border-color: {p['border']} !important; }}
+      [data-baseweb="select"] div {{ color: {p['text']} !important; }}
+      [data-baseweb="select"] svg {{ fill: {p['muted']}; }}
+      /* selectbox — open dropdown. It's portaled to <body> (outside .stApp), so
+         these selectors are global and forced, else light themes show dark-on-dark. */
+      [data-baseweb="popover"] > div,
+      [data-baseweb="menu"],
+      ul[role="listbox"] {{ background-color: {p['panel']} !important; border: 1px solid {p['border']} !important; }}
+      li[role="option"], [role="option"] {{ background-color: {p['panel']} !important; color: {p['text']} !important; }}
+      li[role="option"]:hover,
+      [role="option"][aria-selected="true"] {{ background-color: {p['border']} !important; color: {p['accent']} !important; }}
 
       /* buttons */
       .stButton > button {{ background-color: {p['panel']}; color: {p['text']}; border: 1px solid {p['border']}; }}
