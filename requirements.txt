@@ -2,3 +2,8 @@ streamlit>=1.37
 feedparser>=6.0.10
 requests>=2.31
 beautifulsoup4>=4.12
+
+# Optional — durable history backends. Uncomment ONLY the one you use
+# (and set MARKETWIRE_DB to its connection string). sqlite is the default.
+# psycopg[binary]>=3.1          # Postgres (Neon / Supabase / RDS)
+# libsql-experimental>=0.0.40   # Turso (libSQL)

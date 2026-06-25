@@ -1,16 +1,20 @@
-"""store.py — a tiny SQLite store so MarketWire remembers releases over time.
+"""store.py — durable history for MarketWire, with pluggable backends.
 
-Without it the app only shows whatever is in RBI's RSS window right now (~10) and
-forgets items as they roll off. With it, every release the app has ever fetched
-is kept and accumulated, deduped by RBI prid (or link). It also makes the app
-resilient: if a live fetch fails, the stored history is still shown.
+The backend is chosen from the MARKETWIRE_DB connection string:
 
-DB path is the MARKETWIRE_DB env var (default: marketwire.db next to this file).
+  - sqlite (default): a file path, e.g. `marketwire.db`  — ephemeral on Cloud
+  - Postgres:  `postgres://USER:PASS@HOST:PORT/DBNAME`   — needs `psycopg`
+  - Turso:     `libsql://DBNAME-ORG.turso.io`            — needs `libsql-experimental`
+               (+ auth token in MARKETWIRE_DB_AUTH_TOKEN / TURSO_AUTH_TOKEN)
 
-CAVEAT: on Streamlit Community Cloud the filesystem is EPHEMERAL — the DB
-accumulates while the app is awake but resets when it sleeps / redeploys. For
-durable history use an always-on VM, or point MARKETWIRE_DB at a hosted DB and
-swap this sqlite3 layer for Postgres/Turso (the SQL is standard).
+Every release the app fetches is kept (deduped by RBI prid, or link), so the wire
+accumulates over time and survives a failed live fetch. The schema and SQL are
+portable across all three; the Postgres/Turso drivers are optional and imported
+lazily — install only the one you use.
+
+For durable history on Streamlit Cloud (whose disk is ephemeral), point
+MARKETWIRE_DB at a hosted Postgres (Neon/Supabase) or Turso DB via the app's
+Secrets. On a VM, a plain sqlite file path is already durable.
 """
 
 import os
@@ -18,10 +22,67 @@ import re
 import sqlite3
 import time
 
-DB_PATH = os.environ.get(
-    "MARKETWIRE_DB",
-    os.path.join(os.path.dirname(os.path.abspath(__file__)), "marketwire.db"),
-)
+_CREATE = """CREATE TABLE IF NOT EXISTS articles (
+    key        TEXT PRIMARY KEY,
+    link       TEXT,
+    title      TEXT,
+    summary    TEXT,
+    published  TEXT,
+    ts         BIGINT,
+    fetched_ts BIGINT
+)"""
+
+
+def _db_url():
+    return os.environ.get(
+        "MARKETWIRE_DB",
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "marketwire.db"),
+    )
+
+
+def _backend(url):
+    u = url.lower()
+    if u.startswith(("postgres://", "postgresql://")):
+        return "postgres"
+    if u.startswith("libsql://") or "turso.io" in u:
+        return "turso"
+    return "sqlite"
+
+
+def _connect():
+    """Return (conn, paramstyle). paramstyle is 'qmark' (?) or 'pyformat' (%s).
+
+    All three drivers expose a sqlite3-style `conn.execute(sql, params)` that
+    returns a cursor, plus `commit()`/`close()`, so the callers stay uniform.
+    """
+    url = _db_url()
+    kind = _backend(url)
+    if kind == "postgres":
+        try:
+            import psycopg  # psycopg 3
+        except Exception as ex:
+            raise RuntimeError(
+                "MARKETWIRE_DB is a Postgres URL but psycopg isn't installed — "
+                "pip install 'psycopg[binary]'"
+            ) from ex
+        return psycopg.connect(url), "pyformat"
+    if kind == "turso":
+        try:
+            import libsql_experimental as libsql
+        except Exception as ex:
+            raise RuntimeError(
+                "MARKETWIRE_DB is a Turso URL but libsql-experimental isn't installed — "
+                "pip install libsql-experimental"
+            ) from ex
+        token = os.environ.get("MARKETWIRE_DB_AUTH_TOKEN") or os.environ.get("TURSO_AUTH_TOKEN", "")
+        return libsql.connect(database=url, auth_token=token), "qmark"
+    path = re.sub(r"^sqlite://", "", url)  # accept sqlite:///path or a bare path
+    return sqlite3.connect(path, timeout=30), "qmark"
+
+
+def _q(sql, style):
+    """Translate ? placeholders to the backend's style."""
+    return sql if style == "qmark" else sql.replace("?", "%s")
 
 
 def _key(item):
@@ -30,27 +91,12 @@ def _key(item):
     return m.group(1) if m else item.get("link", "")
 
 
-def _conn():
-    conn = sqlite3.connect(DB_PATH, timeout=30)
-    conn.row_factory = sqlite3.Row
-    return conn
-
-
 def init_db():
-    conn = _conn()
+    conn, style = _connect()
     try:
-        conn.execute("PRAGMA journal_mode=WAL")  # better read/write concurrency
-        conn.execute(
-            """CREATE TABLE IF NOT EXISTS articles (
-                   key        TEXT PRIMARY KEY,
-                   link       TEXT,
-                   title      TEXT,
-                   summary    TEXT,
-                   published  TEXT,
-                   ts         INTEGER,
-                   fetched_ts INTEGER
-               )"""
-        )
+        if _backend(_db_url()) == "sqlite":
+            conn.execute("PRAGMA journal_mode=WAL")  # better read/write concurrency
+        conn.execute(_q(_CREATE, style))
         conn.commit()
     finally:
         conn.close()
@@ -63,23 +109,23 @@ def upsert(items):
         return 0
     now = int(time.time())
     new = 0
-    conn = _conn()
+    conn, style = _connect()
     try:
         for it in items:
             k = _key(it)
             if not k:
                 continue
-            row = conn.execute("SELECT summary FROM articles WHERE key=?", (k,)).fetchone()
+            row = conn.execute(_q("SELECT summary FROM articles WHERE key=?", style), (k,)).fetchone()
             if row is None:
                 conn.execute(
-                    "INSERT INTO articles(key, link, title, summary, published, ts, fetched_ts) "
-                    "VALUES (?,?,?,?,?,?,?)",
+                    _q("INSERT INTO articles(key, link, title, summary, published, ts, fetched_ts) "
+                       "VALUES (?,?,?,?,?,?,?)", style),
                     (k, it.get("link", ""), it.get("title", ""), it.get("summary", "") or "",
                      it.get("published", "") or "", it.get("ts"), now),
                 )
                 new += 1
-            elif not row["summary"] and it.get("summary"):
-                conn.execute("UPDATE articles SET summary=? WHERE key=?", (it["summary"], k))
+            elif not row[0] and it.get("summary"):
+                conn.execute(_q("UPDATE articles SET summary=? WHERE key=?", style), (it["summary"], k))
         conn.commit()
     finally:
         conn.close()
@@ -88,20 +134,21 @@ def upsert(items):
 
 def load(limit=1000):
     """All stored releases, newest first (by published date, then fetch time)."""
-    conn = _conn()
+    conn, style = _connect()
     try:
         rows = conn.execute(
-            "SELECT link, title, summary, published, ts FROM articles "
-            "ORDER BY COALESCE(ts, 0) DESC, fetched_ts DESC LIMIT ?",
+            _q("SELECT link, title, summary, published, ts FROM articles "
+               "ORDER BY COALESCE(ts, 0) DESC, fetched_ts DESC LIMIT ?", style),
             (limit,),
         ).fetchall()
     finally:
         conn.close()
-    return [dict(r) for r in rows]
+    cols = ("link", "title", "summary", "published", "ts")
+    return [dict(zip(cols, r)) for r in rows]
 
 
 def count():
-    conn = _conn()
+    conn, _ = _connect()
     try:
         return conn.execute("SELECT COUNT(*) FROM articles").fetchone()[0]
     finally:
