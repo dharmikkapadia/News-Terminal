@@ -12,9 +12,14 @@ tags, clamped body with an inline `<details>` Show more/less toggle, relative
 timestamp; `_stream_html`/`_stream_row_html`) or
 **Grid** (uniform card grid via `st.columns` + bordered `st.container`s,
 `_story_card_html`, clamped preview + **Full text** expander). A serif **masthead**
-tops both, with subtle fade-in/hover CSS, and five flagship themes
-(Bloomberg, Reuters, Paper, Trading Economics, High Contrast — each with its own
-`headfont` stack, serif or sans). Durable history accumulates per feed
+tops both, with subtle fade-in/hover CSS, and six flagship themes
+(Bloomberg, Reuters, Paper, Trading Economics, High Contrast, and **Equity Terminal**
+— a dark trading-desk palette, the default — each with its own `headfont` stack and
+`up`/`down` gain/loss colours). Above the wire sits an opt-in **Current Rates dashboard**
+(`_rates_dashboard_html`, sidebar **Show rates dashboard** toggle): a signal strip of
+key RBI rates (repo, LAF corridor, CRR/SLR, USD/INR, ~10y G-Sec) plus a **next-MPC
+countdown**, over an expandable full rate card (policy/reserve/exchange/lending rates,
+market trends). It reads `data/rates.json` via `rates.py`. Durable history accumulates per feed
 via `store.py` (SQLite/Postgres/Turso — one table per feed) **and** in-repo
 `data/history.jsonl` (press releases) + `data/notifications.jsonl` (notifications),
 both maintained by a scheduled GitHub Action running `poll.py` (every 30 min).
@@ -51,3 +56,11 @@ so the ids never collide.
   Chromium shot per theme), since the live RBI feed 403s here.
 - Validate `streamlit_app.py` changes headlessly with `streamlit.testing.v1.AppTest`
   (runs the script, asserts `not at.exception`) across themes/filters.
+- **Current Rates** (`data/rates.json`) is refreshed two ways: (1) MANUAL — a
+  Claude-for-Chrome run on rbi.org.in emits the JSON (RBI 403s CI and the rates box is a
+  JS accordion, so a real browser is the reliable extractor); commit it. (2) AUTO —
+  `rates.poll_rates()` (called by `poll.py` on the cron) scrapes the home page but writes
+  **only on a complete + in-bounds parse** (`rates._is_complete`), so a blocked/partial
+  scrape can never clobber the manual snapshot, and the MPC block (not on the home page)
+  is preserved. The scraper was written WITHOUT live RBI access — validate it from a host
+  that can reach the site (like `rbi_archive.py`).

@@ -17,6 +17,7 @@ import sys
 
 import feed
 import history
+import rates
 import rbi_archive
 
 # Each feed: how to fetch it (RSS), where to store it (JSONL), and how to backfill
@@ -108,8 +109,23 @@ def poll_feed(cfg):
     return after
 
 
+def poll_rates():
+    """Best-effort refresh of the Current Rates snapshot (data/rates.json). Guarded so a
+    blocked/partial scrape keeps the committed manual snapshot — never fails the run."""
+    try:
+        status = rates.poll_rates()
+    except Exception as ex:                     # belt-and-suspenders: never break the poll
+        status = f"errored ({type(ex).__name__}: {ex}) — keeping committed snapshot"
+    print(f"[poll:rates] {status}")
+    if "keeping committed snapshot" in status:
+        # Informational only — the manual snapshot is the source of truth, so a failed
+        # scrape is expected when RBI blocks the runner or renders the box via JS.
+        _annotate("notice", "Rates scrape skipped", status)
+
+
 def main():
     counts = [poll_feed(cfg) for cfg in FEEDS]
+    poll_rates()
     # Hard-fail (red run + failure email) only if EVERY feed ended up with nothing —
     # one blocked feed shouldn't fail the run while the other still has history.
     if not any(counts):
