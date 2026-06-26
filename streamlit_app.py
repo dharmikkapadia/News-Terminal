@@ -265,7 +265,6 @@ def wire():
         for it in feed_items:
             it["source"] = cfg["label"]
         items += feed_items
-    items.sort(key=lambda x: x.get("ts") or 0, reverse=True)
     if not st.session_state.get("archive", True):
         items = [it for it in items if not _is_archived(it)]
 
@@ -287,13 +286,53 @@ def wire():
         bits.append("live feed unreachable — showing stored")
     note = (" · " + " · ".join(bits)) if bits else ""
 
-    q = st.text_input("Filter", placeholder="filter by keyword…", label_visibility="collapsed")
-    shown = [it for it in items if q.lower() in (it["title"] + " " + (it["summary"] or "")).lower()] if q.strip() else items
+    # --- controls: keyword · sort order · optional date range ----------------
+    c_kw, c_sort, c_date = st.columns([3, 2, 2])
+    q = c_kw.text_input("Filter", placeholder="filter by keyword…", label_visibility="collapsed")
+    order = c_sort.radio(
+        "Sort order", ["Newest first", "Oldest first"], horizontal=True,
+        label_visibility="collapsed", key="order",
+        help="Sort the wire by date — newest first (descending) or oldest first (ascending).",
+    )
+    # Date filtering is opt-in (default off) so newly-published items always show
+    # without having to widen a range; bounds track the items currently loaded.
+    dated = [it["ts"] for it in items if it.get("ts")]
+    date_on = c_date.checkbox(
+        "Filter by date", key="date_filter", disabled=not dated,
+        help="Limit the wire to a date range you pick.",
+    )
+    lo = hi = None
+    if date_on and dated:
+        dmin = datetime.fromtimestamp(min(dated), IST).date()
+        dmax = datetime.fromtimestamp(max(dated), IST).date()
+        picked = st.date_input(
+            "Date range", value=(dmin, dmax), format="DD/MM/YYYY",
+            key="date_range", label_visibility="collapsed",
+        )
+        pair = picked if isinstance(picked, (list, tuple)) else (picked,)
+        if len(pair) == 2:
+            lo, hi = pair
+        elif len(pair) == 1:
+            lo = hi = pair[0]
+        if lo and hi and lo > hi:           # tolerate a reversed pick
+            lo, hi = hi, lo
+
+    shown = items
+    if q.strip():
+        shown = [it for it in shown if q.lower() in (it["title"] + " " + (it["summary"] or "")).lower()]
+    if lo and hi:
+        shown = [it for it in shown
+                 if it.get("ts") and lo <= datetime.fromtimestamp(it["ts"], IST).date() <= hi]
+    reverse = order == "Newest first"
+    shown = sorted(shown, key=lambda x: x.get("ts") or 0, reverse=reverse)
+
+    order_txt = "newest first" if reverse else "oldest first"
+    range_txt = f" · {lo:%d %b %Y}–{hi:%d %b %Y}" if (lo and hi) else ""
     mins = REFRESH_SECONDS // 60
     every = f"{mins} min" if mins else f"{REFRESH_SECONDS}s"
     checked = datetime.now(IST).strftime("%H:%M:%S")
     st.caption(
-        f"{len(shown)} of {len(items)} stored items · newest first{note} · "
+        f"{len(shown)} of {len(items)} stored items · {order_txt}{range_txt}{note} · "
         f"auto-refresh every {every} · last checked {checked} IST"
     )
 
