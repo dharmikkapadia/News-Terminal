@@ -145,29 +145,36 @@ def _relative_time(ts):
 
 
 def _stream_row_html(it):
-    """One full-width stream row (Trading Economics style): underlined headline +
-    right-aligned source tag(s), the full body inline, then a relative timestamp
-    and a direct 'open' link."""
+    """One full-width stream row (Trading Economics style): the headline is the link
+    (no separate 'open' link); the body is clamped small with an inline Show more /
+    Show less toggle (pure <details>) when long; then a relative timestamp."""
     ts = it.get("ts")
     dt = datetime.fromtimestamp(ts, IST) if ts else None
     archived = dt is not None and not (dt.hour or dt.minute or dt.second)
     src = it.get("source") or ""
     notif = "notif" if "Notification" in src else "press"
     arch = "<span class='mw-tag'>ARCHIVE</span>" if archived else ""
-    body = html.escape((it.get("summary") or "").strip()) or "<span class='mw-nosum'>Open the source for the full text.</span>"
     title = html.escape(it.get("title") or "(untitled)")
     link = it.get("link") or ""
     if link.startswith("http"):
         href = html.escape(link, quote=True)
         head = f"<a class='mw-shead' href='{href}' target='_blank' rel='noopener'>{title}</a>"
-        open_link = f"<a class='mw-open' href='{href}' target='_blank' rel='noopener'>Open on rbi.org.in ↗</a>"
     else:
-        head, open_link = f"<span class='mw-shead'>{title}</span>", ""
+        head = f"<span class='mw-shead'>{title}</span>"
+    text = (it.get("summary") or "").strip()
+    if not text:
+        body = "<div class='mw-sbody mw-sbody-plain'><span class='mw-nosum'>Open the headline for the full text.</span></div>"
+    elif len(text) > 240:                       # long: clamp to a preview + expand
+        body = ("<details class='mw-det'><summary>"
+                f"<span class='mw-sbody'>{html.escape(text)}</span>"
+                "<span class='mw-more'></span></summary></details>")
+    else:                                       # short: show it all, no toggle
+        body = f"<div class='mw-sbody mw-sbody-plain'>{html.escape(text)}</div>"
     return (
         "<div class='mw-stream'>"
         f"<div class='mw-srow'>{head}<span class='mw-stags'><span class='mw-src {notif}'>{html.escape(src)}</span>{arch}</span></div>"
-        f"<div class='mw-sbody'>{body}</div>"
-        f"<div class='mw-sfoot'><span class='mw-time'>{_relative_time(ts)}</span>{open_link}</div>"
+        f"{body}"
+        f"<div class='mw-sfoot'><span class='mw-time'>{_relative_time(ts)}</span></div>"
         "</div>"
     )
 
@@ -299,10 +306,18 @@ def theme_css(p):
       [data-testid="stMarkdownContainer"] .mw-shead:hover {{ color: {p['accent']} !important; }}
       .mw-stags {{ display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; flex: none; max-width: 46%; margin-top: 4px; }}
       .mw-stags .mw-tag {{ margin-left: 0; }}
-      .mw-sbody {{ font-size: 14.5px; line-height: 1.62; color: {p['text']}; margin: 9px 0 11px; }}
+      .mw-sbody {{ font-size: 14.5px; line-height: 1.62; color: {p['text']}; margin: 9px 0 0; }}
+      .mw-sbody-plain {{ margin: 9px 0 11px; }}
+      .mw-det {{ margin: 0; }}
+      .mw-det > summary {{ list-style: none; cursor: pointer; outline: none; }}
+      .mw-det > summary::-webkit-details-marker {{ display: none; }}
+      .mw-det .mw-sbody {{ display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }}
+      .mw-det[open] .mw-sbody {{ -webkit-line-clamp: unset; display: block; overflow: visible; }}
+      .mw-more {{ display: inline-block; margin: 6px 0 11px; font-size: 12px; font-weight: 600; color: {p['accent']}; }}
+      .mw-more::after {{ content: "Show more ▾"; }}
+      .mw-det[open] .mw-more::after {{ content: "Show less ▴"; }}
       .mw-sfoot {{ display: flex; align-items: center; gap: 16px; }}
       .mw-sfoot .mw-time {{ margin: 0; }}
-      .mw-sfoot .mw-open {{ margin: 0; }}
       .mw-tag {{ font-size: 9px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
         color: {p['muted']}; border: 1px solid {p['border']}; border-radius: 3px; padding: 1px 5px; margin-left: 7px; }}
 
