@@ -1,11 +1,16 @@
 # MarketWire — project notes for Claude
 
-A Streamlit reader for **RBI Press Releases** (`streamlit_app.py`): fetches the
-RSS feed server-side and shows it newest-first with a keyword filter and a sidebar
-theme picker (data-terminal palettes). Durable history accumulates via `store.py`
-(SQLite/Postgres/Turso) **and** an in-repo `data/history.jsonl` maintained by a
-scheduled GitHub Action running `poll.py` (every 30 min). `rbi_archive.py` backfills
-older releases from RBI's listing/detail pages; `feed.py` is the shared RSS parser.
+A Streamlit reader for **RBI Press Releases** and **RBI Notifications**
+(`streamlit_app.py`): fetches each RSS feed server-side and shows it newest-first
+with a keyword filter, a sidebar **Feed** picker (Press Releases / Notifications),
+and a theme picker (data-terminal palettes). Durable history accumulates per feed
+via `store.py` (SQLite/Postgres/Turso — one table per feed) **and** in-repo
+`data/history.jsonl` (press releases) + `data/notifications.jsonl` (notifications),
+both maintained by a scheduled GitHub Action running `poll.py` (every 30 min).
+`rbi_archive.py` backfills older items from RBI's listing/detail pages (parameterized
+per feed by the detail-link match); `feed.py` is the shared RSS parser. Press
+releases are keyed by `prid`, notifications by `Id`; the feeds are stored separately
+so the ids never collide.
 
 ## Workflow
 

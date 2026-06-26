@@ -2,16 +2,19 @@
 
 [![MarketWire history](https://github.com/dharmikkapadia/News-Terminal/actions/workflows/history.yml/badge.svg)](https://github.com/dharmikkapadia/News-Terminal/actions/workflows/history.yml)
 
-A minimal Streamlit reader for **RBI Press Releases**. It fetches the feed
-server-side (browsers can't read most RSS directly — CORS), strips the HTML,
-**remembers releases in a small SQLite store so the wire accumulates over time**,
-and shows them newest-first with a keyword filter. More feeds can be added later.
+A minimal Streamlit reader for **RBI Press Releases** and **RBI Notifications**.
+It fetches each feed server-side (browsers can't read most RSS directly — CORS),
+strips the HTML, **remembers items in a small SQLite store so the wire accumulates
+over time**, and shows them newest-first with a keyword filter. Pick the feed in
+the sidebar (**Feed → Press Releases / Notifications**); each keeps its own durable
+history. The choice is remembered in the URL (`?feed=…`), so it's shareable.
 
 ### History store
 
 RBI's RSS only carries the latest ~10, and replaces them as new ones publish.
-`store.py` keeps every release the app has fetched (deduped by `prid`) in a SQLite
-file, so the list **grows over time** and the app **still shows stored history
+`store.py` keeps every item the app has fetched (press releases deduped by `prid`,
+notifications by `Id`) in a SQLite file — one table per feed, so the ids never
+collide — so the list **grows over time** and the app **still shows stored history
 even if a live fetch fails**. The DB path is the `MARKETWIRE_DB` env var (default
 `marketwire.db` beside the app).
 
@@ -24,10 +27,11 @@ On an always-on **VM**, a plain sqlite path is already durable. For durable hist
 ### Durable history in the repo (GitHub Action, no external DB)
 
 History can live **in this repo** instead of an external database. A scheduled
-GitHub Action (`.github/workflows/history.yml`) runs the poller, which fetches RBI
-and writes **`data/history.jsonl`** (deduped by `prid`, JSON-lines so each update is
-a small git diff), then commits it. The app reads that committed file and merges it
-with the live feed — so history survives Streamlit Cloud restarts with no DB.
+GitHub Action (`.github/workflows/history.yml`) runs the poller, which fetches both
+RBI feeds and writes **`data/history.jsonl`** (press releases) and
+**`data/notifications.jsonl`** (notifications) — JSON-lines so each update is a
+small git diff — then commits them. The app reads those committed files and merges
+each with its live feed — so history survives Streamlit Cloud restarts with no DB.
 
 - The workflow runs **independently of the app** — it keeps building history even
   while the Streamlit app is asleep, and only commits when something changed. Each
@@ -106,10 +110,13 @@ misleading `00:00`. The app also does a light listing scrape live (the sidebar
 **“Include archive”** toggle) for immediate display; un-enriched items show an
 **ARCHIVE** tag until the poller fills in their body.
 
-Everything is deduped by `prid` and **isolated/non-fatal** — if scraping is blocked
-or the markup changes, you still get the RSS view. Run the scraper yourself with
-`python rbi_archive.py`. For deeper history, add RBI month/year listing URLs
-(comma-separated) via the `MARKETWIRE_ARCHIVE_URLS` env var / repo variable.
+Everything is deduped by `prid` / `Id` and **isolated/non-fatal** — if scraping is
+blocked or the markup changes, you still get the RSS view. Run the scraper yourself
+with `python rbi_archive.py` (or `python rbi_archive.py <notifications-listing-url>`
+for notifications). For deeper history, add RBI month/year listing URLs
+(comma-separated) via the `MARKETWIRE_ARCHIVE_URLS` (press) / `MARKETWIRE_NOTIFICATIONS_ARCHIVE_URLS`
+(notifications) env var / repo variable. The same applies to notifications, whose
+detail links are matched on `NotificationUser.aspx?Id=`.
 
 **Themes:** pick a data-terminal palette in the sidebar — Bloomberg, Reuters
 Carbon, Amber/Green phosphor, Ice (cyan), a high-contrast light **Paper**, or
@@ -132,5 +139,8 @@ streamlit run streamlit_app.py    # opens at http://localhost:8501
 > Note: government sites occasionally block datacenter IPs. The RBI feed works
 > from a normal desk/VM but may 403 from Streamlit Cloud — if so, run it locally.
 
-Feed: `https://rbi.org.in/pressreleases_rss.xml` — override with the
-`MARKETWIRE_FEED` env var to point at a mirror/cache without code changes.
+Feeds:
+- Press Releases: `https://rbi.org.in/pressreleases_rss.xml` — override with `MARKETWIRE_FEED`.
+- Notifications: `https://rbi.org.in/notifications_rss.xml` — override with `MARKETWIRE_NOTIFICATIONS_FEED`.
+
+Point either env var at a mirror/cache (or a local file for testing) without code changes.

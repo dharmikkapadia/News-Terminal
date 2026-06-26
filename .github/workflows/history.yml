@@ -1,8 +1,9 @@
 name: MarketWire history
 
-# Keeps durable press-release history IN THE REPO: fetches RBI on a schedule and
-# commits data/history.jsonl. The Streamlit app reads that committed file, so
-# history survives Streamlit Cloud restarts with no external database.
+# Keeps durable RBI history IN THE REPO: fetches both feeds (Press Releases +
+# Notifications) on a schedule and commits data/history.jsonl + data/notifications.jsonl.
+# The Streamlit app reads those committed files, so history survives Streamlit Cloud
+# restarts with no external database.
 #
 # Note: committing updates the tracked branch, so Streamlit Cloud redeploys (a
 # brief restart) whenever history changes — tune the cron below to taste. The
@@ -39,16 +40,17 @@ jobs:
 
       - name: Fetch RBI and update history
         env:
-          # Optional: set repo variable MARKETWIRE_ARCHIVE_URLS to also backfill
-          # older releases from RBI's listing page(s).
+          # Optional: set these repo variables to also backfill older items from
+          # RBI's listing page(s) for each feed.
           MARKETWIRE_ARCHIVE_URLS: ${{ vars.MARKETWIRE_ARCHIVE_URLS }}
+          MARKETWIRE_NOTIFICATIONS_ARCHIVE_URLS: ${{ vars.MARKETWIRE_NOTIFICATIONS_ARCHIVE_URLS }}
         run: python poll.py
 
       - name: Commit history if it changed
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/history.jsonl
+          git add data/history.jsonl data/notifications.jsonl
           if git diff --cached --quiet; then
             echo "No history changes."
           else
