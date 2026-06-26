@@ -1,16 +1,19 @@
-"""MarketWire — a minimal RBI press-release reader.
+"""MarketWire — an RBI press-release & notifications reader.
 
-A small Streamlit app that fetches the RBI Press Releases RSS feed server-side
-(browsers can't read most RSS directly because of CORS), remembers releases in a
-small SQLite store so the wire accumulates over time, and shows them newest-first.
+A Streamlit app that fetches the RBI Press Releases + Notifications RSS feeds
+server-side (browsers can't read most RSS directly because of CORS), remembers
+items in a small SQLite store so the wire accumulates over time, and presents them
+as a news website: a newspaper masthead over a uniform grid of story cards, with
+subtle fade-in/hover motion and a summary preview that expands to the full text.
 
-Look & feel: pick a data-terminal theme in the sidebar (Bloomberg, Reuters,
-green/amber phosphor, etc.). Every palette is tuned so all text stays legible.
+Look & feel: pick a flagship theme in the sidebar (Bloomberg, Reuters, Paper,
+High Contrast). Every palette is tuned so all text stays legible.
 
 Run locally:   streamlit run streamlit_app.py
 Deploy:        Streamlit Community Cloud, main file = streamlit_app.py
 """
 
+import html
 import os
 from datetime import datetime, timezone, timedelta
 
@@ -67,28 +70,67 @@ def _is_archived(it):
     dt = datetime.fromtimestamp(ts, IST)
     return not (dt.hour or dt.minute or dt.second)
 
+
+def _masthead_html():
+    """The newspaper nameplate: kicker rule, serif wordmark, section line, rules."""
+    today = datetime.now(IST).strftime("%A, %d %B %Y")
+    return (
+        "<div class='mw-masthead'>"
+        f"<div class='mw-kicker'><span>Reserve Bank of India · Wire</span><span>{today} · IST</span></div>"
+        "<div class='mw-wordmark'>MarketWire</div>"
+        "<div class='mw-sub'>Press Releases &amp; Notifications</div>"
+        "<div class='mw-rule'></div><div class='mw-rule-thin'></div>"
+        "</div>"
+    )
+
+
+def _story_card_html(it):
+    """Inner HTML for one story card: source tag, time, serif headline, and a
+    CSS-clamped summary preview. The full body lives in the expander beside it."""
+    ts = it.get("ts")
+    dt = datetime.fromtimestamp(ts, IST) if ts else None
+    archived = dt is not None and not (dt.hour or dt.minute or dt.second)
+    if dt and not archived:
+        when = dt.strftime("%d %b %Y · %H:%M IST")      # real time (live RSS)
+    elif dt:
+        when = dt.strftime("%d %b %Y")                  # date only (archive)
+    else:
+        when = html.escape(it.get("published") or "—")
+    src = it.get("source") or ""
+    notif = "notif" if "Notification" in src else "press"
+    arch = " <span class='mw-tag'>ARCHIVE</span>" if archived else ""
+    summary = (it.get("summary") or "").strip()
+    preview = html.escape(summary[:340]) if summary else "<span class='mw-nosum'>Open for the full text →</span>"
+    return (
+        "<div class='mw-card'>"
+        f"<div class='mw-meta'><span class='mw-src {notif}'>{html.escape(src)}</span>"
+        f"<span class='mw-time'>{when}{arch}</span></div>"
+        f"<div class='mw-head'>{html.escape(it.get('title') or '(untitled)')}</div>"
+        f"<div class='mw-sum'>{preview}</div>"
+        "</div>"
+    )
+
 # --------------------------------------------------------------------------- #
-# Themes — data-terminal palettes. Each key is tuned for contrast so that ALL
-# text (titles, body, timestamps, captions, inputs, links) stays readable.
-#   bg=app background  panel=cards/inputs/sidebar  text=body  heading=titles
-#   muted=timestamps/captions (kept high-contrast)  accent=hover/focus
-#   link=hyperlinks  border=hairlines
+# Themes — four flagship palettes, two dark + two light, each tuned for contrast
+# so ALL text (headlines, body, timestamps, captions, inputs, links) stays legible.
+#   bg=page  panel=cards/inputs/sidebar  text=body  heading=headlines
+#   muted=timestamps/captions  accent=primary brand (Press tag, hover, focus)
+#   accent2=secondary (Notifications tag)  link=hyperlinks  border=hairlines
+#   shadow=card hover glow (rgba)
 # --------------------------------------------------------------------------- #
 THEMES = {
-    "Bloomberg": dict(bg="#000000", panel="#0F0F0F", text="#EDE6DA", heading="#FFA028",
-                      muted="#C99A57", accent="#FFA028", link="#4FC3E8", border="#2B2218"),
-    "Reuters Carbon": dict(bg="#0B0E13", panel="#151A24", text="#E7EAF1", heading="#FF7A1A",
-                           muted="#9AA4B2", accent="#FF7A1A", link="#5BC8E0", border="#242B37"),
-    "Amber Phosphor": dict(bg="#0B0E15", panel="#11151F", text="#E7EAF1", heading="#FFB23E",
-                           muted="#8A93A6", accent="#FFB23E", link="#5BC8E0", border="#1E2532"),
-    "Green Phosphor": dict(bg="#001108", panel="#04210F", text="#5BFF92", heading="#BFFFD6",
-                           muted="#34C46E", accent="#00FF66", link="#7FFFD4", border="#0A4A28"),
-    "Ice (Cyan)": dict(bg="#06121C", panel="#0C1B29", text="#DCEEF6", heading="#38D6FF",
-                       muted="#86AABF", accent="#38D6FF", link="#6CE0C0", border="#173646"),
-    "Paper (Light)": dict(bg="#FBFBF8", panel="#FFFFFF", text="#1A1A1A", heading="#7A3E00",
-                          muted="#555555", accent="#C2410C", link="#1D4ED8", border="#D9D9D0"),
-    "High Contrast": dict(bg="#000000", panel="#0B0B0B", text="#FFFFFF", heading="#FFFF00",
-                          muted="#D0D0D0", accent="#FFFF00", link="#5AD1FF", border="#6A6A6A"),
+    "Bloomberg": dict(bg="#0A0A0A", panel="#161513", text="#E8E2D6", heading="#FBF7EF",
+                      muted="#9A9080", accent="#FF9E1B", accent2="#4FC3E8", link="#6FD0EE",
+                      border="#2A2622", shadow="rgba(255,158,27,.12)"),
+    "Reuters": dict(bg="#FFFFFF", panel="#FFFFFF", text="#15171C", heading="#08090B",
+                    muted="#5C616B", accent="#FB6400", accent2="#0B6EFD", link="#0A66C2",
+                    border="#E5E7EB", shadow="rgba(15,23,42,.10)"),
+    "Paper": dict(bg="#FBFAF4", panel="#FFFFFF", text="#1C1B17", heading="#12110D",
+                  muted="#6A6456", accent="#B3471B", accent2="#1D4ED8", link="#1D4ED8",
+                  border="#E7E1D2", shadow="rgba(80,60,30,.10)"),
+    "High Contrast": dict(bg="#000000", panel="#0C0C0C", text="#FFFFFF", heading="#FFFF00",
+                          muted="#D8D8D8", accent="#FFE000", accent2="#5AD1FF", link="#6BD8FF",
+                          border="#5C5C5C", shadow="rgba(255,224,0,.20)"),
 }
 DEFAULT_THEME = "Bloomberg"
 
@@ -106,83 +148,122 @@ def load_history(url_env, default_path):
 
 
 def theme_css(p):
-    """Build a full CSS override for palette `p`, forcing every text surface."""
+    """Build a full CSS override for palette `p` — masthead, card grid, subtle
+    animations, and every themed widget (forcing portaled overlays too)."""
     return f"""
     <style>
-      /* surfaces */
-      .stApp {{ background-color: {p['bg']}; color: {p['text']}; }}
-      [data-testid="stHeader"] {{ background: {p['bg']}; }}
+      @import url('https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700;8..60,900&display=swap');
+
+      /* ---- surfaces ---- */
+      .stApp {{ background-color: {p['bg']}; color: {p['text']};
+        font-family: 'Libre Franklin', system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }}
+      [data-testid="stHeader"] {{ background: transparent; }}
+      [data-testid="stToolbar"] {{ right: .5rem; }}
+      .block-container {{ padding-top: 1.1rem; max-width: 1280px; }}
       section[data-testid="stSidebar"] > div {{ background-color: {p['panel']}; border-right: 1px solid {p['border']}; }}
 
-      /* headings */
-      .stApp h1, .stApp h2, .stApp h3, .stApp h4, .stApp h5 {{ color: {p['heading']}; }}
+      /* ---- newspaper masthead ---- */
+      .mw-masthead {{ text-align: center; margin: 0 0 .3rem; animation: mwFade .5s ease both; }}
+      .mw-kicker {{ display: flex; justify-content: space-between; align-items: center;
+        font-size: 11px; letter-spacing: .16em; text-transform: uppercase; font-weight: 600;
+        color: {p['muted']}; border-top: 1px solid {p['border']}; border-bottom: 1px solid {p['border']}; padding: 7px 2px; }}
+      .mw-wordmark {{ font-family: 'Source Serif 4', Georgia, serif; font-weight: 900;
+        font-size: clamp(38px, 6.5vw, 74px); line-height: 1.02; letter-spacing: -.02em;
+        color: {p['heading']}; margin: .16em 0 .05em; }}
+      .mw-wordmark::first-letter {{ color: {p['accent']}; }}
+      .mw-sub {{ font-size: 12px; letter-spacing: .34em; text-transform: uppercase;
+        color: {p['muted']}; font-weight: 600; }}
+      .mw-rule {{ height: 3px; background: {p['heading']}; margin: .55rem 0 0; }}
+      .mw-rule-thin {{ height: 1px; background: {p['border']}; margin-top: 2px; }}
 
-      /* body text: markdown, lists, widget labels, sidebar */
+      /* ---- headings & body ---- */
+      .stApp h1, .stApp h2, .stApp h3, .stApp h4, .stApp h5 {{ color: {p['heading']};
+        font-family: 'Source Serif 4', Georgia, serif; }}
       .stApp p, .stApp li, .stApp strong,
       [data-testid="stMarkdownContainer"], [data-testid="stMarkdownContainer"] p,
       [data-testid="stWidgetLabel"], [data-testid="stWidgetLabel"] p,
       section[data-testid="stSidebar"] label {{ color: {p['text']}; }}
-
-      /* muted: captions + the timestamp line */
       [data-testid="stCaptionContainer"], [data-testid="stCaptionContainer"] p {{ color: {p['muted']} !important; }}
-      [data-testid="stMarkdownContainer"] .mw-time {{
-        color: {p['muted']}; font-family: ui-monospace, Menlo, Consolas, monospace;
-        font-size: 12px; letter-spacing: .02em;
-      }}
-      [data-testid="stMarkdownContainer"] .mw-tag {{
-        font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 10px;
-        letter-spacing: .08em; color: {p['muted']}; border: 1px solid {p['border']};
-        border-radius: 3px; padding: 0 4px; margin-left: 8px; vertical-align: 1px;
-      }}
-      /* source tag (RBI - Press Release / RBI - Notifications): accent-coloured so
-         it reads as a label, distinct from the muted ARCHIVE tag. */
-      [data-testid="stMarkdownContainer"] .mw-src {{
-        font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 10px;
-        letter-spacing: .08em; color: {p['accent']}; border: 1px solid {p['accent']};
-        border-radius: 3px; padding: 0 4px; margin-left: 8px; vertical-align: 1px;
-      }}
+
+      /* ---- story cards: the bordered containers in the grid ---- */
+      [data-testid="stVerticalBlockBorderWrapper"] {{
+        background: {p['panel']}; border: 1px solid {p['border']} !important; border-radius: 10px;
+        height: 100%; overflow: hidden;
+        transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+        animation: mwRise .45s ease both; }}
+      [data-testid="stVerticalBlockBorderWrapper"]:hover {{
+        transform: translateY(-3px); border-color: {p['accent']} !important;
+        box-shadow: 0 12px 30px {p['shadow']}; }}
+      @keyframes mwRise {{ from {{ opacity: 0; transform: translateY(9px); }} to {{ opacity: 1; transform: none; }} }}
+      @keyframes mwFade {{ from {{ opacity: 0; }} to {{ opacity: 1; }} }}
+
+      .mw-card {{ padding: 15px 16px 4px; }}
+      .mw-meta {{ display: flex; align-items: center; gap: 10px; margin-bottom: 9px; }}
+      .mw-src {{ font-size: 10px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase;
+        padding: 3px 8px; border-radius: 3px; color: {p['bg']}; background: {p['accent']}; white-space: nowrap; }}
+      .mw-src.notif {{ background: {p['accent2']}; }}
+      .mw-time {{ font-size: 11px; color: {p['muted']}; letter-spacing: .02em; margin-left: auto; text-align: right; }}
+      .mw-head {{ font-family: 'Source Serif 4', Georgia, serif; font-weight: 700; font-size: 17px;
+        line-height: 1.24; color: {p['heading']}; margin: 0 0 8px; }}
+      .mw-sum {{ font-size: 13px; line-height: 1.5; color: {p['muted']};
+        display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }}
+      .mw-nosum {{ font-style: italic; opacity: .8; }}
+      .mw-tag {{ font-size: 9px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+        color: {p['muted']}; border: 1px solid {p['border']}; border-radius: 3px; padding: 1px 5px; margin-left: 7px; }}
+
+      /* expander = the in-card 'Full text' toggle (strip its default chrome) */
+      [data-testid="stExpander"] {{ border: none !important; background: transparent !important; }}
+      [data-testid="stExpander"] details {{ border: none !important; background: transparent !important; }}
+      [data-testid="stExpander"] summary {{ color: {p['accent']}; font-size: 12px; font-weight: 600; padding: 4px 16px; }}
+      [data-testid="stExpander"] summary:hover {{ color: {p['accent']}; opacity: .78; }}
+      [data-testid="stExpander"] summary p {{ color: {p['accent']} !important; font-weight: 600; }}
+      [data-testid="stExpander"] [data-testid="stMarkdownContainer"] p {{ color: {p['text']}; font-size: 13.5px; line-height: 1.55; }}
 
       /* links */
-      .stApp a, [data-testid="stMarkdownContainer"] a {{ color: {p['link']} !important; text-decoration: none; }}
+      .stApp a, [data-testid="stMarkdownContainer"] a {{ color: {p['link']} !important; text-decoration: none; font-weight: 600; }}
       .stApp a:hover {{ text-decoration: underline; }}
 
-      /* text input — force bg + text so it tracks the theme (esp. light palettes,
-         which would otherwise inherit Streamlit's dark base and hide typed text) */
+      /* ---- inputs ---- */
       .stTextInput div[data-baseweb="input"],
       .stTextInput div[data-baseweb="base-input"] {{ background-color: {p['panel']} !important; border-color: {p['border']} !important; }}
       .stTextInput input {{ background-color: {p['panel']} !important; color: {p['text']} !important; -webkit-text-fill-color: {p['text']}; }}
       .stTextInput input::placeholder {{ color: {p['muted']} !important; -webkit-text-fill-color: {p['muted']}; opacity: 1; }}
       [data-testid="InputInstructions"] {{ color: {p['muted']} !important; }}
+      .stDateInput div[data-baseweb="input"], .stDateInput div[data-baseweb="base-input"] {{ background-color: {p['panel']} !important; border-color: {p['border']} !important; }}
+      .stDateInput input {{ background-color: {p['panel']} !important; color: {p['text']} !important; -webkit-text-fill-color: {p['text']}; }}
 
-      /* selectbox — closed control */
+      /* selectbox / multiselect — closed control */
       [data-baseweb="select"] > div {{ background-color: {p['panel']} !important; border-color: {p['border']} !important; }}
       [data-baseweb="select"] div {{ color: {p['text']} !important; }}
       [data-baseweb="select"] svg {{ fill: {p['muted']}; }}
-      /* selectbox — open dropdown. It's portaled to <body> (outside .stApp), so
-         these selectors are global and forced, else light themes show dark-on-dark. */
-      [data-baseweb="popover"] > div,
-      [data-baseweb="menu"],
-      ul[role="listbox"] {{ background-color: {p['panel']} !important; border: 1px solid {p['border']} !important; }}
-      li[role="option"], [role="option"] {{ background-color: {p['panel']} !important; color: {p['text']} !important; }}
-      li[role="option"]:hover,
-      [role="option"][aria-selected="true"] {{ background-color: {p['border']} !important; color: {p['accent']} !important; }}
+      /* multiselect chips */
+      span[data-baseweb="tag"] {{ background-color: {p['accent']} !important; color: {p['bg']} !important; border-radius: 4px; }}
+      span[data-baseweb="tag"] span {{ color: {p['bg']} !important; }}
+      span[data-baseweb="tag"] svg {{ fill: {p['bg']} !important; }}
 
-      /* help (?) tooltips — also portaled outside .stApp; without this the popup
-         is dark-on-dark on light themes. Force theme bg + text on the content. */
+      /* portaled overlays (dropdowns, calendar) live outside .stApp — force globally */
+      [data-baseweb="popover"] > div, [data-baseweb="menu"], ul[role="listbox"] {{
+        background-color: {p['panel']} !important; border: 1px solid {p['border']} !important; }}
+      li[role="option"], [role="option"] {{ background-color: {p['panel']} !important; color: {p['text']} !important; }}
+      li[role="option"]:hover, [role="option"][aria-selected="true"] {{ background-color: {p['border']} !important; color: {p['accent']} !important; }}
+      /* date-picker calendar */
+      [data-baseweb="calendar"], [data-baseweb="calendar"] > div {{ background-color: {p['panel']} !important; }}
+      [data-baseweb="calendar"] * {{ color: {p['text']} !important; }}
+      [data-baseweb="calendar"] [aria-selected="true"] {{ background-color: {p['accent']} !important; color: {p['bg']} !important; }}
+      [data-baseweb="calendar"] [aria-selected="true"] * {{ color: {p['bg']} !important; }}
+
+      /* tooltips */
       [data-testid="stTooltipContent"] {{ background-color: {p['panel']} !important; border: 1px solid {p['border']} !important; }}
       [data-testid="stTooltipContent"], [data-testid="stTooltipContent"] * {{ color: {p['text']} !important; }}
 
+      /* radio (sort order) selected dot */
+      [role="radiogroup"] [aria-checked="true"] div:first-child {{ background-color: {p['accent']} !important; border-color: {p['accent']} !important; }}
+
       /* buttons */
-      .stButton > button {{ background-color: {p['panel']}; color: {p['text']}; border: 1px solid {p['border']}; }}
-      .stButton > button:hover {{ color: {p['accent']}; border-color: {p['accent']}; }}
+      .stButton > button {{ background-color: {p['panel']}; color: {p['text']}; border: 1px solid {p['border']};
+        border-radius: 6px; font-weight: 600; transition: all .15s ease; }}
+      .stButton > button:hover {{ color: {p['bg']}; background: {p['accent']}; border-color: {p['accent']}; }}
 
-      /* expander */
-      [data-testid="stExpander"] {{ background-color: {p['panel']}; border: 1px solid {p['border']}; border-radius: 6px; }}
-      [data-testid="stExpander"] summary {{ color: {p['text']}; }}
-      [data-testid="stExpander"] summary:hover {{ color: {p['accent']}; }}
-      [data-testid="stExpander"] [data-testid="stMarkdownContainer"] p {{ color: {p['text']}; }}
-
-      /* dividers */
       .stApp hr {{ border-color: {p['border']}; }}
     </style>
     """
@@ -227,9 +308,9 @@ st.query_params["theme"] = theme  # keep the URL in sync (shareable / sticky)
 st.query_params["sources"] = ",".join(sources)
 st.markdown(theme_css(THEMES[theme]), unsafe_allow_html=True)
 
-# --- header ------------------------------------------------------------------
-head, refresh = st.columns([6, 1])
-head.markdown("## ◢ MarketWire — RBI Press Releases & Notifications")
+# --- masthead ----------------------------------------------------------------
+st.markdown(_masthead_html(), unsafe_allow_html=True)
+_spacer, refresh = st.columns([6, 1])
 if refresh.button("⟳ Refresh", use_container_width=True):
     fetch_feed.clear()
     load_history.clear()
@@ -336,29 +417,24 @@ def wire():
         f"auto-refresh every {every} · last checked {checked} IST"
     )
 
-    for it in shown:
-        summary = (it.get("summary") or "").strip()
-        ts = it.get("ts")
-        dt = datetime.fromtimestamp(ts, IST) if ts else None
-        archived = dt is not None and not (dt.hour or dt.minute or dt.second)
-        if dt and not archived:
-            when = dt.strftime("%d %b %Y · %H:%M IST")   # real time (live RSS)
-        elif dt:
-            when = dt.strftime("%d %b %Y")               # date only (archive — RBI's page has no time)
-        else:
-            when = it.get("published") or "—"
-        tag = " <span class='mw-tag'>ARCHIVE</span>" if archived else ""
-        src = it.get("source")
-        src_tag = f" <span class='mw-src'>{src}</span>" if src else ""
-        st.markdown(
-            f"**{it['title']}**  \n<span class='mw-time'>{when}</span>{src_tag}{tag}",
-            unsafe_allow_html=True,
-        )
-        with st.expander("details"):
-            st.write(summary or "(full text at the link below)")
-            if it["link"].startswith("http"):
-                st.markdown(f"[Open original ↗]({it['link']})")
-        st.divider()
+    # --- story grid: a uniform 3-up card grid (masthead-style, no hero) --------
+    CARD_COLS = 3
+    RENDER_CAP = 120          # bound the DOM; narrow with filters to reach the rest
+    visible = shown[:RENDER_CAP]
+    if len(shown) > RENDER_CAP:
+        st.caption(f"Showing the first {RENDER_CAP} of {len(shown)} — narrow with the filters above to see the rest.")
+    for row in range(0, len(visible), CARD_COLS):
+        cols = st.columns(CARD_COLS, gap="small")
+        for col, it in zip(cols, visible[row:row + CARD_COLS]):
+            with col:
+                with st.container(border=True):
+                    st.markdown(_story_card_html(it), unsafe_allow_html=True)
+                    with st.expander("Full text"):
+                        body = (it.get("summary") or "").strip()
+                        st.write(body or "(full text at the link below)")
+                        link = it.get("link") or ""
+                        if link.startswith("http"):
+                            st.markdown(f"[Open on rbi.org.in ↗]({link})")
 
 
 wire()
