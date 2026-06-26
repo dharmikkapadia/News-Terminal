@@ -15,8 +15,10 @@ On any failure it returns (items=[], error=str) and NEVER raises, so the app
 keeps working on the RSS feed alone.
 
 Heuristics (resilient to class/layout changes):
-  - a press release is any <a> whose href contains "prid=" (the detail page);
-    notifications are the <a>s whose href contains "notificationuser.aspx?id=";
+  - a press release is any <a> whose resolved URL contains "prid=" (the detail
+    page); notifications are the <a>s whose resolved URL is a "NotificationUser.aspx"
+    page carrying an "Id=" (matched on the absolute URL so relative listing hrefs
+    like "?Id=123&Mode=0" still resolve correctly);
   - its title is the link text; its date is the first date found by walking a
     few ancestors (handles both per-row dates and date-grouped sections).
 
@@ -39,9 +41,12 @@ except Exception:
 
 LISTING_URL = "https://www.rbi.org.in/Scripts/BS_PressReleaseDisplay.aspx"
 NOTIFICATIONS_LISTING_URL = "https://www.rbi.org.in/Scripts/NotificationUser.aspx"
-# Substring (lowercased href) that marks a detail link for each feed.
-PRESS_HREF_MATCH = "prid="
-NOTIFICATIONS_HREF_MATCH = "notificationuser.aspx?id="
+# Substrings that ALL must appear (lowercased) in a link's RESOLVED absolute URL
+# for it to count as a detail link. Matching the resolved URL — not the raw href —
+# is what makes RBI's relative listing links (e.g. "?Id=123&Mode=0") work, and a
+# multi-substring match is order-independent (Id may not come first in the query).
+PRESS_HREF_MATCH = ("prid=",)
+NOTIFICATIONS_HREF_MATCH = ("notificationuser.aspx", "id=")
 UA = "Mozilla/5.0 (compatible; MarketWire/1.0; RSS reader)"
 IST = timezone(timedelta(hours=5, minutes=30))
 
@@ -76,8 +81,9 @@ def _key(link):
 
 
 def scrape_listing(url=LISTING_URL, timeout=20, href_match=PRESS_HREF_MATCH):
-    """Scrape an RBI listing page for detail links. `href_match` is the lowercased
-    href substring that marks a detail link (press releases vs notifications).
+    """Scrape an RBI listing page for detail links. `href_match` is a tuple of
+    lowercased substrings that ALL must appear in a link's resolved (absolute) URL
+    for it to count as a detail link (press releases vs notifications).
     Return (items, error). Never raises."""
     if not _HAVE_BS4:
         return [], "beautifulsoup4 not installed (pip install beautifulsoup4)"
@@ -91,12 +97,13 @@ def scrape_listing(url=LISTING_URL, timeout=20, href_match=PRESS_HREF_MATCH):
         soup = BeautifulSoup(resp.content, "html.parser")
         items, seen = [], set()
         for a in soup.find_all("a", href=True):
-            if href_match not in a["href"].lower():
+            link = requests.compat.urljoin(url, a["href"])  # resolve relative hrefs
+            low = link.lower()
+            if not all(s in low for s in href_match):
                 continue
             title = " ".join(a.get_text(" ", strip=True).split())
             if not title:
                 continue
-            link = requests.compat.urljoin(url, a["href"])
             key = _key(link) or link
             if key in seen:
                 continue
@@ -124,13 +131,42 @@ def scrape_listing(url=LISTING_URL, timeout=20, href_match=PRESS_HREF_MATCH):
 
 _DATE_LABEL_RE = re.compile(r"Date\s*:\s*([A-Za-z]{3,9}\s+\d{1,2},\s+\d{4})", re.I)
 
+# Containers RBI uses for the main body, most specific first. Press releases use
+# <div class="text1">; notification pages use a different template, so we also try
+# their known content cells and fall back to the largest text block on the page.
+_BODY_SELECTORS = [
+    ("div", {"class": "text1"}),         # press releases (and some notifications)
+    ("td", {"class": "tablecontent2"}),  # notification body cell
+    ("div", {"id": "divNotification"}),
+    ("div", {"class": "notification"}),
+]
+
+
+def _body_node(soup):
+    """Pick the element holding the main body. Tries known RBI containers, then
+    falls back to the leaf-most block with a substantial amount of text (skips
+    short nav/sidebar blocks and outer wrappers that would drag in the header)."""
+    for name, attrs in _BODY_SELECTORS:
+        node = soup.find(name, attrs=attrs)
+        if node and node.get_text(strip=True):
+            return node
+    blocks = [b for b in soup.find_all(["td", "div"]) if len(b.get_text(" ", strip=True)) > 200]
+    if not blocks:
+        return None
+    # Fewest nested td/div (most leaf-like) first, then most text — so we land on
+    # the content block itself, not a layout wrapper enclosing the whole page.
+    blocks.sort(key=lambda b: (len(b.find_all(["td", "div"])), -len(b.get_text(" ", strip=True))))
+    return blocks[0]
+
 
 def fetch_detail(url, title="", timeout=20):
-    """Fetch one press-release DETAIL page and pull the full body + date.
+    """Fetch one DETAIL page (press release or notification) and pull the full
+    body + date.
 
-    RBI puts the release in <div class="text1"> as "... Date : <date> <title> <body>"
-    and exposes only a DATE (no time), so the returned ts is that date at midnight.
-    Returns {"summary","published","ts"} or None. Never raises.
+    RBI puts the body in a content container (e.g. <div class="text1"> for press
+    releases) as "... Date : <date> <title> <body>" and exposes only a DATE (no
+    time), so the returned ts is that date at midnight. Returns
+    {"summary","published","ts"} or None. Never raises.
     """
     if not _HAVE_BS4:
         return None
@@ -141,7 +177,7 @@ def fetch_detail(url, title="", timeout=20):
         return None
     try:
         soup = BeautifulSoup(resp.content, "html.parser")
-        node = soup.find("div", class_="text1")
+        node = _body_node(soup)
         if node is None:
             return None
         txt = re.sub(r"\s+", " ", node.get_text(" ", strip=True)).strip()
