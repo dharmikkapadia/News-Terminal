@@ -1,42 +1,83 @@
 {
-  "captured_at": "2026-06-26T14:30:00+05:30",
+  "captured_at": "2026-06-26T23:30:36+05:30",
   "source": "https://www.rbi.org.in/",
   "policy_rates": {
     "repo_rate": 5.25,
-    "standing_deposit_facility_rate": 5.00,
-    "marginal_standing_facility_rate": 5.50,
-    "bank_rate": 5.50,
+    "standing_deposit_facility_rate": 5.0,
+    "marginal_standing_facility_rate": 5.5,
+    "bank_rate": 5.5,
     "fixed_reverse_repo_rate": 3.35
   },
-  "reserve_ratios": { "crr": 3.00, "slr": 18.00 },
+  "reserve_ratios": {
+    "crr": 3.0,
+    "slr": 18.0
+  },
   "exchange_rates": {
-    "as_of": "As at 1.00pm of June 25, 2026",
+    "as_of": null,
     "source": "FBIL",
     "inr_per_usd": 94.4804,
     "inr_per_gbp": 124.4987,
     "inr_per_eur": 107.3637,
-    "inr_per_100_jpy": 58.3800,
+    "inr_per_100_jpy": 58.38,
     "inr_per_aed": 25.7233,
     "inr_per_10000_idr": 52.6626
   },
   "lending_deposit_rates": {
-    "base_rate": [8.35, 9.90],
-    "mclr_overnight": [7.80, 7.95],
-    "savings_deposit_rate": 2.50,
-    "term_deposit_rate_gt_1yr": [6.00, 6.60]
+    "base_rate": [
+      8.35,
+      9.9
+    ],
+    "mclr_overnight": [
+      7.8,
+      7.95
+    ],
+    "savings_deposit_rate": 2.5,
+    "term_deposit_rate_gt_1yr": [
+      6.0,
+      6.6
+    ]
   },
   "market_trends": {
-    "money_market": { "call_rate": [4.20, 5.45], "as_on": "as on June 24, 2026" },
+    "money_market": {
+      "call_rate": [
+        4.2,
+        5.45
+      ],
+      "as_on": "as on June 24, 2026"
+    },
     "gsec_yields": [
-      { "security": "6.03% GS 2029", "yield": 6.1266 },
-      { "security": "6.36% GS 2031", "yield": 6.4241 },
-      { "security": "6.94% GS 2036", "yield": 6.7895 },
-      { "security": "6.68% GS 2040", "yield": 7.0813 },
-      { "security": "7.24% GS 2055", "yield": 7.4033 }
+      {
+        "security": "6.03% GS 2029",
+        "yield": 6.1266
+      },
+      {
+        "security": "6.36% GS 2031",
+        "yield": 6.4241
+      },
+      {
+        "security": "6.94% GS 2036",
+        "yield": 6.7895
+      },
+      {
+        "security": "6.68% GS 2040",
+        "yield": 7.0813
+      },
+      {
+        "security": "7.24% GS 2055",
+        "yield": 7.4033
+      }
     ],
-    "tbill_yields": { "91_day": 5.2476, "182_day": 5.4499, "364_day": 5.6387 },
+    "tbill_yields": {
+      "91_day": 5.2476,
+      "182_day": 5.4499,
+      "364_day": 5.6387
+    },
     "gsec_tbill_as_on": "as on June 24, 2026",
-    "capital_market": { "sensex": 76991.22, "nifty_50": 24021.65, "as_on": "as on June 24, 2026" }
+    "capital_market": {
+      "sensex": 76991.22,
+      "nifty_50": 24021.65,
+      "as_on": "as on June 24, 2026"
+    }
   },
   "mpc": {
     "next_meeting_start": "2026-08-03",
