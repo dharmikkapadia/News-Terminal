@@ -131,11 +131,13 @@ over a uniform **grid of story cards**, each tagged with its colour-coded source
 a serif headline, a summary preview, and a **Full text** expander, with subtle
 fade-in/hover motion.
 
-**Themes:** four flagship palettes in the sidebar — **Bloomberg** (dark amber),
-**Reuters** (light orange), **Paper** (warm light), **High Contrast** (black/yellow).
-Every palette is tuned so all text stays legible (including portaled overlays like
-dropdowns and the date-picker), and your choice is remembered in the URL (`?theme=…`),
-so it sticks and is shareable.
+**Themes:** five flagship palettes in the sidebar — **Bloomberg** (dark amber),
+**Reuters** (light orange), **Paper** (warm light), **Trading Economics** (light,
+navy/blue data-site look with a sans headline font), and **High Contrast**
+(black/yellow). Each theme carries its own headline font stack (`headfont` — serif
+for the newspaper looks, sans for Trading Economics). Every palette is tuned so all
+text stays legible (including portaled overlays like dropdowns and the date-picker),
+and your choice is remembered in the URL (`?theme=…`), so it sticks and is shareable.
 
 ## Run locally
 
