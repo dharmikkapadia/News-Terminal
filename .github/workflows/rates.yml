@@ -1,8 +1,11 @@
 name: MarketWire rates
 
-# Refreshes the Current Rates snapshot (data/rates.json) ONCE A DAY, at local midnight.
-# Kept separate from the history poller so the rates scrape runs on its own daily cadence
-# and the manual snapshot (the source of truth) is touched at most once a day.
+# Refreshes the Current Rates snapshot (data/rates.json) ONCE A DAY, after RBI's 1pm
+# FX update. RBI's home page stamps its exchange rates "As at 1.00pm" (FBIL's daily
+# USD/INR reference rate), so scraping in the early afternoon captures the SAME day's
+# rates; a midnight run would only ever get the previous day's. Kept separate from the
+# history poller so the rates scrape runs on its own daily cadence and the manual
+# snapshot (the source of truth) is touched at most once a day.
 #
 # rates.poll_rates() (via `python rates.py`) writes the file ONLY on a complete, in-bounds
 # parse, so a blocked / JS-rendered / changed-markup scrape leaves the committed snapshot
@@ -11,11 +14,12 @@ name: MarketWire rates
 
 on:
   schedule:
-    # 00:00 IST = 18:30 UTC (IST = UTC+5:30). GitHub's scheduler is best-effort — a daily
-    # run may be delayed a bit or, rarely, skipped; fine for a once-a-day snapshot. For
-    # exact timing, also point an external cron at this workflow's workflow_dispatch
-    # (same setup as README → "Reliable 30-min cadence", just once a day on this file).
-    - cron: "30 18 * * *"
+    # 13:30 IST = 08:00 UTC (IST = UTC+5:30). A ~30-min buffer past RBI's "1.00pm" FX
+    # stamp so the same-day reference rate has actually posted, and to absorb GitHub's
+    # best-effort scheduler drift (a run may be delayed a bit or, rarely, skipped — fine
+    # for a once-a-day snapshot). For exact timing, also point an external cron at this
+    # workflow's workflow_dispatch (same setup as README → "Reliable 30-min cadence").
+    - cron: "0 8 * * *"
   workflow_dispatch: {}       # manual runs (Actions tab) + optional external cron
 
 permissions:
