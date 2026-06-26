@@ -126,6 +126,27 @@ for notifications — it auto-selects the right matcher). For deeper history, ad
 month/year listing URLs (comma-separated) via the `MARKETWIRE_ARCHIVE_URLS` (press) /
 `MARKETWIRE_NOTIFICATIONS_ARCHIVE_URLS` (notifications) env var / repo variable.
 
+### Current Rates dashboard (equity desk)
+
+Above the wire, an opt-in **Current Rates** panel (sidebar **Show rates dashboard**) gives
+an equity-investor snapshot of RBI's home-page rates: a **signal strip** — Policy Repo, the
+SDF/MSF LAF corridor, CRR/SLR, USD/INR, the ~10-year benchmark G-Sec, and a **next-MPC-meeting
+countdown** ("Next MPC: Aug 3–5, 2026 · in 38 days") — over an expandable **full rate card**
+(policy/reserve/exchange/lending-deposit rates and market trends: call money, G-Sec & T-bill
+yields, Sensex/Nifty), each with its "as on" stamp.
+
+It reads a committed **`data/rates.json`** (`rates.py`), refreshed two ways:
+- **Manual (source of truth):** RBI 403s datacenter IPs and the rates box is a JS accordion,
+  so a **Claude-for-Chrome** run on rbi.org.in is the reliable extractor — it emits the JSON
+  (including the next MPC date, which isn't on the home page); commit it.
+- **Automated (best-effort):** the poller (`poll.py`, on the cron) calls `rates.poll_rates()`,
+  which scrapes the home page and rewrites the file **only on a complete, in-bounds parse** —
+  a blocked/partial scrape leaves the committed manual snapshot untouched, and the MPC block is
+  preserved. Like `rbi_archive.py`, the scraper needs validating from a host that can reach RBI.
+
+This pairs with the new dark **Equity Terminal** theme (now the default) — charcoal page,
+terminal-green press tags, amber notifications, monospace numerics.
+
 **Look & feel:** the app is laid out like a news website — a newspaper **masthead**
 over your choice of two layouts (sidebar **Layout** toggle, remembered via `?layout=`):
 - **Stream** (default) — a single-column feed (Trading Economics style): underlined
@@ -138,11 +159,12 @@ over your choice of two layouts (sidebar **Layout** toggle, remembered via `?lay
 Both tag every item with its colour-coded source, link the headline straight to RBI,
 and use subtle fade-in/hover motion.
 
-**Themes:** five flagship palettes in the sidebar — **Bloomberg** (dark amber),
-**Reuters** (light orange), **Paper** (warm light), **Trading Economics** (light,
-navy/blue data-site look with a sans headline font), and **High Contrast**
-(black/yellow). Each theme carries its own headline font stack (`headfont` — serif
-for the newspaper looks, sans for Trading Economics). Every palette is tuned so all
+**Themes:** six flagship palettes in the sidebar — **Equity Terminal** (dark trading-desk,
+the default), **Bloomberg** (dark amber), **Reuters** (light orange), **Paper** (warm light),
+**Trading Economics** (light, navy/blue data-site look with a sans headline font), and
+**High Contrast** (black/yellow). Each theme carries its own headline font stack (`headfont` —
+serif for the newspaper looks, sans for the data-site looks) and `up`/`down` gain/loss colours
+for the rates dashboard. Every palette is tuned so all
 text stays legible (including portaled overlays like dropdowns and the date-picker),
 and your choice is remembered in the URL (`?theme=…`), so it sticks and is shareable.
 
