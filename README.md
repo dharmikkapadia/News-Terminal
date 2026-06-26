@@ -29,12 +29,32 @@ and writes **`data/history.jsonl`** (deduped by `prid`, JSON-lines so each updat
 a small git diff), then commits it. The app reads that committed file and merges it
 with the live feed — so history survives Streamlit Cloud restarts with no DB.
 
-- The Action runs every 30 minutes (and on demand via **Actions → Run workflow**),
-  **independently of the app** — it keeps building history even while the Streamlit
-  app is asleep. It only commits when something changed. Tune the `cron` in the workflow.
-  At 30 min it uses ~1,460 Actions minutes/month, comfortably under the 2,000-min
-  private-repo free tier. (Going faster on a private repo can exceed it — each run
-  bills as a full minute — so make the repo **public** for free unlimited Actions first.)
+- The workflow runs **independently of the app** — it keeps building history even
+  while the Streamlit app is asleep, and only commits when something changed. Each
+  run bills as ~1 Actions minute on a private repo (free tier: 2,000 min/month).
+
+#### Reliable 30-min cadence (external cron)
+
+GitHub's own scheduler is **best-effort and unreliable** — a `*/30` cron here actually
+fired only ~every 90 min (GitHub drops most frequent scheduled runs). So the workflow's
+built-in `schedule` is just a sparse **6-hour fallback**; the primary cadence comes from
+an **external cron** that calls the `workflow_dispatch` API every 30 min:
+
+1. Create a **fine-grained PAT** (GitHub → Settings → Developer settings → Fine-grained
+   tokens): scope it to **only this repo**, permission **Actions: Read and write**
+   (Metadata: read is automatic). Set an expiry and save the token.
+2. In a free cron service (e.g. [cron-job.org](https://cron-job.org)), add a job every
+   30 min:
+   - **URL:** `https://api.github.com/repos/dharmikkapadia/News-Terminal/actions/workflows/history.yml/dispatches`
+   - **Method:** `POST`
+   - **Headers:** `Accept: application/vnd.github+json`, `X-GitHub-Api-Version: 2022-11-28`,
+     `Authorization: Bearer <YOUR_PAT>`
+   - **Body:** `{"ref":"main"}`
+   - Expect HTTP **204** on success.
+
+This gives a dependable 30-min cadence and bypasses GitHub's flaky scheduler. ~48
+runs/day ≈ 1,460 min/month — within the free tier. (Security: the token lives in the
+cron service, so keep it minimally scoped and rotate it on expiry.)
 - Run it yourself anytime: `python poll.py` (writes `data/history.jsonl`).
 - **Trade-offs:** history grows at the Action's cadence (not instant — the *live*
   view is still real-time); and because each commit updates the tracked branch,
