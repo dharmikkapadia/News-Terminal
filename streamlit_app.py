@@ -101,12 +101,23 @@ def _story_card_html(it):
     arch = " <span class='mw-tag'>ARCHIVE</span>" if archived else ""
     summary = (it.get("summary") or "").strip()
     preview = html.escape(summary[:340]) if summary else "<span class='mw-nosum'>Open for the full text →</span>"
+    title = html.escape(it.get("title") or "(untitled)")
+    link = it.get("link") or ""
+    # Linkify the headline + show an explicit 'open' link, so the RBI page is one
+    # click away without expanding. Only for real http links (archive stubs may lack one).
+    if link.startswith("http"):
+        href = html.escape(link, quote=True)
+        head = f"<a href='{href}' target='_blank' rel='noopener'>{title}</a>"
+        open_link = f"<a class='mw-open' href='{href}' target='_blank' rel='noopener'>Open on rbi.org.in ↗</a>"
+    else:
+        head, open_link = title, ""
     return (
         "<div class='mw-card'>"
         f"<div class='mw-meta'><span class='mw-src {notif}'>{html.escape(src)}</span>"
         f"<span class='mw-time'>{when}{arch}</span></div>"
-        f"<div class='mw-head'>{html.escape(it.get('title') or '(untitled)')}</div>"
+        f"<div class='mw-head'>{head}</div>"
         f"<div class='mw-sum'>{preview}</div>"
+        f"{open_link}"
         "</div>"
     )
 
@@ -205,9 +216,16 @@ def theme_css(p):
       .mw-time {{ font-size: 11px; color: {p['muted']}; letter-spacing: .02em; margin-left: auto; text-align: right; }}
       .mw-head {{ font-family: 'Source Serif 4', Georgia, serif; font-weight: 700; font-size: 17px;
         line-height: 1.24; color: {p['heading']}; margin: 0 0 8px; }}
+      /* clickable headline -> opens the RBI source in a new tab (keep heading colour) */
+      [data-testid="stMarkdownContainer"] .mw-head a {{ color: {p['heading']} !important; text-decoration: none; }}
+      [data-testid="stMarkdownContainer"] .mw-head a:hover {{ color: {p['accent']} !important; text-decoration: underline; }}
       .mw-sum {{ font-size: 13px; line-height: 1.5; color: {p['muted']};
         display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }}
       .mw-nosum {{ font-style: italic; opacity: .8; }}
+      /* always-visible 'open original' link on the card face (no expand needed) */
+      [data-testid="stMarkdownContainer"] .mw-open {{ display: inline-block; margin: 11px 0 2px;
+        font-size: 12px; font-weight: 600; color: {p['link']} !important; }}
+      [data-testid="stMarkdownContainer"] .mw-open:hover {{ text-decoration: underline; }}
       .mw-tag {{ font-size: 9px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
         color: {p['muted']}; border: 1px solid {p['border']}; border-radius: 3px; padding: 1px 5px; margin-left: 7px; }}
 
@@ -431,10 +449,7 @@ def wire():
                     st.markdown(_story_card_html(it), unsafe_allow_html=True)
                     with st.expander("Full text"):
                         body = (it.get("summary") or "").strip()
-                        st.write(body or "(full text at the link below)")
-                        link = it.get("link") or ""
-                        if link.startswith("http"):
-                            st.markdown(f"[Open on rbi.org.in ↗]({link})")
+                        st.write(body or "(full text not stored yet — use the link above to open it on rbi.org.in)")
 
 
 wire()
