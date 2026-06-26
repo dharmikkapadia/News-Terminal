@@ -126,10 +126,16 @@ for notifications — it auto-selects the right matcher). For deeper history, ad
 month/year listing URLs (comma-separated) via the `MARKETWIRE_ARCHIVE_URLS` (press) /
 `MARKETWIRE_NOTIFICATIONS_ARCHIVE_URLS` (notifications) env var / repo variable.
 
-**Themes:** pick a data-terminal palette in the sidebar — Bloomberg, Reuters
-Carbon, Amber/Green phosphor, Ice (cyan), a high-contrast light **Paper**, or
-**High Contrast**. Every palette is tuned so all text stays legible, and your
-choice is remembered in the URL (`?theme=…`), so it sticks and is shareable.
+**Look & feel:** the app is laid out like a news website — a newspaper **masthead**
+over a uniform **grid of story cards**, each tagged with its colour-coded source,
+a serif headline, a summary preview, and a **Full text** expander, with subtle
+fade-in/hover motion.
+
+**Themes:** four flagship palettes in the sidebar — **Bloomberg** (dark amber),
+**Reuters** (light orange), **Paper** (warm light), **High Contrast** (black/yellow).
+Every palette is tuned so all text stays legible (including portaled overlays like
+dropdowns and the date-picker), and your choice is remembered in the URL (`?theme=…`),
+so it sticks and is shareable.
 
 ## Run locally
 
