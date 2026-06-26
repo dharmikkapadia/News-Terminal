@@ -8,8 +8,9 @@ or pick individually), each item tagged with its source
 (`RBI - Press Release` / `RBI - Notifications`), plus a theme picker. The UI is laid
 out like a news website: a serif **masthead** over a uniform **card grid** (`st.columns`
 + bordered `st.container`s) rendered by `_story_card_html`, summary preview + a
-**Full text** expander per card, subtle fade-in/hover CSS, and four flagship themes
-(Bloomberg, Reuters, Paper, High Contrast). Durable history accumulates per feed
+**Full text** expander per card, subtle fade-in/hover CSS, and five flagship themes
+(Bloomberg, Reuters, Paper, Trading Economics, High Contrast — each with its own
+`headfont` stack, serif or sans). Durable history accumulates per feed
 via `store.py` (SQLite/Postgres/Turso — one table per feed) **and** in-repo
 `data/history.jsonl` (press releases) + `data/notifications.jsonl` (notifications),
 both maintained by a scheduled GitHub Action running `poll.py` (every 30 min).

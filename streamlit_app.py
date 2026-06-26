@@ -122,26 +122,33 @@ def _story_card_html(it):
     )
 
 # --------------------------------------------------------------------------- #
-# Themes — four flagship palettes, two dark + two light, each tuned for contrast
-# so ALL text (headlines, body, timestamps, captions, inputs, links) stays legible.
+# Themes — flagship palettes, each tuned for contrast so ALL text (headlines, body,
+# timestamps, captions, inputs, links) stays legible.
 #   bg=page  panel=cards/inputs/sidebar  text=body  heading=headlines
 #   muted=timestamps/captions  accent=primary brand (Press tag, hover, focus)
 #   accent2=secondary (Notifications tag)  link=hyperlinks  border=hairlines
-#   shadow=card hover glow (rgba)
+#   shadow=card hover glow (rgba)  headfont=masthead/headline font stack
 # --------------------------------------------------------------------------- #
+_SERIF = "'Source Serif 4', Georgia, 'Times New Roman', serif"   # newspaper headlines
+_SANS = "'Libre Franklin', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"  # data-site headlines
 THEMES = {
     "Bloomberg": dict(bg="#0A0A0A", panel="#161513", text="#E8E2D6", heading="#FBF7EF",
                       muted="#9A9080", accent="#FF9E1B", accent2="#4FC3E8", link="#6FD0EE",
-                      border="#2A2622", shadow="rgba(255,158,27,.12)"),
+                      border="#2A2622", shadow="rgba(255,158,27,.12)", headfont=_SERIF),
     "Reuters": dict(bg="#FFFFFF", panel="#FFFFFF", text="#15171C", heading="#08090B",
                     muted="#5C616B", accent="#FB6400", accent2="#0B6EFD", link="#0A66C2",
-                    border="#E5E7EB", shadow="rgba(15,23,42,.10)"),
+                    border="#E5E7EB", shadow="rgba(15,23,42,.10)", headfont=_SERIF),
     "Paper": dict(bg="#FBFAF4", panel="#FFFFFF", text="#1C1B17", heading="#12110D",
                   muted="#6A6456", accent="#B3471B", accent2="#1D4ED8", link="#1D4ED8",
-                  border="#E7E1D2", shadow="rgba(80,60,30,.10)"),
+                  border="#E7E1D2", shadow="rgba(80,60,30,.10)", headfont=_SERIF),
+    # Trading Economics-inspired: soft-grey page, white cards, navy headlines,
+    # signal blue/green accents, crisp sans (no serif) — a markets-data look.
+    "Trading Economics": dict(bg="#EEF2F6", panel="#FFFFFF", text="#1C2A38", heading="#14304F",
+                              muted="#6A7889", accent="#0E72BC", accent2="#13A36B", link="#0E72BC",
+                              border="#DCE3EB", shadow="rgba(16,48,90,.12)", headfont=_SANS),
     "High Contrast": dict(bg="#000000", panel="#0C0C0C", text="#FFFFFF", heading="#FFFF00",
                           muted="#D8D8D8", accent="#FFE000", accent2="#5AD1FF", link="#6BD8FF",
-                          border="#5C5C5C", shadow="rgba(255,224,0,.20)"),
+                          border="#5C5C5C", shadow="rgba(255,224,0,.20)", headfont=_SERIF),
 }
 DEFAULT_THEME = "Bloomberg"
 
@@ -178,7 +185,7 @@ def theme_css(p):
       .mw-kicker {{ display: flex; justify-content: space-between; align-items: center;
         font-size: 11px; letter-spacing: .16em; text-transform: uppercase; font-weight: 600;
         color: {p['muted']}; border-top: 1px solid {p['border']}; border-bottom: 1px solid {p['border']}; padding: 7px 2px; }}
-      .mw-wordmark {{ font-family: 'Source Serif 4', Georgia, serif; font-weight: 900;
+      .mw-wordmark {{ font-family: {p['headfont']}; font-weight: 900;
         font-size: clamp(38px, 6.5vw, 74px); line-height: 1.02; letter-spacing: -.02em;
         color: {p['heading']}; margin: .16em 0 .05em; }}
       .mw-wordmark::first-letter {{ color: {p['accent']}; }}
@@ -189,7 +196,7 @@ def theme_css(p):
 
       /* ---- headings & body ---- */
       .stApp h1, .stApp h2, .stApp h3, .stApp h4, .stApp h5 {{ color: {p['heading']};
-        font-family: 'Source Serif 4', Georgia, serif; }}
+        font-family: {p['headfont']}; }}
       .stApp p, .stApp li, .stApp strong,
       [data-testid="stMarkdownContainer"], [data-testid="stMarkdownContainer"] p,
       [data-testid="stWidgetLabel"], [data-testid="stWidgetLabel"] p,
@@ -214,7 +221,7 @@ def theme_css(p):
         padding: 3px 8px; border-radius: 3px; color: {p['bg']}; background: {p['accent']}; white-space: nowrap; }}
       .mw-src.notif {{ background: {p['accent2']}; }}
       .mw-time {{ font-size: 11px; color: {p['muted']}; letter-spacing: .02em; margin-left: auto; text-align: right; }}
-      .mw-head {{ font-family: 'Source Serif 4', Georgia, serif; font-weight: 700; font-size: 17px;
+      .mw-head {{ font-family: {p['headfont']}; font-weight: 700; font-size: 17px;
         line-height: 1.24; color: {p['heading']}; margin: 0 0 8px; }}
       /* clickable headline -> opens the RBI source in a new tab (keep heading colour) */
       [data-testid="stMarkdownContainer"] .mw-head a {{ color: {p['heading']} !important; text-decoration: none; }}
