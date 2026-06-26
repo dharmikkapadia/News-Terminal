@@ -105,55 +105,181 @@ def _num(s):
     return float(m.group(0)) if m else None
 
 
-def _after(text, label, window=60):
-    """The first number appearing within `window` chars after `label` in `text`."""
-    m = re.search(re.escape(label), text, re.I)
-    if not m:
+def _range(s):
+    """A '6.00% - 6.60%' band -> [6.0, 6.6]; a single '2.50%' -> [2.5, 2.5]; else None."""
+    if s is None:
         return None
-    return _num(text[m.end(): m.end() + window])
+    nums = re.findall(r"-?\d[\d,]*\.?\d*", str(s).replace(",", ""))
+    if not nums:
+        return None
+    return [float(nums[0]), float(nums[-1])]
+
+
+def _norm(s):
+    return re.sub(r"\s+", " ", (s or "").strip()).lower()
+
+
+def _rows(content):
+    """[(label, value)] for every <tr> with a <th>+<td> inside an accordion panel; the
+    value has RBI's leading ': ' stripped."""
+    out = []
+    if content is None:
+        return out
+    for tr in content.find_all("tr"):
+        th, td = tr.find("th"), tr.find("td")
+        if th and td:
+            label = re.sub(r"\s+", " ", th.get_text(" ", strip=True))
+            value = td.get_text(" ", strip=True).lstrip(": ").strip()
+            out.append((label, value))
+    return out
+
+
+def _pick(rows, *needles):
+    """Value of the first row whose lower-cased label contains all `needles`."""
+    for label, value in rows:
+        low = label.lower()
+        if all(n in low for n in needles):
+            return value
+    return None
+
+
+# The five Current Rates panels, by their accordion header text (the page has other
+# accordions sharing the class, so we match on these names).
+_PANEL_NAMES = {"policy rates", "reserve ratios", "exchange rates",
+                "lending / deposit rates", "market trends"}
+
+
+def _find_panels(soup):
+    """{normalized panel name: accordionContent element} for the Current Rates widget —
+    each `h3.accordionButton` whose text is a known panel, paired with its following
+    `div.accordionContent` sibling. Scoped to `div#wrapper` when present."""
+    scope = soup.find(id="wrapper") or soup
+    panels = {}
+    for h in scope.find_all("h3", class_="accordionButton"):
+        name = _norm(h.get_text(" ", strip=True))
+        if name in _PANEL_NAMES:
+            content = h.find_next_sibling("div", class_="accordionContent")
+            if content is not None:
+                panels[name] = content
+    return panels
+
+
+def _parse_market_trends(content):
+    """Walk the Market Trends panel in document order, routing each <tr> by its inner <h3>
+    sub-section and label into money-market / G-Sec / T-bill / capital-market, and each
+    'as on …' subText note to its section."""
+    mt = {
+        "money_market": {"call_rate": None, "as_on": None},
+        "gsec_yields": [],
+        "tbill_yields": {"91_day": None, "182_day": None, "364_day": None},
+        "gsec_tbill_as_on": None,
+        "capital_market": {"sensex": None, "nifty_50": None, "as_on": None},
+    }
+    if content is None:
+        return mt
+    section = ""
+    for el in content.find_all(["h3", "tr", "span"]):
+        if el.name == "h3":
+            section = _norm(el.get_text(" ", strip=True))
+        elif el.name == "tr":
+            th, td = el.find("th"), el.find("td")
+            if not (th and td):
+                continue
+            label = re.sub(r"\s+", " ", th.get_text(" ", strip=True))
+            low = label.lower()
+            value = td.get_text(" ", strip=True).lstrip(": ").strip()
+            if "call" in low:
+                mt["money_market"]["call_rate"] = _range(value)
+            elif "t-bill" in low or "t bill" in low or "treasury bill" in low:
+                m = re.search(r"(91|182|364)", low)
+                if m:
+                    mt["tbill_yields"][f"{m.group(1)}_day"] = _num(value)
+            elif re.search(r"gs\s*20\d\d", low) or "g-sec" in low:
+                y = _num(value)
+                if y is not None:
+                    mt["gsec_yields"].append({"security": label, "yield": y})
+            elif "sensex" in low:
+                mt["capital_market"]["sensex"] = _num(value)
+            elif "nifty" in low:
+                mt["capital_market"]["nifty_50"] = _num(value)
+        elif el.name == "span" and "subText" in (el.get("class") or []):
+            note = el.get_text(" ", strip=True)
+            if "as on" in note.lower():
+                if "money" in section:
+                    mt["money_market"]["as_on"] = note
+                elif "government" in section or "securities" in section:
+                    mt["gsec_tbill_as_on"] = note
+                elif "capital" in section:
+                    mt["capital_market"]["as_on"] = note
+                else:
+                    mt["gsec_tbill_as_on"] = mt["gsec_tbill_as_on"] or note
+    return mt
 
 
 def fetch_rates(url=HOME_URL, timeout=20):
-    """Scrape RBI's home-page Current Rates box. Returns (rates_dict, error).
+    """Scrape RBI's home-page Current Rates accordion (`div#wrapper`) into the rates schema.
+    Returns (rates_dict, error).
 
-    BEST EFFORT: RBI may 403 datacenter IPs, the box may be JS-rendered (values absent
-    from the served HTML), and the markup can change — any of which yields a partial or
-    empty result that _is_complete() will reject. Validate from a host that can reach RBI.
+    The widget is server-rendered: each `h3.accordionButton` is followed by a
+    `div.accordionContent` whose <table> rows are `<th>label</th><td>: value</td>`; Market
+    Trends is sub-sectioned by inner <h3> (Money Market / Government Securities / Capital).
+    BEST EFFORT: RBI may 403 datacenter IPs and the markup can change — either yields a
+    partial result that _is_complete() rejects. Validate from a host that can reach RBI.
     """
     try:
         resp = requests.get(url, headers={"User-Agent": UA}, timeout=timeout)
         resp.raise_for_status()
     except Exception as ex:
         return None, f"{type(ex).__name__}: {ex}"
-
     try:
         from bs4 import BeautifulSoup
-        text = BeautifulSoup(resp.content, "html.parser").get_text(" ", strip=True)
-    except Exception:
-        text = re.sub(r"<[^>]+>", " ", resp.text)
-    text = re.sub(r"\s+", " ", text)
+    except Exception as ex:
+        return None, f"BeautifulSoup unavailable: {ex}"
 
-    rates = {
-        "captured_at": datetime.now(IST).isoformat(timespec="seconds"),
-        "source": url,
-        "policy_rates": {
-            "repo_rate": _after(text, "Policy Repo Rate"),
-            "standing_deposit_facility_rate": _after(text, "Standing Deposit Facility Rate"),
-            "marginal_standing_facility_rate": _after(text, "Marginal Standing Facility Rate"),
-            "bank_rate": _after(text, "Bank Rate"),
-            "fixed_reverse_repo_rate": _after(text, "Fixed Reverse Repo Rate"),
-        },
-        "reserve_ratios": {"crr": _after(text, "CRR"), "slr": _after(text, "SLR")},
-        "exchange_rates": {
-            "as_of": None, "source": "FBIL",
-            "inr_per_usd": _after(text, "1 USD"),
-            "inr_per_gbp": _after(text, "1 GBP"),
-            "inr_per_eur": _after(text, "1 EUR"),
-            "inr_per_100_jpy": _after(text, "100 JPY"),
-            "inr_per_aed": _after(text, "1 AED"),
-            "inr_per_10000_idr": _after(text, "10000 IDR"),
-        },
+    soup = BeautifulSoup(resp.content, "html.parser")
+    panels = _find_panels(soup)
+    if "policy rates" not in panels:
+        return None, "Current Rates widget not found (markup changed or page blocked)"
+
+    rates = {"captured_at": datetime.now(IST).isoformat(timespec="seconds"), "source": url}
+
+    pol = _rows(panels.get("policy rates"))
+    rates["policy_rates"] = {
+        "repo_rate": _num(_pick(pol, "policy repo")),
+        "standing_deposit_facility_rate": _num(_pick(pol, "standing deposit")),
+        "marginal_standing_facility_rate": _num(_pick(pol, "marginal standing")),
+        "bank_rate": _num(_pick(pol, "bank rate")),
+        "fixed_reverse_repo_rate": _num(_pick(pol, "fixed reverse")),
     }
+
+    res = _rows(panels.get("reserve ratios"))
+    rates["reserve_ratios"] = {"crr": _num(_pick(res, "crr")), "slr": _num(_pick(res, "slr"))}
+
+    fxp = panels.get("exchange rates")
+    fxr = _rows(fxp)
+    fx_text = fxp.get_text(" ", strip=True) if fxp else ""
+    m_as = re.search(r"As at .*?\d{4}", fx_text)
+    m_src = re.search(r"Source\s*:?\s*([A-Za-z]+)", fx_text)
+    rates["exchange_rates"] = {
+        "as_of": m_as.group(0).strip() if m_as else None,
+        "source": m_src.group(1).strip() if m_src else None,
+        "inr_per_usd": _num(_pick(fxr, "usd")),
+        "inr_per_gbp": _num(_pick(fxr, "gbp")),
+        "inr_per_eur": _num(_pick(fxr, "eur")),
+        "inr_per_100_jpy": _num(_pick(fxr, "jpy")),
+        "inr_per_aed": _num(_pick(fxr, "aed")),
+        "inr_per_10000_idr": _num(_pick(fxr, "idr")),
+    }
+
+    lend = _rows(panels.get("lending / deposit rates"))
+    rates["lending_deposit_rates"] = {
+        "base_rate": _range(_pick(lend, "base rate")),
+        "mclr_overnight": _range(_pick(lend, "mclr")),
+        "savings_deposit_rate": _num(_pick(lend, "savings")),
+        "term_deposit_rate_gt_1yr": _range(_pick(lend, "term deposit")),
+    }
+
+    rates["market_trends"] = _parse_market_trends(panels.get("market trends"))
     return rates, None
 
 
@@ -211,12 +337,25 @@ def poll_rates(path=RATES_PATH, url=HOME_URL):
             prior = json.load(f)
     except Exception:
         prior = {}
-    merged = dict(prior)
-    merged.update(scraped)
-    if prior.get("mpc") and not merged.get("mpc"):   # MPC isn't on the home page
-        merged["mpc"] = prior["mpc"]
+    merged = _merge(prior, scraped)   # scrape covers all panels but MPC; deep-merge keeps it
     save_rates(merged, path)
     return f"rates updated ({merged['policy_rates']['repo_rate']}% repo)"
+
+
+def _merge(prior, scraped):
+    """Deep-merge a scrape onto the prior snapshot: scraped non-null scalars and non-empty
+    lists win; None / missing / empty-list keep the prior value — so a partial parse never
+    wipes good data, and fields the scrape doesn't cover (e.g. the MPC block) are preserved."""
+    out = dict(prior) if isinstance(prior, dict) else {}
+    for k, v in (scraped or {}).items():
+        if isinstance(v, dict):
+            out[k] = _merge(out.get(k) if isinstance(out.get(k), dict) else {}, v)
+        elif isinstance(v, list):
+            if v:
+                out[k] = v
+        elif v is not None:
+            out[k] = v
+    return out
 
 
 if __name__ == "__main__":
