@@ -7,10 +7,12 @@ The backend is chosen from the MARKETWIRE_DB connection string:
   - Turso:     `libsql://DBNAME-ORG.turso.io`            — needs `libsql-experimental`
                (+ auth token in MARKETWIRE_DB_AUTH_TOKEN / TURSO_AUTH_TOKEN)
 
-Every release the app fetches is kept (deduped by RBI prid, or link), so the wire
-accumulates over time and survives a failed live fetch. The schema and SQL are
-portable across all three; the Postgres/Turso drivers are optional and imported
-lazily — install only the one you use.
+Every item the app fetches is kept (deduped by RBI prid / notification Id, or
+link), so the wire accumulates over time and survives a failed live fetch. The
+two RBI feeds — Press Releases and Notifications — are kept in separate tables
+(chosen by the `category` argument) so their ids never collide. The schema and
+SQL are portable across all three backends; the Postgres/Turso drivers are
+optional and imported lazily — install only the one you use.
 
 For durable history on Streamlit Cloud (whose disk is ephemeral), point
 MARKETWIRE_DB at a hosted Postgres (Neon/Supabase) or Turso DB via the app's
@@ -22,7 +24,12 @@ import re
 import sqlite3
 import time
 
-_CREATE = """CREATE TABLE IF NOT EXISTS articles (
+# One table per feed so press-release `prid`s and notification `Id`s can't
+# collide on the key. category -> table name (the only values ever interpolated
+# into SQL — never raw user input).
+_TABLES = {"press": "articles", "notifications": "notifications"}
+
+_CREATE = """CREATE TABLE IF NOT EXISTS {table} (
     key        TEXT PRIMARY KEY,
     link       TEXT,
     title      TEXT,
@@ -31,6 +38,14 @@ _CREATE = """CREATE TABLE IF NOT EXISTS articles (
     ts         BIGINT,
     fetched_ts BIGINT
 )"""
+
+
+def _table(category):
+    """Map a feed category to its table name (defends against bad input)."""
+    try:
+        return _TABLES[category]
+    except KeyError:
+        raise ValueError(f"unknown category {category!r}; expected one of {list(_TABLES)}")
 
 
 def _db_url():
@@ -86,27 +101,33 @@ def _q(sql, style):
 
 
 def _key(item):
-    """Stable identity: RBI prid if present in the link, else the link itself."""
-    m = re.search(r"prid=(\d+)", item.get("link", ""), re.I)
-    return m.group(1) if m else item.get("link", "")
+    """Stable identity: RBI press-release `prid` or notification `Id` from the
+    link, else the link itself. (Feeds live in separate tables, so a prid and an
+    Id sharing a number never clash.)"""
+    link = item.get("link", "") or ""
+    m = re.search(r"\bprid=(\d+)", link, re.I) or re.search(r"\bid=(\d+)", link, re.I)
+    return m.group(1) if m else link
 
 
 def init_db():
+    """Create the table for every feed category (idempotent)."""
     conn, style = _connect()
     try:
         if _backend(_db_url()) == "sqlite":
             conn.execute("PRAGMA journal_mode=WAL")  # better read/write concurrency
-        conn.execute(_q(_CREATE, style))
+        for table in _TABLES.values():
+            conn.execute(_q(_CREATE.format(table=table), style))
         conn.commit()
     finally:
         conn.close()
 
 
-def upsert(items):
+def upsert(items, category="press"):
     """Insert items we haven't stored; backfill a summary if we now have one.
     Returns the number of genuinely new rows (so the UI can show "N new")."""
     if not items:
         return 0
+    table = _table(category)
     now = int(time.time())
     new = 0
     conn, style = _connect()
@@ -115,29 +136,30 @@ def upsert(items):
             k = _key(it)
             if not k:
                 continue
-            row = conn.execute(_q("SELECT summary FROM articles WHERE key=?", style), (k,)).fetchone()
+            row = conn.execute(_q(f"SELECT summary FROM {table} WHERE key=?", style), (k,)).fetchone()
             if row is None:
                 conn.execute(
-                    _q("INSERT INTO articles(key, link, title, summary, published, ts, fetched_ts) "
+                    _q(f"INSERT INTO {table}(key, link, title, summary, published, ts, fetched_ts) "
                        "VALUES (?,?,?,?,?,?,?)", style),
                     (k, it.get("link", ""), it.get("title", ""), it.get("summary", "") or "",
                      it.get("published", "") or "", it.get("ts"), now),
                 )
                 new += 1
             elif not row[0] and it.get("summary"):
-                conn.execute(_q("UPDATE articles SET summary=? WHERE key=?", style), (it["summary"], k))
+                conn.execute(_q(f"UPDATE {table} SET summary=? WHERE key=?", style), (it["summary"], k))
         conn.commit()
     finally:
         conn.close()
     return new
 
 
-def load(limit=1000):
-    """All stored releases, newest first (by published date, then fetch time)."""
+def load(limit=1000, category="press"):
+    """All stored items for a feed, newest first (by published date, then fetch time)."""
+    table = _table(category)
     conn, style = _connect()
     try:
         rows = conn.execute(
-            _q("SELECT link, title, summary, published, ts FROM articles "
+            _q(f"SELECT link, title, summary, published, ts FROM {table} "
                "ORDER BY COALESCE(ts, 0) DESC, fetched_ts DESC LIMIT ?", style),
             (limit,),
         ).fetchall()
@@ -147,9 +169,10 @@ def load(limit=1000):
     return [dict(zip(cols, r)) for r in rows]
 
 
-def count():
+def count(category="press"):
+    table = _table(category)
     conn, _ = _connect()
     try:
-        return conn.execute("SELECT COUNT(*) FROM articles").fetchone()[0]
+        return conn.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0]
     finally:
         conn.close()

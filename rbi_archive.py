@@ -16,8 +16,12 @@ keeps working on the RSS feed alone.
 
 Heuristics (resilient to class/layout changes):
   - a press release is any <a> whose href contains "prid=" (the detail page);
+    notifications are the <a>s whose href contains "notificationuser.aspx?id=";
   - its title is the link text; its date is the first date found by walking a
     few ancestors (handles both per-row dates and date-grouped sections).
+
+Both RBI feeds (Press Releases + Notifications) share this scraper — pass the
+listing URL and the matching `href_match` for the feed you want.
 """
 
 import calendar
@@ -34,6 +38,10 @@ except Exception:
     _HAVE_BS4 = False
 
 LISTING_URL = "https://www.rbi.org.in/Scripts/BS_PressReleaseDisplay.aspx"
+NOTIFICATIONS_LISTING_URL = "https://www.rbi.org.in/Scripts/NotificationUser.aspx"
+# Substring (lowercased href) that marks a detail link for each feed.
+PRESS_HREF_MATCH = "prid="
+NOTIFICATIONS_HREF_MATCH = "notificationuser.aspx?id="
 UA = "Mozilla/5.0 (compatible; MarketWire/1.0; RSS reader)"
 IST = timezone(timedelta(hours=5, minutes=30))
 
@@ -61,13 +69,16 @@ def _parse_date(text):
     return None, ""
 
 
-def _prid(link):
-    m = re.search(r"prid=(\d+)", link, re.I)
+def _key(link):
+    """RBI press-release `prid` or notification `Id` from a detail link, else None."""
+    m = re.search(r"\bprid=(\d+)", link, re.I) or re.search(r"\bid=(\d+)", link, re.I)
     return m.group(1) if m else None
 
 
-def scrape_listing(url=LISTING_URL, timeout=20):
-    """Return (items, error). Never raises."""
+def scrape_listing(url=LISTING_URL, timeout=20, href_match=PRESS_HREF_MATCH):
+    """Scrape an RBI listing page for detail links. `href_match` is the lowercased
+    href substring that marks a detail link (press releases vs notifications).
+    Return (items, error). Never raises."""
     if not _HAVE_BS4:
         return [], "beautifulsoup4 not installed (pip install beautifulsoup4)"
     try:
@@ -80,13 +91,13 @@ def scrape_listing(url=LISTING_URL, timeout=20):
         soup = BeautifulSoup(resp.content, "html.parser")
         items, seen = [], set()
         for a in soup.find_all("a", href=True):
-            if "prid=" not in a["href"].lower():
+            if href_match not in a["href"].lower():
                 continue
             title = " ".join(a.get_text(" ", strip=True).split())
             if not title:
                 continue
             link = requests.compat.urljoin(url, a["href"])
-            key = _prid(link) or link
+            key = _key(link) or link
             if key in seen:
                 continue
             seen.add(key)
@@ -152,8 +163,11 @@ def fetch_detail(url, title="", timeout=20):
 
 if __name__ == "__main__":
     url = sys.argv[1] if len(sys.argv) > 1 else LISTING_URL
+    # Pick the right detail-link matcher from the listing URL (press vs notifications).
+    href_match = NOTIFICATIONS_HREF_MATCH if "notification" in url.lower() else PRESS_HREF_MATCH
+    kind = "notification" if href_match == NOTIFICATIONS_HREF_MATCH else "press-release"
     print(f"Scraping {url} …\n")
-    items, error = scrape_listing(url)
+    items, error = scrape_listing(url, href_match=href_match)
     if error:
         print("ERROR:", error)
         sys.exit(1)
@@ -161,7 +175,7 @@ if __name__ == "__main__":
         print(f"  {(it['published'] or '(no date)'):>18}  {it['title'][:80]}")
         print(f"  {'':18}  {it['link']}")
     dated = sum(1 for i in items if i["ts"])
-    print(f"\n{len(items)} press-release links found; {dated} with a parsed date.")
+    print(f"\n{len(items)} {kind} links found; {dated} with a parsed date.")
     if not items:
         print("Nothing parsed — the page structure may differ. Share a snippet "
               "of the listing HTML and the parser can be tuned.")

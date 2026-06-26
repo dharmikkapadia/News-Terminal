@@ -13,6 +13,7 @@ import requests
 import feedparser
 
 RBI_FEED = "https://rbi.org.in/pressreleases_rss.xml"
+RBI_NOTIFICATIONS_FEED = "https://rbi.org.in/notifications_rss.xml"
 UA = "Mozilla/5.0 (compatible; MarketWire/1.0; RSS reader)"
 IST = timezone(timedelta(hours=5, minutes=30))
 _TAG_RE = re.compile(r"<[^>]+>")

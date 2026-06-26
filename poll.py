@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
-"""poll.py — fetch RBI (RSS + optional archive) and merge into data/history.jsonl.
+"""poll.py — fetch RBI (RSS + optional archive) and merge into the repo history.
 
 Run by the GitHub Action (.github/workflows/history.yml) on a schedule, or by hand:
 
     python poll.py
 
-It reads the existing history, fetches the feed (and any MARKETWIRE_ARCHIVE_URLS),
-merges + dedupes, and rewrites data/history.jsonl. The Action then commits the file
-so durable history lives in the repo — no external database.
+It polls BOTH RBI feeds — Press Releases (data/history.jsonl) and Notifications
+(data/notifications.jsonl) — reading the existing history, fetching the RSS feed
+(and any archive listing URLs), merging + deduping, and rewriting each file. The
+Action then commits the files so durable history lives in the repo — no external
+database.
 """
 
 import os
@@ -17,6 +19,28 @@ import feed
 import history
 import rbi_archive
 
+# Each feed: how to fetch it (RSS), where to store it (JSONL), and how to backfill
+# older items (listing URL + the href substring that marks a detail link). Env vars
+# let a deploy override the feed/listing URLs without code changes.
+FEEDS = [
+    {
+        "label": "press releases",
+        "feed_url": os.environ.get("MARKETWIRE_FEED", feed.RBI_FEED),
+        "history_path": history.HISTORY_PATH,
+        "listing_url": rbi_archive.LISTING_URL,
+        "href_match": rbi_archive.PRESS_HREF_MATCH,
+        "archive_env": "MARKETWIRE_ARCHIVE_URLS",
+    },
+    {
+        "label": "notifications",
+        "feed_url": os.environ.get("MARKETWIRE_NOTIFICATIONS_FEED", feed.RBI_NOTIFICATIONS_FEED),
+        "history_path": history.NOTIFICATIONS_PATH,
+        "listing_url": rbi_archive.NOTIFICATIONS_LISTING_URL,
+        "href_match": rbi_archive.NOTIFICATIONS_HREF_MATCH,
+        "archive_env": "MARKETWIRE_NOTIFICATIONS_ARCHIVE_URLS",
+    },
+]
+
 
 def _annotate(level, title, msg):
     """Emit a GitHub Actions annotation (read from stdout) so problems show on the
@@ -25,29 +49,32 @@ def _annotate(level, title, msg):
     print(f"::{level} title={title}::{msg}")
 
 
-def main():
-    existing = history.load_file()
+def poll_feed(cfg):
+    """Poll one feed (RSS + archive) and rewrite its history file. Returns the
+    stored item count (0 means we have nothing at all for this feed)."""
+    label = cfg["label"]
+    existing = history.load_file(cfg["history_path"])
 
-    rss, err = feed.fetch_rss(os.environ.get("MARKETWIRE_FEED", feed.RBI_FEED))
+    rss, err = feed.fetch_rss(cfg["feed_url"])
     if err:
-        _annotate("warning", "RBI fetch failed", err)
+        _annotate("warning", f"RBI {label} fetch failed", err)
 
     arch = []
     # Note: an unset GitHub repo variable injects an EMPTY env var, so use `or`
     # (not the get() default) to fall back to the listing URL.
-    archive_env = os.environ.get("MARKETWIRE_ARCHIVE_URLS", "").strip() or rbi_archive.LISTING_URL
+    archive_env = os.environ.get(cfg["archive_env"], "").strip() or cfg["listing_url"]
     archive_urls = [u.strip() for u in archive_env.split(",") if u.strip()]
     for url in archive_urls:
-        got, aerr = rbi_archive.scrape_listing(url)
+        got, aerr = rbi_archive.scrape_listing(url, href_match=cfg["href_match"])
         if aerr:
-            _annotate("warning", "Archive fetch failed", f"{url}: {aerr}")
+            _annotate("warning", f"{label} archive fetch failed", f"{url}: {aerr}")
         arch += got
     raw_archive = len(arch)
 
     # Enrich archive stubs (the listing has title+date+link only) with the full
-    # body from each release's detail page — only for items we don't already have
-    # full text for, capped per run to bound requests. RBI's detail page exposes no
-    # time, so enriched items keep a date-only (midnight) timestamp.
+    # body from each detail page — only for items we don't already have full text
+    # for, capped per run to bound requests. RBI's detail page exposes no time, so
+    # enriched items keep a date-only (midnight) timestamp.
     have_full = {history._key(it) for it in existing + rss if (it.get("summary") or "").strip()}
     cap = int(os.environ.get("MARKETWIRE_ENRICH_LIMIT", "120"))
     enriched = 0
@@ -68,13 +95,18 @@ def main():
     arch = [a for a in arch if (a.get("summary") or "").strip()]  # store only full (enriched) archive items
     before = len(existing)
     merged = history.dedupe(existing + rss + arch)
-    history.save_file(merged)
+    history.save_file(merged, cfg["history_path"])
     after = len(merged)
-    print(f"[poll] existing={before} rss={len(rss)} archive={raw_archive} "
+    print(f"[poll:{label}] existing={before} rss={len(rss)} archive={raw_archive} "
           f"enriched={enriched} stored_archive={len(arch)} total={after} new={after - before}")
+    return after
 
-    # Hard-fail (red run + failure email) only if we ended up with nothing at all.
-    if after == 0:
+
+def main():
+    counts = [poll_feed(cfg) for cfg in FEEDS]
+    # Hard-fail (red run + failure email) only if EVERY feed ended up with nothing —
+    # one blocked feed shouldn't fail the run while the other still has history.
+    if not any(counts):
         _annotate("error", "No data", "Fetched nothing and no stored history — check feed reachability.")
         return 1
     return 0

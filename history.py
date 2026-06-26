@@ -15,18 +15,26 @@ import re
 
 import requests
 
+_DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 HISTORY_PATH = os.environ.get(
     "MARKETWIRE_HISTORY_FILE",
-    os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "history.jsonl"),
+    os.path.join(_DATA_DIR, "history.jsonl"),
+)
+NOTIFICATIONS_PATH = os.environ.get(
+    "MARKETWIRE_NOTIFICATIONS_FILE",
+    os.path.join(_DATA_DIR, "notifications.jsonl"),
 )
 UA = "Mozilla/5.0 (compatible; MarketWire/1.0; RSS reader)"
 _FIELDS = ("link", "title", "summary", "published", "ts")
 
 
 def _key(it):
-    """Stable identity: RBI prid if present in the link, else the link."""
-    m = re.search(r"prid=(\d+)", it.get("link", "") or "", re.I)
-    return m.group(1) if m else (it.get("link", "") or "")
+    """Stable identity: RBI press-release `prid` or notification `Id` from the
+    link, else the link. (The two feeds are stored separately, so a prid and an
+    Id sharing a number never clash.)"""
+    link = it.get("link", "") or ""
+    m = re.search(r"\bprid=(\d+)", link, re.I) or re.search(r"\bid=(\d+)", link, re.I)
+    return m.group(1) if m else link
 
 
 def dedupe(items):
@@ -80,11 +88,12 @@ def save_file(items, path=HISTORY_PATH):
     return len(items)
 
 
-def load_durable(source=None):
-    """Read durable history for the app. `source` (or MARKETWIRE_HISTORY_URL) may be
-    a raw http(s) URL or a file path; defaults to the local committed file.
+def load_durable(source=None, url_env="MARKETWIRE_HISTORY_URL", default_path=HISTORY_PATH):
+    """Read durable history for the app. `source` (or the `url_env` env var) may be
+    a raw http(s) URL or a file path; defaults to `default_path` (the local
+    committed file). Pass the notifications path/env to read that feed instead.
     Never raises — returns [] on any problem."""
-    source = source or os.environ.get("MARKETWIRE_HISTORY_URL", "").strip() or HISTORY_PATH
+    source = source or os.environ.get(url_env, "").strip() or default_path
     if source.startswith(("http://", "https://")):
         try:
             resp = requests.get(source, headers={"User-Agent": UA}, timeout=15)
