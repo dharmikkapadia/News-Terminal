@@ -2,7 +2,8 @@
 
 A Streamlit reader for **RBI Press Releases** and **RBI Notifications**
 (`streamlit_app.py`): fetches both RSS feeds server-side and shows them **together**
-in one newest-first wire with a keyword filter, each item tagged with its source
+in one newest-first wire with a keyword filter and a sidebar **Sources** multiselect
+(show all feeds or pick individually), each item tagged with its source
 (`RBI - Press Release` / `RBI - Notifications`), plus a theme picker (data-terminal
 palettes). Durable history accumulates per feed
 via `store.py` (SQLite/Postgres/Turso — one table per feed) **and** in-repo
