@@ -59,8 +59,9 @@ so the ids never collide.
 - **Current Rates** (`data/rates.json`) is refreshed two ways: (1) MANUAL — a
   Claude-for-Chrome run on rbi.org.in emits the JSON (RBI 403s CI and the rates box is a
   JS accordion, so a real browser is the reliable extractor); commit it. (2) AUTO — a
-  separate **daily** GitHub Action (`.github/workflows/rates.yml`, midnight IST = `30 18 * * *`
-  UTC) runs `rates.poll_rates()` via `python rates.py`; it scrapes the home page but writes
+  separate **daily** GitHub Action (`.github/workflows/rates.yml`, 1:30pm IST = `0 8 * * *`
+  UTC — just after RBI's "1.00pm" FBIL FX update, so each run gets the SAME day's rates) runs
+  `rates.poll_rates()` via `python rates.py`; it scrapes the home page but writes
   **only on a complete + in-bounds parse** (`rates._is_complete`), so a blocked/partial
   scrape can never clobber the manual snapshot, and the MPC block (not on the home page)
   is preserved. (Kept out of `poll.py`/the 30-min history cron on purpose — rates refresh

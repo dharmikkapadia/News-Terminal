@@ -140,7 +140,9 @@ It reads a committed **`data/rates.json`** (`rates.py`), refreshed two ways:
   so a **Claude-for-Chrome** run on rbi.org.in is the reliable extractor — it emits the JSON
   (including the next MPC date, which isn't on the home page); commit it.
 - **Automated (best-effort):** a separate **daily** GitHub Action (`.github/workflows/rates.yml`)
-  runs at **midnight IST** (`python rates.py` → `rates.poll_rates()`) and rewrites the file
+  runs at **1:30pm IST** — just after RBI's "1.00pm" FBIL FX update, so each run captures the
+  same day's exchange rates (a midnight run would only get the prior day's). It runs
+  `python rates.py` → `rates.poll_rates()`, which rewrites the file
   **only on a complete, in-bounds parse** — a blocked/partial scrape leaves the committed manual
   snapshot untouched, and the MPC block is preserved. It's deliberately on its own once-a-day
   cadence (not the 30-min history poller). GitHub's scheduler is best-effort; for exact timing,

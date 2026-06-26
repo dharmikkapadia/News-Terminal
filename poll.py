@@ -111,7 +111,8 @@ def poll_feed(cfg):
 def main():
     counts = [poll_feed(cfg) for cfg in FEEDS]
     # NOTE: the Current Rates snapshot (data/rates.json) is refreshed on its OWN cadence —
-    # once a day at midnight IST by .github/workflows/rates.yml (python rates.py) — not here.
+    # once a day at 1:30pm IST (after RBI's 1pm FX update) by .github/workflows/rates.yml
+    # (python rates.py) — not here.
     # Hard-fail (red run + failure email) only if EVERY feed ended up with nothing —
     # one blocked feed shouldn't fail the run while the other still has history.
     if not any(counts):
