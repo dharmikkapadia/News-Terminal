@@ -29,7 +29,9 @@ import requests
 
 _DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 RATES_PATH = os.environ.get("MARKETWIRE_RATES_FILE", os.path.join(_DATA_DIR, "rates.json"))
-HOME_URL = os.environ.get("MARKETWIRE_RATES_URL", "https://www.rbi.org.in/")
+# The scrape TARGET (RBI home page). Distinct from MARKETWIRE_RATES_URL, which is where the
+# *app* may read the committed rates.json from a raw URL (parallel to MARKETWIRE_HISTORY_URL).
+HOME_URL = os.environ.get("MARKETWIRE_RATES_HOME", "https://www.rbi.org.in/")
 UA = "Mozilla/5.0 (compatible; MarketWire/1.0; RSS reader)"
 IST = timezone(timedelta(hours=5, minutes=30))
 
@@ -202,7 +204,13 @@ def poll_rates(path=RATES_PATH, url=HOME_URL):
         return f"scrape failed ({err}) — keeping committed snapshot"
     if not _is_complete(scraped):
         return "scrape incomplete/out-of-range — keeping committed snapshot"
-    prior = load_rates(default_path=path) or {}
+    # Read the prior snapshot strictly from the local FILE (not load_rates, which would honour
+    # MARKETWIRE_RATES_URL) so we always merge onto — and preserve — the committed JSON.
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            prior = json.load(f)
+    except Exception:
+        prior = {}
     merged = dict(prior)
     merged.update(scraped)
     if prior.get("mpc") and not merged.get("mpc"):   # MPC isn't on the home page
