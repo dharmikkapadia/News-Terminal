@@ -107,7 +107,10 @@ already have, fetches the **detail page** to recover the **full body + date**
 feed per run. Detail-link matching is done on each link's **resolved absolute URL**,
 so RBI's relative listing hrefs (e.g. `?Id=123&Mode=0`) resolve correctly; body
 extraction tries `<div class="text1">` (press releases) and the notification body
-cell, falling back to the largest text block. So backfilled items end up with a date
+cell, falling back to the largest text block. For **notifications** the scraper also
+**follows the listing's per-year navigation links** (an `<a>` whose text is a 4-digit
+year), one level deep, so history is walked back **year by year** rather than just
+the latest page — all pages deduped by `Id`. So backfilled items end up with a date
 and a full summary — they just lack a precise **time** (RBI's HTML doesn't expose
 one), so they carry a date-only stamp and the app shows them without a misleading
 `00:00`. Older, date-only items show an **ARCHIVE** tag and can be hidden with the
