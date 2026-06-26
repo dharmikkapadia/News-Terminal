@@ -127,9 +127,15 @@ month/year listing URLs (comma-separated) via the `MARKETWIRE_ARCHIVE_URLS` (pre
 `MARKETWIRE_NOTIFICATIONS_ARCHIVE_URLS` (notifications) env var / repo variable.
 
 **Look & feel:** the app is laid out like a news website — a newspaper **masthead**
-over a uniform **grid of story cards**, each tagged with its colour-coded source,
-a serif headline, a summary preview, and a **Full text** expander, with subtle
-fade-in/hover motion.
+over your choice of two layouts (sidebar **Layout** toggle, remembered via `?layout=`):
+- **Stream** (default) — a single-column feed (Trading Economics style): underlined
+  headline, right-aligned colour-coded source tag(s), the full body inline, and a
+  relative timestamp ("16 minutes ago"), with hairline dividers.
+- **Grid** — a uniform grid of story cards, each with a source tag, headline, a
+  clamped summary preview, and a **Full text** expander.
+
+Both tag every item with its colour-coded source, link the headline straight to RBI,
+and use subtle fade-in/hover motion.
 
 **Themes:** five flagship palettes in the sidebar — **Bloomberg** (dark amber),
 **Reuters** (light orange), **Paper** (warm light), **Trading Economics** (light,

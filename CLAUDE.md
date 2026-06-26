@@ -6,9 +6,12 @@ in one wire with a keyword filter, a **sort order** toggle (newest/oldest first)
 opt-in **date-range** filter, and a sidebar **Sources** multiselect (show all feeds
 or pick individually), each item tagged with its source
 (`RBI - Press Release` / `RBI - Notifications`), plus a theme picker. The UI is laid
-out like a news website: a serif **masthead** over a uniform **card grid** (`st.columns`
-+ bordered `st.container`s) rendered by `_story_card_html`, summary preview + a
-**Full text** expander per card, subtle fade-in/hover CSS, and five flagship themes
+out like a news website with a sidebar **Layout** toggle: **Stream** (default — a
+single-column feed à la Trading Economics: underlined headline, right-aligned source
+tags, full body inline, relative timestamp; `_stream_html`/`_stream_row_html`) or
+**Grid** (uniform card grid via `st.columns` + bordered `st.container`s,
+`_story_card_html`, clamped preview + **Full text** expander). A serif **masthead**
+tops both, with subtle fade-in/hover CSS, and five flagship themes
 (Bloomberg, Reuters, Paper, Trading Economics, High Contrast — each with its own
 `headfont` stack, serif or sans). Durable history accumulates per feed
 via `store.py` (SQLite/Postgres/Turso — one table per feed) **and** in-repo

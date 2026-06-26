@@ -121,6 +121,61 @@ def _story_card_html(it):
         "</div>"
     )
 
+
+def _relative_time(ts):
+    """Trading-Economics-style relative stamp ('91 seconds ago', '16 minutes ago').
+    Archive items (date-only) fall back to the date; very old items show the date."""
+    if not ts:
+        return "—"
+    dt = datetime.fromtimestamp(ts, IST)
+    if not (dt.hour or dt.minute or dt.second):        # archive: no real time
+        return dt.strftime("%d %b %Y")
+    secs = max(0, int((datetime.now(IST) - dt).total_seconds()))
+    if secs < 60:
+        v, unit = secs, "second"
+    elif secs < 3600:
+        v, unit = secs // 60, "minute"
+    elif secs < 86400:
+        v, unit = secs // 3600, "hour"
+    elif secs < 30 * 86400:
+        v, unit = secs // 86400, "day"
+    else:
+        return dt.strftime("%d %b %Y")
+    return f"{v} {unit}{'s' if v != 1 else ''} ago"
+
+
+def _stream_row_html(it):
+    """One full-width stream row (Trading Economics style): underlined headline +
+    right-aligned source tag(s), the full body inline, then a relative timestamp
+    and a direct 'open' link."""
+    ts = it.get("ts")
+    dt = datetime.fromtimestamp(ts, IST) if ts else None
+    archived = dt is not None and not (dt.hour or dt.minute or dt.second)
+    src = it.get("source") or ""
+    notif = "notif" if "Notification" in src else "press"
+    arch = "<span class='mw-tag'>ARCHIVE</span>" if archived else ""
+    body = html.escape((it.get("summary") or "").strip()) or "<span class='mw-nosum'>Open the source for the full text.</span>"
+    title = html.escape(it.get("title") or "(untitled)")
+    link = it.get("link") or ""
+    if link.startswith("http"):
+        href = html.escape(link, quote=True)
+        head = f"<a class='mw-shead' href='{href}' target='_blank' rel='noopener'>{title}</a>"
+        open_link = f"<a class='mw-open' href='{href}' target='_blank' rel='noopener'>Open on rbi.org.in ↗</a>"
+    else:
+        head, open_link = f"<span class='mw-shead'>{title}</span>", ""
+    return (
+        "<div class='mw-stream'>"
+        f"<div class='mw-srow'>{head}<span class='mw-stags'><span class='mw-src {notif}'>{html.escape(src)}</span>{arch}</span></div>"
+        f"<div class='mw-sbody'>{body}</div>"
+        f"<div class='mw-sfoot'><span class='mw-time'>{_relative_time(ts)}</span>{open_link}</div>"
+        "</div>"
+    )
+
+
+def _stream_html(items):
+    """The whole single-column stream as one HTML blob (fewer Streamlit elements)."""
+    return "<div class='mw-streamwrap'>" + "".join(_stream_row_html(it) for it in items) + "</div>"
+
 # --------------------------------------------------------------------------- #
 # Themes — flagship palettes, each tuned for contrast so ALL text (headlines, body,
 # timestamps, captions, inputs, links) stays legible.
@@ -233,6 +288,21 @@ def theme_css(p):
       [data-testid="stMarkdownContainer"] .mw-open {{ display: inline-block; margin: 11px 0 2px;
         font-size: 12px; font-weight: 600; color: {p['link']} !important; }}
       [data-testid="stMarkdownContainer"] .mw-open:hover {{ text-decoration: underline; }}
+
+      /* ---- stream layout: single-column feed (Trading Economics style) ---- */
+      .mw-stream {{ padding: 16px 4px 15px; border-bottom: 1px solid {p['border']}; animation: mwRise .4s ease both; }}
+      .mw-stream:first-child {{ border-top: 1px solid {p['border']}; }}
+      .mw-srow {{ display: flex; align-items: flex-start; gap: 14px; }}
+      [data-testid="stMarkdownContainer"] .mw-shead {{ flex: 1; font-family: {p['headfont']}; font-weight: 700;
+        font-size: 19px; line-height: 1.3; color: {p['heading']} !important;
+        text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }}
+      [data-testid="stMarkdownContainer"] .mw-shead:hover {{ color: {p['accent']} !important; }}
+      .mw-stags {{ display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; flex: none; max-width: 46%; margin-top: 4px; }}
+      .mw-stags .mw-tag {{ margin-left: 0; }}
+      .mw-sbody {{ font-size: 14.5px; line-height: 1.62; color: {p['text']}; margin: 9px 0 11px; }}
+      .mw-sfoot {{ display: flex; align-items: center; gap: 16px; }}
+      .mw-sfoot .mw-time {{ margin: 0; }}
+      .mw-sfoot .mw-open {{ margin: 0; }}
       .mw-tag {{ font-size: 9px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
         color: {p['muted']}; border: 1px solid {p['border']}; border-radius: 3px; padding: 1px 5px; margin-left: 7px; }}
 
@@ -314,14 +384,22 @@ if "sources" not in st.session_state:
         st.session_state["sources"] = FEED_NAMES
     else:
         st.session_state["sources"] = [s for s in _qs.split(",") if s in FEED_NAMES]
+LAYOUTS = ["Stream", "Grid"]
+if "layout" not in st.session_state:
+    _ql = st.query_params.get("layout")
+    st.session_state["layout"] = _ql if _ql in LAYOUTS else "Stream"
 with st.sidebar:
     st.markdown("### ◢ MarketWire")
     sources = st.multiselect(
         "Sources", FEED_NAMES, key="sources",
         help="Which RBI feeds to show — keep all selected, or pick one/some individually.",
     )
+    layout = st.radio(
+        "Layout", LAYOUTS, key="layout", horizontal=True,
+        help="Stream = single-column feed (Trading Economics style). Grid = card grid.",
+    )
     st.divider()
-    theme = st.selectbox("Theme", names, key="theme", help="Data-terminal palettes — all text stays legible in each.")
+    theme = st.selectbox("Theme", names, key="theme", help="Five flagship palettes — all text stays legible in each.")
     st.caption("Switch the look to suit your screen / lighting.")
     st.divider()
     st.checkbox(
@@ -331,6 +409,7 @@ with st.sidebar:
     )
 st.query_params["theme"] = theme  # keep the URL in sync (shareable / sticky)
 st.query_params["sources"] = ",".join(sources)
+st.query_params["layout"] = layout
 st.markdown(theme_css(THEMES[theme]), unsafe_allow_html=True)
 
 # --- masthead ----------------------------------------------------------------
@@ -442,21 +521,25 @@ def wire():
         f"auto-refresh every {every} · last checked {checked} IST"
     )
 
-    # --- story grid: a uniform 3-up card grid (masthead-style, no hero) --------
-    CARD_COLS = 3
+    # --- render: Stream (single-column feed) or Grid (3-up card grid) ---------
     RENDER_CAP = 120          # bound the DOM; narrow with filters to reach the rest
     visible = shown[:RENDER_CAP]
     if len(shown) > RENDER_CAP:
         st.caption(f"Showing the first {RENDER_CAP} of {len(shown)} — narrow with the filters above to see the rest.")
-    for row in range(0, len(visible), CARD_COLS):
-        cols = st.columns(CARD_COLS, gap="small")
-        for col, it in zip(cols, visible[row:row + CARD_COLS]):
-            with col:
-                with st.container(border=True):
-                    st.markdown(_story_card_html(it), unsafe_allow_html=True)
-                    with st.expander("Full text"):
-                        body = (it.get("summary") or "").strip()
-                        st.write(body or "(full text not stored yet — use the link above to open it on rbi.org.in)")
+
+    if st.session_state.get("layout", "Stream") == "Grid":
+        CARD_COLS = 3
+        for row in range(0, len(visible), CARD_COLS):
+            cols = st.columns(CARD_COLS, gap="small")
+            for col, it in zip(cols, visible[row:row + CARD_COLS]):
+                with col:
+                    with st.container(border=True):
+                        st.markdown(_story_card_html(it), unsafe_allow_html=True)
+                        with st.expander("Full text"):
+                            body = (it.get("summary") or "").strip()
+                            st.write(body or "(full text not stored yet — use the link above to open it on rbi.org.in)")
+    else:
+        st.markdown(_stream_html(visible), unsafe_allow_html=True)
 
 
 wire()
