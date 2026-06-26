@@ -139,10 +139,14 @@ It reads a committed **`data/rates.json`** (`rates.py`), refreshed two ways:
 - **Manual (source of truth):** RBI 403s datacenter IPs and the rates box is a JS accordion,
   so a **Claude-for-Chrome** run on rbi.org.in is the reliable extractor — it emits the JSON
   (including the next MPC date, which isn't on the home page); commit it.
-- **Automated (best-effort):** the poller (`poll.py`, on the cron) calls `rates.poll_rates()`,
-  which scrapes the home page and rewrites the file **only on a complete, in-bounds parse** —
-  a blocked/partial scrape leaves the committed manual snapshot untouched, and the MPC block is
-  preserved. Like `rbi_archive.py`, the scraper needs validating from a host that can reach RBI.
+- **Automated (best-effort):** a separate **daily** GitHub Action (`.github/workflows/rates.yml`)
+  runs at **midnight IST** (`python rates.py` → `rates.poll_rates()`) and rewrites the file
+  **only on a complete, in-bounds parse** — a blocked/partial scrape leaves the committed manual
+  snapshot untouched, and the MPC block is preserved. It's deliberately on its own once-a-day
+  cadence (not the 30-min history poller). GitHub's scheduler is best-effort; for exact timing,
+  also point an external cron at the workflow's `workflow_dispatch` (same recipe as the 30-min
+  cadence above, once a day on `rates.yml`). Like `rbi_archive.py`, the scraper needs validating
+  from a host that can reach RBI.
 
 This pairs with the new dark **Equity Terminal** theme (now the default) — charcoal page,
 terminal-green press tags, amber notifications, monospace numerics.

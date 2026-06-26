@@ -58,9 +58,11 @@ so the ids never collide.
   (runs the script, asserts `not at.exception`) across themes/filters.
 - **Current Rates** (`data/rates.json`) is refreshed two ways: (1) MANUAL — a
   Claude-for-Chrome run on rbi.org.in emits the JSON (RBI 403s CI and the rates box is a
-  JS accordion, so a real browser is the reliable extractor); commit it. (2) AUTO —
-  `rates.poll_rates()` (called by `poll.py` on the cron) scrapes the home page but writes
+  JS accordion, so a real browser is the reliable extractor); commit it. (2) AUTO — a
+  separate **daily** GitHub Action (`.github/workflows/rates.yml`, midnight IST = `30 18 * * *`
+  UTC) runs `rates.poll_rates()` via `python rates.py`; it scrapes the home page but writes
   **only on a complete + in-bounds parse** (`rates._is_complete`), so a blocked/partial
   scrape can never clobber the manual snapshot, and the MPC block (not on the home page)
-  is preserved. The scraper was written WITHOUT live RBI access — validate it from a host
+  is preserved. (Kept out of `poll.py`/the 30-min history cron on purpose — rates refresh
+  once a day.) The scraper was written WITHOUT live RBI access — validate it from a host
   that can reach the site (like `rbi_archive.py`).

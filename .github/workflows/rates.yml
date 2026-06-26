@@ -1,0 +1,53 @@
+name: MarketWire rates
+
+# Refreshes the Current Rates snapshot (data/rates.json) ONCE A DAY, at local midnight.
+# Kept separate from the history poller so the rates scrape runs on its own daily cadence
+# and the manual snapshot (the source of truth) is touched at most once a day.
+#
+# rates.poll_rates() (via `python rates.py`) writes the file ONLY on a complete, in-bounds
+# parse, so a blocked / JS-rendered / changed-markup scrape leaves the committed snapshot
+# untouched and preserves the MPC block (which isn't on the home page). The commit step
+# then only commits when something actually changed.
+
+on:
+  schedule:
+    # 00:00 IST = 18:30 UTC (IST = UTC+5:30). GitHub's scheduler is best-effort — a daily
+    # run may be delayed a bit or, rarely, skipped; fine for a once-a-day snapshot. For
+    # exact timing, also point an external cron at this workflow's workflow_dispatch
+    # (same setup as README → "Reliable 30-min cadence", just once a day on this file).
+    - cron: "30 18 * * *"
+  workflow_dispatch: {}       # manual runs (Actions tab) + optional external cron
+
+permissions:
+  contents: write             # needed to push the updated rates file
+
+concurrency:
+  group: marketwire-rates
+  cancel-in-progress: false
+
+jobs:
+  rates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: pip install requests beautifulsoup4
+
+      - name: Scrape RBI current rates
+        run: python rates.py
+
+      - name: Commit rates if it changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/rates.json
+          if git diff --cached --quiet; then
+            echo "No rates change."
+          else
+            git commit -m "rates: update $(date -u +%FT%TZ)"
+            git push
+          fi
