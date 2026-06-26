@@ -30,26 +30,26 @@ import feed         # pure RSS fetch/parse (shared with the poller)
 import history      # durable history kept as JSONL in the repo (maintained by the Action)
 import store        # durable history backend (sqlite / Postgres / Turso)
 
-# The two RBI feeds the app reads. Each carries its own live RSS URL, durable
-# store category, and committed history file — picked in the sidebar. Override any
-# URL via env (mirror/cache or local testing) without code changes.
+# The two RBI feeds the app reads — both are shown together in one wire, each item
+# tagged with its source `label`. Each carries its own live RSS URL, durable store
+# category, and committed history file. Override any URL via env (mirror/cache or
+# local testing) without code changes.
 FEEDS = {
-    "Press Releases": dict(
+    "press": dict(
         url=os.environ.get("MARKETWIRE_FEED", feed.RBI_FEED),
         category="press",
         history_url_env="MARKETWIRE_HISTORY_URL",
         history_path=history.HISTORY_PATH,
-        noun="press release",
+        label="RBI - Press Release",
     ),
-    "Notifications": dict(
+    "notifications": dict(
         url=os.environ.get("MARKETWIRE_NOTIFICATIONS_FEED", feed.RBI_NOTIFICATIONS_FEED),
         category="notifications",
         history_url_env="MARKETWIRE_NOTIFICATIONS_URL",
         history_path=history.NOTIFICATIONS_PATH,
-        noun="notification",
+        label="RBI - Notifications",
     ),
 }
-DEFAULT_FEED = "Press Releases"
 IST = timezone(timedelta(hours=5, minutes=30))
 # The wire re-runs itself on this interval (seconds) with no clicks; override via env.
 REFRESH_SECONDS = int(os.environ.get("MARKETWIRE_REFRESH", "300"))
@@ -131,6 +131,13 @@ def theme_css(p):
         letter-spacing: .08em; color: {p['muted']}; border: 1px solid {p['border']};
         border-radius: 3px; padding: 0 4px; margin-left: 8px; vertical-align: 1px;
       }}
+      /* source tag (RBI - Press Release / RBI - Notifications): accent-coloured so
+         it reads as a label, distinct from the muted ARCHIVE tag. */
+      [data-testid="stMarkdownContainer"] .mw-src {{
+        font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 10px;
+        letter-spacing: .08em; color: {p['accent']}; border: 1px solid {p['accent']};
+        border-radius: 3px; padding: 0 4px; margin-left: 8px; vertical-align: 1px;
+      }}
 
       /* links */
       .stApp a, [data-testid="stMarkdownContainer"] a {{ color: {p['link']} !important; text-decoration: none; }}
@@ -190,17 +197,8 @@ names = list(THEMES)
 if "theme" not in st.session_state:
     _qp = st.query_params.get("theme")
     st.session_state["theme"] = _qp if _qp in names else DEFAULT_THEME
-if "feed" not in st.session_state:
-    _qf = st.query_params.get("feed")
-    st.session_state["feed"] = _qf if _qf in FEEDS else DEFAULT_FEED
 with st.sidebar:
     st.markdown("### ◢ MarketWire")
-    feed_name = st.radio(
-        "Feed", list(FEEDS), key="feed",
-        help="Which RBI wire to read — Press Releases or Notifications. "
-             "Each keeps its own durable history.",
-    )
-    st.divider()
     theme = st.selectbox("Theme", names, key="theme", help="Data-terminal palettes — all text stays legible in each.")
     st.caption("Switch the look to suit your screen / lighting.")
     st.divider()
@@ -210,12 +208,11 @@ with st.sidebar:
              "only (RBI's pages don't expose a publish time). Off = live RSS items only.",
     )
 st.query_params["theme"] = theme  # keep the URL in sync (shareable / sticky)
-st.query_params["feed"] = feed_name
 st.markdown(theme_css(THEMES[theme]), unsafe_allow_html=True)
 
 # --- header ------------------------------------------------------------------
 head, refresh = st.columns([6, 1])
-head.markdown(f"## ◢ MarketWire — RBI {feed_name}")
+head.markdown("## ◢ MarketWire — RBI Press Releases & Notifications")
 if refresh.button("⟳ Refresh", use_container_width=True):
     fetch_feed.clear()
     load_history.clear()
@@ -227,36 +224,44 @@ def wire():
     REFRESH_SECONDS with no clicks — only this part of the page, so the theme and
     header stay put. fetch_feed is cached just under the interval, so each tick
     pulls fresh data. (st.stop() can't be used in a fragment, so we return.)"""
-    cfg = FEEDS[st.session_state.get("feed", DEFAULT_FEED)]
-    plural = cfg["noun"] + "s"
-    rss_items, error = fetch_feed(cfg["url"])
-    new_count = store.upsert(rss_items or [], category=cfg["category"])  # accumulate live RSS in the DB
-    # Merge durable sources + the live RSS, deduped by prid / Id. Archive items
-    # (older, date-only, full body) come pre-enriched from the repo history the
-    # Action maintains — the app no longer scrapes the listing live (only stubs).
-    items = history.dedupe(
-        store.load(limit=5000, category=cfg["category"])
-        + load_history(cfg["history_url_env"], cfg["history_path"])
-        + (rss_items or [])
-    )
+    # Pull every feed, tag each item with its source label, then interleave them
+    # into one newest-first wire. Each feed is deduped on its OWN ids (prid / Id)
+    # BEFORE combining, so a press-release prid never merges with a notification Id
+    # that happens to share the number. Archive items (older, date-only, full body)
+    # come pre-enriched from the repo history the Action maintains.
+    items, new_count, errors = [], 0, []
+    for cfg in FEEDS.values():
+        rss_items, error = fetch_feed(cfg["url"])
+        if error:
+            errors.append(error)
+        new_count += store.upsert(rss_items or [], category=cfg["category"])  # accumulate live RSS in the DB
+        feed_items = history.dedupe(
+            store.load(limit=5000, category=cfg["category"])
+            + load_history(cfg["history_url_env"], cfg["history_path"])
+            + (rss_items or [])
+        )
+        for it in feed_items:
+            it["source"] = cfg["label"]
+        items += feed_items
+    items.sort(key=lambda x: x.get("ts") or 0, reverse=True)
     if not st.session_state.get("archive", True):
         items = [it for it in items if not _is_archived(it)]
 
     if not items:
-        if error:
-            st.error(f"Couldn't fetch the feed: {error}")
+        if errors:
+            st.error(f"Couldn't fetch the feeds: {errors[0]}")
             st.caption(
                 "Government sites sometimes block datacenter IPs (e.g. Streamlit Cloud). "
-                "Try Refresh, or run it locally where the feed is reachable."
+                "Try Refresh, or run it locally where the feeds are reachable."
             )
         else:
-            st.info(f"No {plural} stored yet — try ⟳ Refresh.")
+            st.info("Nothing stored yet — try ⟳ Refresh.")
         return
 
     bits = []
     if new_count:
         bits.append(f"{new_count} new this fetch")
-    if error:
+    if errors:
         bits.append("live feed unreachable — showing stored")
     note = (" · " + " · ".join(bits)) if bits else ""
 
@@ -266,7 +271,7 @@ def wire():
     every = f"{mins} min" if mins else f"{REFRESH_SECONDS}s"
     checked = datetime.now(IST).strftime("%H:%M:%S")
     st.caption(
-        f"{len(shown)} of {len(items)} stored {plural} · newest first{note} · "
+        f"{len(shown)} of {len(items)} stored items · newest first{note} · "
         f"auto-refresh every {every} · last checked {checked} IST"
     )
 
@@ -282,8 +287,10 @@ def wire():
         else:
             when = it.get("published") or "—"
         tag = " <span class='mw-tag'>ARCHIVE</span>" if archived else ""
+        src = it.get("source")
+        src_tag = f" <span class='mw-src'>{src}</span>" if src else ""
         st.markdown(
-            f"**{it['title']}**  \n<span class='mw-time'>{when}</span>{tag}",
+            f"**{it['title']}**  \n<span class='mw-time'>{when}</span>{src_tag}{tag}",
             unsafe_allow_html=True,
         )
         with st.expander("details"):
