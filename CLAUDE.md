@@ -8,7 +8,8 @@ or pick individually), each item tagged with its source
 (`RBI - Press Release` / `RBI - Notifications`), plus a theme picker. The UI is laid
 out like a news website with a sidebar **Layout** toggle: **Stream** (default — a
 single-column feed à la Trading Economics: underlined headline, right-aligned source
-tags, full body inline, relative timestamp; `_stream_html`/`_stream_row_html`) or
+tags, clamped body with an inline `<details>` Show more/less toggle, relative
+timestamp; `_stream_html`/`_stream_row_html`) or
 **Grid** (uniform card grid via `st.columns` + bordered `st.container`s,
 `_story_card_html`, clamped preview + **Full text** expander). A serif **masthead**
 tops both, with subtle fade-in/hover CSS, and five flagship themes

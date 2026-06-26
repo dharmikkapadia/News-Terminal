@@ -129,8 +129,9 @@ month/year listing URLs (comma-separated) via the `MARKETWIRE_ARCHIVE_URLS` (pre
 **Look & feel:** the app is laid out like a news website — a newspaper **masthead**
 over your choice of two layouts (sidebar **Layout** toggle, remembered via `?layout=`):
 - **Stream** (default) — a single-column feed (Trading Economics style): underlined
-  headline, right-aligned colour-coded source tag(s), the full body inline, and a
-  relative timestamp ("16 minutes ago"), with hairline dividers.
+  headline (the link itself), right-aligned colour-coded source tag(s), a clamped
+  body preview with an inline **Show more / Show less** toggle, and a relative
+  timestamp ("16 minutes ago"), with hairline dividers.
 - **Grid** — a uniform grid of story cards, each with a source tag, headline, a
   clamped summary preview, and a **Full text** expander.
 
