@@ -98,25 +98,27 @@ Override the interval with the `MARKETWIRE_REFRESH` env var (seconds).
 
 ### Beyond the latest 10 (archive backfill)
 
-RBI's RSS feed only carries the ~10 most recent releases. The poller (`poll.py`,
-run by the Action) also scrapes RBI's press-release **listing**
-(`BS_PressReleaseDisplay.aspx`, releases keyed by `?prid=`) and, for each release it
-doesn't already have, fetches the **detail page** to recover the **full body + date**
-(`rbi_archive.fetch_detail`, from `<div class="text1">`), capped at
-`MARKETWIRE_ENRICH_LIMIT` (default 30) per run. So backfilled items end up with a
-date and a full summary — they just lack a precise **time** (RBI's HTML doesn't
-expose one), so they carry a date-only stamp and the app shows them without a
-misleading `00:00`. The app also does a light listing scrape live (the sidebar
-**“Include archive”** toggle) for immediate display; un-enriched items show an
-**ARCHIVE** tag until the poller fills in their body.
+RBI's RSS feeds only carry the ~10 most recent items each. For **both** feeds the
+poller (`poll.py`, run by the Action) also scrapes RBI's **listing** page —
+press releases from `BS_PressReleaseDisplay.aspx` (keyed by `?prid=`), notifications
+from `NotificationUser.aspx` (keyed by `?Id=`) — and, for each item it doesn't
+already have, fetches the **detail page** to recover the **full body + date**
+(`rbi_archive.fetch_detail`), capped at `MARKETWIRE_ENRICH_LIMIT` (default 120) per
+feed per run. Detail-link matching is done on each link's **resolved absolute URL**,
+so RBI's relative listing hrefs (e.g. `?Id=123&Mode=0`) resolve correctly; body
+extraction tries `<div class="text1">` (press releases) and the notification body
+cell, falling back to the largest text block. So backfilled items end up with a date
+and a full summary — they just lack a precise **time** (RBI's HTML doesn't expose
+one), so they carry a date-only stamp and the app shows them without a misleading
+`00:00`. Older, date-only items show an **ARCHIVE** tag and can be hidden with the
+sidebar **“Show archive”** toggle.
 
 Everything is deduped by `prid` / `Id` and **isolated/non-fatal** — if scraping is
 blocked or the markup changes, you still get the RSS view. Run the scraper yourself
-with `python rbi_archive.py` (or `python rbi_archive.py <notifications-listing-url>`
-for notifications). For deeper history, add RBI month/year listing URLs
-(comma-separated) via the `MARKETWIRE_ARCHIVE_URLS` (press) / `MARKETWIRE_NOTIFICATIONS_ARCHIVE_URLS`
-(notifications) env var / repo variable. The same applies to notifications, whose
-detail links are matched on `NotificationUser.aspx?Id=`.
+with `python rbi_archive.py` (or `python rbi_archive.py https://www.rbi.org.in/Scripts/NotificationUser.aspx`
+for notifications — it auto-selects the right matcher). For deeper history, add RBI
+month/year listing URLs (comma-separated) via the `MARKETWIRE_ARCHIVE_URLS` (press) /
+`MARKETWIRE_NOTIFICATIONS_ARCHIVE_URLS` (notifications) env var / repo variable.
 
 **Themes:** pick a data-terminal palette in the sidebar — Bloomberg, Reuters
 Carbon, Amber/Green phosphor, Ice (cyan), a high-contrast light **Paper**, or
