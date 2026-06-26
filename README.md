@@ -5,9 +5,9 @@
 A minimal Streamlit reader for **RBI Press Releases** and **RBI Notifications**.
 It fetches each feed server-side (browsers can't read most RSS directly — CORS),
 strips the HTML, **remembers items in a small SQLite store so the wire accumulates
-over time**, and shows them newest-first with a keyword filter. Pick the feed in
-the sidebar (**Feed → Press Releases / Notifications**); each keeps its own durable
-history. The choice is remembered in the URL (`?feed=…`), so it's shareable.
+over time**, and shows **both feeds together**, newest-first, with a keyword filter.
+Every item is tagged with its source — **RBI - Press Release** or
+**RBI - Notifications** — and each feed keeps its own durable history.
 
 ### History store
 
