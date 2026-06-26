@@ -30,6 +30,7 @@ FEEDS = [
         "listing_url": rbi_archive.LISTING_URL,
         "href_match": rbi_archive.PRESS_HREF_MATCH,
         "archive_env": "MARKETWIRE_ARCHIVE_URLS",
+        "follow_year_archives": False,
     },
     {
         "label": "notifications",
@@ -38,6 +39,9 @@ FEEDS = [
         "listing_url": rbi_archive.NOTIFICATIONS_LISTING_URL,
         "href_match": rbi_archive.NOTIFICATIONS_HREF_MATCH,
         "archive_env": "MARKETWIRE_NOTIFICATIONS_ARCHIVE_URLS",
+        # Walk notifications back through earlier years via the listing's per-year
+        # navigation links, not just the latest page.
+        "follow_year_archives": True,
     },
 ]
 
@@ -65,7 +69,9 @@ def poll_feed(cfg):
     archive_env = os.environ.get(cfg["archive_env"], "").strip() or cfg["listing_url"]
     archive_urls = [u.strip() for u in archive_env.split(",") if u.strip()]
     for url in archive_urls:
-        got, aerr = rbi_archive.scrape_listing(url, href_match=cfg["href_match"])
+        got, aerr = rbi_archive.scrape_listing(
+            url, href_match=cfg["href_match"],
+            follow_year_archives=cfg.get("follow_year_archives", False))
         if aerr:
             _annotate("warning", f"{label} archive fetch failed", f"{url}: {aerr}")
         arch += got

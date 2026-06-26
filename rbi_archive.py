@@ -16,9 +16,11 @@ keeps working on the RSS feed alone.
 
 Heuristics (resilient to class/layout changes):
   - a press release is any <a> whose resolved URL contains "prid=" (the detail
-    page); notifications are the <a>s whose resolved URL is a "NotificationUser.aspx"
-    page carrying an "Id=" (matched on the absolute URL so relative listing hrefs
-    like "?Id=123&Mode=0" still resolve correctly);
+    page); notifications are the <a>s carrying an "Id=" (never a "prid="), either an
+    explicit NotificationUser.aspx URL or a bare same-page "?Id=..." query — matched
+    on the absolute URL so relative listing hrefs like "?Id=123&Mode=0" still work;
+  - notifications also follow the listing's per-year navigation links (text == a
+    4-digit year) to walk back through earlier years, not just the latest page;
   - its title is the link text; its date is the first date found by walking a
     few ancestors (handles both per-row dates and date-grouped sections).
 
@@ -41,12 +43,27 @@ except Exception:
 
 LISTING_URL = "https://www.rbi.org.in/Scripts/BS_PressReleaseDisplay.aspx"
 NOTIFICATIONS_LISTING_URL = "https://www.rbi.org.in/Scripts/NotificationUser.aspx"
-# Substrings that ALL must appear (lowercased) in a link's RESOLVED absolute URL
-# for it to count as a detail link. Matching the resolved URL — not the raw href —
-# is what makes RBI's relative listing links (e.g. "?Id=123&Mode=0") work, and a
-# multi-substring match is order-independent (Id may not come first in the query).
-PRESS_HREF_MATCH = ("prid=",)
-NOTIFICATIONS_HREF_MATCH = ("notificationuser.aspx", "id=")
+# A detail-link matcher is a predicate (raw_href, resolved_url_lower) -> bool.
+# Matching the RESOLVED absolute URL — not the raw href — is what makes RBI's
+# relative listing links (e.g. "?Id=123&Mode=0") work.
+def _press_match(raw_href, resolved_low):
+    """A press-release detail link — 'prid=' is unambiguous on the resolved URL."""
+    return "prid=" in resolved_low
+
+
+def _notif_match(raw_href, resolved_low):
+    """A notification detail link: carries an 'Id=' (never a 'prid='), and is either
+    an explicit NotificationUser.aspx URL or a bare same-page query ('?Id=...'). The
+    bare-query case matters when following per-year archive pages whose own filename
+    isn't NotificationUser.aspx, so their relative '?Id=' links wouldn't otherwise
+    resolve to a NotificationUser.aspx URL."""
+    if "prid=" in resolved_low or "id=" not in resolved_low:
+        return False
+    return "notificationuser.aspx" in resolved_low or raw_href.strip().startswith("?")
+
+
+PRESS_HREF_MATCH = _press_match
+NOTIFICATIONS_HREF_MATCH = _notif_match
 UA = "Mozilla/5.0 (compatible; MarketWire/1.0; RSS reader)"
 IST = timezone(timedelta(hours=5, minutes=30))
 
@@ -80,26 +97,44 @@ def _key(link):
     return m.group(1) if m else None
 
 
-def scrape_listing(url=LISTING_URL, timeout=20, href_match=PRESS_HREF_MATCH):
-    """Scrape an RBI listing page for detail links. `href_match` is a tuple of
-    lowercased substrings that ALL must appear in a link's resolved (absolute) URL
-    for it to count as a detail link (press releases vs notifications).
-    Return (items, error). Never raises."""
+_YEAR_TEXT_RE = re.compile(r"^(?:19|20)\d{2}$")  # an <a> whose text is just a year
+
+
+def _year_archive_links(soup, base_url):
+    """Resolved URLs of the listing's year-navigation anchors (text == a 4-digit
+    year), skipping javascript:/# postbacks we can't GET. RBI's notification (and
+    press-release) listings expose older items behind these per-year links."""
+    out, seen = [], set()
+    for a in soup.find_all("a", href=True):
+        if not _YEAR_TEXT_RE.match(a.get_text(strip=True)):
+            continue
+        href = a["href"].strip()
+        if href.lower().startswith(("javascript:", "#", "mailto:")):
+            continue
+        url = requests.compat.urljoin(base_url, href)
+        if url == base_url or url in seen:
+            continue
+        seen.add(url)
+        out.append(url)
+    return out
+
+
+def _scrape_page(url, timeout, href_match):
+    """Scrape ONE listing page. Returns (items, soup, error); never raises."""
     if not _HAVE_BS4:
-        return [], "beautifulsoup4 not installed (pip install beautifulsoup4)"
+        return [], None, "beautifulsoup4 not installed (pip install beautifulsoup4)"
     try:
         resp = requests.get(url, headers={"User-Agent": UA}, timeout=timeout)
         resp.raise_for_status()
     except Exception as ex:
-        return [], f"{type(ex).__name__}: {ex}"
-
+        return [], None, f"{type(ex).__name__}: {ex}"
     try:
         soup = BeautifulSoup(resp.content, "html.parser")
         items, seen = [], set()
         for a in soup.find_all("a", href=True):
-            link = requests.compat.urljoin(url, a["href"])  # resolve relative hrefs
-            low = link.lower()
-            if not all(s in low for s in href_match):
+            raw = a["href"]
+            link = requests.compat.urljoin(url, raw)  # resolve relative hrefs
+            if not href_match(raw, link.lower()):
                 continue
             title = " ".join(a.get_text(" ", strip=True).split())
             if not title:
@@ -123,10 +158,48 @@ def scrape_listing(url=LISTING_URL, timeout=20, href_match=PRESS_HREF_MATCH):
                     break
             items.append({"title": title, "link": link, "summary": "",
                           "published": raw, "ts": ts})
-        items.sort(key=lambda x: x["ts"] or 0, reverse=True)
-        return items, None
+        return items, soup, None
     except Exception as ex:
-        return [], f"parse error: {type(ex).__name__}: {ex}"
+        return [], None, f"parse error: {type(ex).__name__}: {ex}"
+
+
+def scrape_listing(url=LISTING_URL, timeout=20, href_match=PRESS_HREF_MATCH,
+                   follow_year_archives=False, max_pages=20):
+    """Scrape an RBI listing page for detail links. `href_match` is a predicate
+    (raw_href, resolved_url_lower) -> bool selecting detail links for the feed
+    (PRESS_HREF_MATCH / NOTIFICATIONS_HREF_MATCH).
+
+    With `follow_year_archives=True`, also follow the listing's per-year navigation
+    links (one level deep, up to `max_pages` pages total) and merge their items —
+    this is what walks notifications back through earlier years, not just the latest
+    page. Items are deduped by key (prid / Id) across all pages. Returns
+    (items, error); never raises."""
+    items, soup, error = _scrape_page(url, timeout, href_match)
+    if error:
+        return [], error
+
+    if follow_year_archives and soup is not None:
+        visited = {url}
+        for yurl in _year_archive_links(soup, url):
+            if len(visited) >= max_pages:
+                break
+            if yurl in visited:
+                continue
+            visited.add(yurl)
+            more, _, yerr = _scrape_page(yurl, timeout, href_match)
+            if not yerr:
+                items += more
+
+    # Dedupe by key across all pages (prefer an entry that carries a date).
+    best = {}
+    for it in items:
+        k = _key(it["link"]) or it["link"]
+        cur = best.get(k)
+        if cur is None or (cur.get("ts") is None and it.get("ts") is not None):
+            best[k] = it
+    items = list(best.values())
+    items.sort(key=lambda x: x["ts"] or 0, reverse=True)
+    return items, None
 
 
 _DATE_LABEL_RE = re.compile(r"Date\s*:\s*([A-Za-z]{3,9}\s+\d{1,2},\s+\d{4})", re.I)
@@ -201,9 +274,10 @@ if __name__ == "__main__":
     url = sys.argv[1] if len(sys.argv) > 1 else LISTING_URL
     # Pick the right detail-link matcher from the listing URL (press vs notifications).
     href_match = NOTIFICATIONS_HREF_MATCH if "notification" in url.lower() else PRESS_HREF_MATCH
-    kind = "notification" if href_match == NOTIFICATIONS_HREF_MATCH else "press-release"
+    is_notif = href_match == NOTIFICATIONS_HREF_MATCH
+    kind = "notification" if is_notif else "press-release"
     print(f"Scraping {url} …\n")
-    items, error = scrape_listing(url, href_match=href_match)
+    items, error = scrape_listing(url, href_match=href_match, follow_year_archives=is_notif)
     if error:
         print("ERROR:", error)
         sys.exit(1)
