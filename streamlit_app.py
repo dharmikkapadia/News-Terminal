@@ -36,13 +36,15 @@ import store        # durable history backend (sqlite / Postgres / Turso)
 # local testing) without code changes.
 FEEDS = {
     "press": dict(
+        name="Press Releases",            # friendly name shown in the Sources filter
         url=os.environ.get("MARKETWIRE_FEED", feed.RBI_FEED),
         category="press",
         history_url_env="MARKETWIRE_HISTORY_URL",
         history_path=history.HISTORY_PATH,
-        label="RBI - Press Release",
+        label="RBI - Press Release",       # per-item source tag
     ),
     "notifications": dict(
+        name="Notifications",
         url=os.environ.get("MARKETWIRE_NOTIFICATIONS_FEED", feed.RBI_NOTIFICATIONS_FEED),
         category="notifications",
         history_url_env="MARKETWIRE_NOTIFICATIONS_URL",
@@ -50,6 +52,7 @@ FEEDS = {
         label="RBI - Notifications",
     ),
 }
+FEED_NAMES = [cfg["name"] for cfg in FEEDS.values()]
 IST = timezone(timedelta(hours=5, minutes=30))
 # The wire re-runs itself on this interval (seconds) with no clicks; override via env.
 REFRESH_SECONDS = int(os.environ.get("MARKETWIRE_REFRESH", "300"))
@@ -197,8 +200,21 @@ names = list(THEMES)
 if "theme" not in st.session_state:
     _qp = st.query_params.get("theme")
     st.session_state["theme"] = _qp if _qp in names else DEFAULT_THEME
+# Seed the Sources multiselect once from the URL (?sources=Press Releases,Notifications),
+# same first-click pattern as the theme. Absent param → all feeds selected.
+if "sources" not in st.session_state:
+    _qs = st.query_params.get("sources")
+    if _qs is None:
+        st.session_state["sources"] = FEED_NAMES
+    else:
+        st.session_state["sources"] = [s for s in _qs.split(",") if s in FEED_NAMES]
 with st.sidebar:
     st.markdown("### ◢ MarketWire")
+    sources = st.multiselect(
+        "Sources", FEED_NAMES, key="sources",
+        help="Which RBI feeds to show — keep all selected, or pick one/some individually.",
+    )
+    st.divider()
     theme = st.selectbox("Theme", names, key="theme", help="Data-terminal palettes — all text stays legible in each.")
     st.caption("Switch the look to suit your screen / lighting.")
     st.divider()
@@ -208,6 +224,7 @@ with st.sidebar:
              "only (RBI's pages don't expose a publish time). Off = live RSS items only.",
     )
 st.query_params["theme"] = theme  # keep the URL in sync (shareable / sticky)
+st.query_params["sources"] = ",".join(sources)
 st.markdown(theme_css(THEMES[theme]), unsafe_allow_html=True)
 
 # --- header ------------------------------------------------------------------
@@ -224,13 +241,18 @@ def wire():
     REFRESH_SECONDS with no clicks — only this part of the page, so the theme and
     header stay put. fetch_feed is cached just under the interval, so each tick
     pulls fresh data. (st.stop() can't be used in a fragment, so we return.)"""
-    # Pull every feed, tag each item with its source label, then interleave them
-    # into one newest-first wire. Each feed is deduped on its OWN ids (prid / Id)
+    # Pull each SELECTED feed, tag every item with its source label, then interleave
+    # them into one newest-first wire. Each feed is deduped on its OWN ids (prid / Id)
     # BEFORE combining, so a press-release prid never merges with a notification Id
     # that happens to share the number. Archive items (older, date-only, full body)
     # come pre-enriched from the repo history the Action maintains.
+    selected = st.session_state.get("sources", FEED_NAMES)
+    active = [cfg for cfg in FEEDS.values() if cfg["name"] in selected]
+    if not active:
+        st.info("No sources selected — pick at least one feed in the sidebar.")
+        return
     items, new_count, errors = [], 0, []
-    for cfg in FEEDS.values():
+    for cfg in active:
         rss_items, error = fetch_feed(cfg["url"])
         if error:
             errors.append(error)

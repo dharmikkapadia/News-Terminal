@@ -7,7 +7,9 @@ It fetches each feed server-side (browsers can't read most RSS directly — CORS
 strips the HTML, **remembers items in a small SQLite store so the wire accumulates
 over time**, and shows **both feeds together**, newest-first, with a keyword filter.
 Every item is tagged with its source — **RBI - Press Release** or
-**RBI - Notifications** — and each feed keeps its own durable history.
+**RBI - Notifications** — and each feed keeps its own durable history. A sidebar
+**Sources** filter lets you keep all feeds or pick one/some individually (the choice
+is remembered in the URL via `?sources=…`, so it's shareable).
 
 ### History store
 
