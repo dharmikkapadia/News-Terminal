@@ -19,7 +19,14 @@ tops both, with subtle fade-in/hover CSS, and six flagship themes
 (`_rates_dashboard_html`, sidebar **Show rates dashboard** toggle): a signal strip of
 key RBI rates (repo, LAF corridor, CRR/SLR, USD/INR, ~10y G-Sec) plus a **next-MPC
 countdown**, over an expandable full rate card (policy/reserve/exchange/lending rates,
-market trends). It reads `data/rates.json` via `rates.py`. Durable history accumulates per feed
+market trends). It reads `data/rates.json` via `rates.py`. Below it sits an opt-in
+**Commodities** strip (`_commodities_dashboard_html`, sidebar **Show commodities** toggle): a
+tile per commodity (Brent, Gold, Silver, Copper, Aluminium, Zinc, Steel, Iron Ore, Coffee) with
+price, **% change vs the previous close** (coloured with each theme's `up`/`down` gain/loss
+tones — previously defined but unused), and a **direct chart link** (the tile opens the
+commodity's Trading Economics page). It reads `data/commodities.json` via `commodities.py`, which
+scrapes Yahoo Finance's keyless chart endpoint for 8 of the 9 (Zinc has no free daily future —
+it's a monthly World Bank "Pink Sheet" value, set by hand). Durable history accumulates per feed
 via `store.py` (SQLite/Postgres/Turso — one table per feed) **and** in-repo
 `data/history.jsonl` (press releases) + `data/notifications.jsonl` (notifications),
 both maintained by a scheduled GitHub Action running `poll.py` (every 30 min).
@@ -67,3 +74,15 @@ so the ids never collide.
   is preserved. (Kept out of `poll.py`/the 30-min history cron on purpose — rates refresh
   once a day.) The scraper was written WITHOUT live RBI access — validate it from a host
   that can reach the site (like `rbi_archive.py`).
+- **Commodities** (`data/commodities.json`, `commodities.py`) mirrors the rates pattern. AUTO:
+  a **daily** GitHub Action (`.github/workflows/commodities.yml`, 07:00 UTC, offset from
+  `rates.yml`) runs `commodities.poll_commodities()` via `python commodities.py`. The source is
+  free + keyless — **Yahoo Finance's chart endpoint** (`query1.finance.yahoo.com/v8/finance/chart/<sym>`,
+  symbols in `SPECS`); we read daily closes and report `(last − prev)/prev` as the % vs previous
+  close. It writes **only when the liquid core (Brent/Gold/Silver/Copper) parses in-bounds**
+  (`_is_complete`), and any symbol the scrape misses keeps its last committed price (a list-aware
+  preserve, like the rates `_merge`). **Zinc** has no free daily future, so it's a MONTHLY World
+  Bank "Pink Sheet" value set by hand (`cadence: "monthly"`, never overwritten). Chart links are
+  Trading Economics per-commodity pages. The seed ships with `null` prices — run `commodities.yml`
+  via workflow_dispatch once to populate. Yahoo may 403 datacenter IPs (incl. this sandbox), so
+  validate the scraper from a host that can reach Yahoo Finance, like `rates.py`/`rbi_archive.py`.

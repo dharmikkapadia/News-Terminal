@@ -153,6 +153,32 @@ It reads a committed **`data/rates.json`** (`rates.py`), refreshed two ways:
 This pairs with the new dark **Equity Terminal** theme (now the default) — charcoal page,
 terminal-green press tags, amber notifications, monospace numerics.
 
+### Commodities strip (free prices · % vs prev close · chart links)
+
+Below the rates panel, an opt-in **Commodities** strip (sidebar **Show commodities**) shows
+**Brent, Gold, Silver, Copper, Aluminium, Zinc, Steel (HRC), Iron Ore and Coffee** — each as a
+tile with the price, the **% change vs its previous close** (coloured with the theme's
+`up`/`down` gain/loss tones), and a **direct chart link** (the whole tile opens the commodity's
+[Trading Economics](https://tradingeconomics.com/commodities) page in a new tab).
+
+It reads a committed **`data/commodities.json`** (`commodities.py`), refreshed the same guarded
+way as the rates snapshot:
+- **Source — all free, no paid key.** Price + % change come from **Yahoo Finance's keyless chart
+  endpoint** (`query1.finance.yahoo.com/v8/finance/chart/<symbol>`), which returns daily closes —
+  we take the last two and report `(last − prev) / prev`. Yahoo covers 8 of the 9 as
+  futures (Brent `BZ=F`, Gold `GC=F`, Silver `SI=F`, Copper `HG=F`, Aluminium `ALI=F`,
+  Steel `HRC=F`, Iron Ore `TIO=F`, Coffee `KC=F`). The LME base-metal **Zinc** has no free daily
+  future, so it's a **monthly** value from the [World Bank "Pink Sheet"](https://www.worldbank.org/en/research/commodity-markets)
+  (set by hand, tagged `monthly`). Chart links are Trading Economics' public per-commodity pages.
+- **Automated (best-effort):** a separate **daily** GitHub Action (`.github/workflows/commodities.yml`,
+  07:00 UTC, offset from `rates.yml`) runs `python commodities.py` → `commodities.poll_commodities()`,
+  which rewrites the file **only when the liquid core (Brent/Gold/Silver/Copper) parses sanely** —
+  a blocked/rate-limited scrape leaves the committed snapshot untouched, and any single symbol
+  that fails (or Zinc) keeps its last committed price. The seed file ships with `null` prices;
+  trigger the workflow once via **workflow_dispatch** (from a host that can reach Yahoo) to
+  populate it. Like `rates.py`, the scraper was written without live market access — validate it
+  from a machine that can reach Yahoo Finance.
+
 **Look & feel:** the app is laid out like a news website — a newspaper **masthead**
 over your choice of two layouts (sidebar **Layout** toggle, remembered via `?layout=`):
 - **Stream** (default) — a single-column feed (Trading Economics style): underlined
