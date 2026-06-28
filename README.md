@@ -163,24 +163,31 @@ tile with the price, the **% change vs its previous close** (coloured with the t
 
 It reads a committed **`data/commodities.json`** (`commodities.py`), refreshed the same guarded
 way as the rates snapshot:
-- **Source — all free, no paid key.** Price + % change come from **Yahoo Finance's keyless chart
-  endpoint** (`query1.finance.yahoo.com/v8/finance/chart/<symbol>`), which returns daily closes —
-  we take the last two and report `(last − prev) / prev`. Yahoo covers 8 of the 9 as
-  futures (Brent `BZ=F`, Gold `GC=F`, Silver `SI=F`, Copper `HG=F`, Aluminium `ALI=F`,
-  Steel `HRC=F`, Iron Ore `TIO=F`, Coffee `KC=F`). The LME base-metal **Zinc** has no free daily
-  future, so it's a **monthly** value from the [World Bank "Pink Sheet"](https://www.worldbank.org/en/research/commodity-markets)
-  (set by hand, tagged `monthly`). Chart links are Trading Economics' public per-commodity pages.
+- **Source — all free, no paid key: Trading Economics primary, Yahoo Finance fallback.** Prices and
+  the **% change vs previous close** come from **Trading Economics' server-rendered commodities
+  table** (`tradingeconomics.com/commodities`) — for a logged-out visitor the price, net change and
+  percent change are baked into each row's markup (`tr[data-symbol]` → `td#p`/`td#nch`/`td#pch`),
+  no key or JavaScript needed. TE covers all 9 **including Zinc** (`LMZSDS03:COM`) and gives a
+  broker-grade % change, so we don't compute one. If TE is blocked / rate-limited / drops a symbol,
+  we fall back to **Yahoo Finance's keyless chart endpoint** (`…/v8/finance/chart/<symbol>`, daily
+  closes → `(last − prev)/prev`) for the 8 it covers. **Steel** is pinned to Yahoo (`HRC=F`, a USD
+  HR-coil benchmark) on purpose — TE's steel (`JBP:COM`) is Chinese rebar in CNY/T. Yahoo is only
+  queried for the symbols that actually need it (Steel + any TE gaps), so a healthy TE run hits Yahoo
+  once. Chart links are Trading Economics' public per-commodity pages. (Note: TE's logged-out page
+  serves last-settled values, so prices can lag the live intraday tick until TE's next server rebuild
+  — fine for a 30-min poll; verified to be current, not stale.)
 - **Automated (best-effort):** commodities ride the **same 30-min poller as history** — `poll.py`
   calls `commodities.poll_commodities()` each run and `.github/workflows/history.yml` commits
   `data/commodities.json` alongside the history files. (Prices move intraday, so they want frequent
   updates — unlike the once-a-day RBI rates, which stay on their own `rates.yml`.) The refresh
-  rewrites the file **only when the liquid core (Brent/Gold/Silver/Copper) parses sanely** — a
-  blocked/rate-limited scrape leaves the committed snapshot untouched, and any single symbol that
-  fails (or Zinc) keeps its last committed price. The seed file ships with `null` prices; they fill
-  on the next 30-min poll (or trigger `history.yml` via **workflow_dispatch** to populate now). Like
-  `rates.py`, the scraper was written without live market access — validate it from a machine that
-  can reach Yahoo Finance. Note: committing on each price tick means more frequent commits during
-  market hours (each a brief Streamlit Cloud redeploy) — the trade-off for fresher prices.
+  rewrites the file **only when the liquid core (Brent/Gold/Silver/Copper) resolves in-bounds from
+  either source** — a blocked/rate-limited scrape leaves the committed snapshot untouched, and any
+  symbol both sources miss (e.g. Zinc, which is TE-only) keeps its last committed price. The seed
+  file ships with `null` prices; they fill on the next 30-min poll (or trigger `history.yml` via
+  **workflow_dispatch** to populate now). Like `rates.py`, the scrapers were written without live
+  market access — validate them from a machine that can reach TE / Yahoo (TE sits behind Cloudflare;
+  Yahoo 403s some datacenter IPs). Note: committing on each price tick means more frequent commits
+  during market hours (each a brief Streamlit Cloud redeploy) — the trade-off for fresher prices.
 
 **Look & feel:** the app is laid out like a news website — a newspaper **masthead**
 over your choice of two layouts (sidebar **Layout** toggle, remembered via `?layout=`):
