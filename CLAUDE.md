@@ -74,15 +74,18 @@ so the ids never collide.
   is preserved. (Kept out of `poll.py`/the 30-min history cron on purpose — rates refresh
   once a day.) The scraper was written WITHOUT live RBI access — validate it from a host
   that can reach the site (like `rbi_archive.py`).
-- **Commodities** (`data/commodities.json`, `commodities.py`) mirrors the rates pattern. AUTO:
-  a **daily** GitHub Action (`.github/workflows/commodities.yml`, 07:00 UTC, offset from
-  `rates.yml`) runs `commodities.poll_commodities()` via `python commodities.py`. The source is
-  free + keyless — **Yahoo Finance's chart endpoint** (`query1.finance.yahoo.com/v8/finance/chart/<sym>`,
-  symbols in `SPECS`); we read daily closes and report `(last − prev)/prev` as the % vs previous
-  close. It writes **only when the liquid core (Brent/Gold/Silver/Copper) parses in-bounds**
-  (`_is_complete`), and any symbol the scrape misses keeps its last committed price (a list-aware
-  preserve, like the rates `_merge`). **Zinc** has no free daily future, so it's a MONTHLY World
-  Bank "Pink Sheet" value set by hand (`cadence: "monthly"`, never overwritten). Chart links are
-  Trading Economics per-commodity pages. The seed ships with `null` prices — run `commodities.yml`
-  via workflow_dispatch once to populate. Yahoo may 403 datacenter IPs (incl. this sandbox), so
-  validate the scraper from a host that can reach Yahoo Finance, like `rates.py`/`rbi_archive.py`.
+- **Commodities** (`data/commodities.json`, `commodities.py`) follows the rates guard pattern but
+  rides the **30-min `poll.py` cron** (committed by `history.yml`), NOT a separate daily job —
+  prices move intraday, unlike the once-a-day RBI rates. `poll.py`'s `main()` calls
+  `commodities.poll_commodities()` each run and `history.yml` commits `data/commodities.json`
+  alongside the history files. The source is free + keyless — **Yahoo Finance's chart endpoint**
+  (`query1.finance.yahoo.com/v8/finance/chart/<sym>`, symbols in `SPECS`); we read daily closes and
+  report `(last − prev)/prev` as the % vs previous close. It writes **only when the liquid core
+  (Brent/Gold/Silver/Copper) parses in-bounds** (`_is_complete`), and any symbol the scrape misses
+  keeps its last committed price (a list-aware preserve, like the rates `_merge`). **Zinc** has no
+  free daily future, so it's a MONTHLY World Bank "Pink Sheet" value set by hand (`cadence: "monthly"`,
+  never overwritten). Chart links are Trading Economics per-commodity pages. The seed ships with
+  `null` prices — they fill on the next 30-min poll (or trigger `history.yml` via workflow_dispatch
+  to populate now). Yahoo may 403 some datacenter IPs (incl. this sandbox), so validate the scraper
+  from a host that can reach Yahoo Finance, like `rates.py`/`rbi_archive.py`. NB: the 30-min cron now
+  commits whenever a price ticks (→ a Streamlit Cloud redeploy), the intended freshness trade-off.

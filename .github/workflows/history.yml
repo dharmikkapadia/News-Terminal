@@ -2,8 +2,10 @@ name: MarketWire history
 
 # Keeps durable RBI history IN THE REPO: fetches both feeds (Press Releases +
 # Notifications) on a schedule and commits data/history.jsonl + data/notifications.jsonl.
-# The Streamlit app reads those committed files, so history survives Streamlit Cloud
-# restarts with no external database.
+# The same run also refreshes the commodity-price snapshot (data/commodities.json) — prices
+# move intraday, so they ride this 30-min cadence (the RBI Current Rates snapshot stays on
+# its own once-a-day rates.yml). The Streamlit app reads those committed files, so everything
+# survives Streamlit Cloud restarts with no external database.
 #
 # Note: committing updates the tracked branch, so Streamlit Cloud redeploys (a
 # brief restart) whenever history changes — tune the cron below to taste. The
@@ -46,14 +48,14 @@ jobs:
           MARKETWIRE_NOTIFICATIONS_ARCHIVE_URLS: ${{ vars.MARKETWIRE_NOTIFICATIONS_ARCHIVE_URLS }}
         run: python poll.py
 
-      - name: Commit history if it changed
+      - name: Commit history + commodities if changed
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/history.jsonl data/notifications.jsonl
+          git add data/history.jsonl data/notifications.jsonl data/commodities.json
           if git diff --cached --quiet; then
-            echo "No history changes."
+            echo "No data changes."
           else
-            git commit -m "history: update $(date -u +%FT%TZ)"
+            git commit -m "data: update history + commodities $(date -u +%FT%TZ)"
             git push
           fi
