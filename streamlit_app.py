@@ -30,6 +30,7 @@ try:
 except Exception:
     pass  # no secrets configured — fine
 
+import commodities  # free commodity-price snapshot (data/commodities.json) for the dashboard
 import feed         # pure RSS fetch/parse (shared with the poller)
 import history      # durable history kept as JSONL in the repo (maintained by the Action)
 import rates        # RBI Current Rates snapshot (data/rates.json) for the dashboard
@@ -333,6 +334,65 @@ def _rates_dashboard_html(r):
         "</div>"
     )
 
+
+def _cmd_num(v):
+    """Format a commodity price by magnitude — big numbers get thousands separators, small
+    ones (e.g. copper in $/lb) keep precision. None -> em dash."""
+    if not isinstance(v, (int, float)):
+        return "—"
+    if abs(v) >= 1000:
+        return f"{v:,.0f}"
+    if abs(v) >= 10:
+        return f"{v:,.2f}"
+    return f"{v:,.3f}"
+
+
+def _cmd_change(pct):
+    """('+1.23%', 'up') / ('-0.84%', 'down') / ('0.00%', 'flat') / ('—', 'flat')."""
+    if not isinstance(pct, (int, float)):
+        return "—", "flat"
+    cls = "up" if pct > 0 else "down" if pct < 0 else "flat"
+    return f"{pct:+.2f}%", cls
+
+
+def _cmd_card(c):
+    """One commodity tile: name·unit, price, coloured % vs previous close, and the whole
+    card links out to its chart (Trading Economics). 'monthly'/as-of date in the subtext."""
+    chg, cls = _cmd_change(c.get("change_pct"))
+    tag = "monthly" if c.get("cadence") == "monthly" else (c.get("as_of") or "")
+    sub = " · ".join(s for s in (tag, "chart ↗") if s)
+    url = c.get("chart_url") or "#"
+    return (
+        f"<a class='mw-cmd' href='{html.escape(url)}' target='_blank' rel='noopener'>"
+        f"<div class='lab'>{html.escape(c.get('name', ''))} "
+        f"<span class='u'>{html.escape(c.get('unit', ''))}</span></div>"
+        f"<div class='val'>{html.escape(_cmd_num(c.get('price')))}</div>"
+        f"<div class='chg mw-{cls}'>{html.escape(chg)}</div>"
+        f"<div class='sub'>{html.escape(sub)}</div>"
+        "</a>"
+    )
+
+
+def _commodities_dashboard_html(snap):
+    """The Commodities strip: a tile per commodity with price, % change vs the previous
+    close (green/red), and a direct chart link. Built from data/commodities.json."""
+    rows = snap.get("commodities") or []
+    if not rows:
+        return ""
+    captured = snap.get("captured_at") or ""
+    try:
+        captured = datetime.fromisoformat(captured).strftime("%d %b %Y, %H:%M IST")
+    except (ValueError, TypeError):
+        pass
+    sub = f"snapshot · {captured}" if captured else "awaiting first snapshot"
+    return (
+        "<div class='mw-cmds-wrap'>"
+        f"<div class='mw-rates-hd'><span class='t'>Commodities</span>"
+        f"<span class='s'>{html.escape(sub)} · % vs prev close · charts: Trading Economics</span></div>"
+        f"<div class='mw-cmds'>{''.join(_cmd_card(c) for c in rows)}</div>"
+        "</div>"
+    )
+
 # --------------------------------------------------------------------------- #
 # Themes — flagship palettes, each tuned for contrast so ALL text (headlines, body,
 # timestamps, captions, inputs, links) stays legible.
@@ -395,6 +455,12 @@ def load_history(url_env, default_path):
 def load_rates_cached():
     """The committed Current Rates snapshot (data/rates.json). Cached; Refresh clears it."""
     return rates.load_rates()
+
+
+@st.cache_data(ttl=600, show_spinner=False)
+def load_commodities_cached():
+    """The committed Commodities snapshot (data/commodities.json). Cached; Refresh clears it."""
+    return commodities.load_commodities()
 
 
 def theme_css(p):
@@ -581,6 +647,23 @@ def theme_css(p):
       .mw-rates > details > summary::-webkit-details-marker {{ display: none; }}
       .mw-rates > details > summary::after {{ content: "▾ FULL RATE CARD"; }}
       .mw-rates > details[open] > summary::after {{ content: "▴ HIDE RATE CARD"; }}
+      /* Commodities strip — tiles link out to each commodity's chart; % vs prev close
+         is coloured with the palette's gain/loss (up/down) tones. */
+      .mw-cmds-wrap {{ margin: 4px 0 20px; animation: mwFade .5s ease both; }}
+      .mw-cmds {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(116px, 1fr)); gap: 8px; }}
+      .mw-cmd {{ display: block; text-decoration: none; background: {p['panel']}; border: 1px solid {p['border']};
+        border-radius: 9px; padding: 10px 11px; transition: border-color .18s ease, transform .18s ease; }}
+      .mw-cmd:hover {{ transform: translateY(-2px); border-color: {p['accent']}; }}
+      .mw-cmd .lab {{ font-family: {_MONO}; font-size: 10px; letter-spacing: .04em; text-transform: uppercase;
+        color: {p['text']}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }}
+      .mw-cmd .lab .u {{ color: {p['muted']}; }}
+      .mw-cmd .val {{ font-family: {_MONO}; font-size: 18px; font-weight: 700; line-height: 1.1;
+        margin-top: 5px; color: {p['heading']}; }}
+      .mw-cmd .chg {{ font-family: {_MONO}; font-size: 12.5px; font-weight: 700; margin-top: 3px; }}
+      .mw-cmd .sub {{ font-family: {_MONO}; font-size: 10px; color: {p['muted']}; margin-top: 4px; }}
+      .mw-up {{ color: {p['up']}; }}
+      .mw-down {{ color: {p['down']}; }}
+      .mw-flat {{ color: {p['muted']}; }}
     </style>
     """
 
@@ -633,6 +716,11 @@ with st.sidebar:
         help="RBI Current Rates (policy/reserve/exchange/lending rates, market trends) "
              "and the next MPC-meeting countdown, above the wire.",
     )
+    st.checkbox(
+        "Show commodities", value=True, key="commodities_dash",
+        help="Free commodity prices (Brent, gold, silver, copper, aluminium, zinc, steel, "
+             "iron ore, coffee) with % change vs the previous close and a direct chart link.",
+    )
 st.query_params["theme"] = theme  # keep the URL in sync (shareable / sticky)
 st.query_params["sources"] = ",".join(sources)
 st.query_params["layout"] = layout
@@ -645,6 +733,7 @@ if refresh.button("⟳ Refresh", use_container_width=True):
     fetch_feed.clear()
     load_history.clear()
     load_rates_cached.clear()
+    load_commodities_cached.clear()
     st.rerun()
 
 # --- Current Rates dashboard (equity desk) -----------------------------------
@@ -653,6 +742,12 @@ if st.session_state.get("rates_dash", True):
     _rates = load_rates_cached()
     if _rates:
         st.markdown(_rates_dashboard_html(_rates), unsafe_allow_html=True)
+
+# --- Commodities strip (free prices · % vs prev close · chart links) ----------
+if st.session_state.get("commodities_dash", True):
+    _cmds = load_commodities_cached()
+    if _cmds:
+        st.markdown(_commodities_dashboard_html(_cmds), unsafe_allow_html=True)
 
 @st.fragment(run_every=REFRESH_SECONDS)
 def wire():
