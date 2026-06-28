@@ -475,6 +475,35 @@ def theme_css(p):
         font-family: 'Libre Franklin', system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }}
       [data-testid="stHeader"] {{ background: transparent; }}
       [data-testid="stToolbar"] {{ right: .5rem; }}
+
+      /* ---- header / sidebar chrome — Streamlit's toolbar icons, the 3-dot main menu,
+         its popover, the Deploy/Share button and the sidebar collapse/expand arrow inherit
+         Streamlit's OWN base-theme colours (not this palette), so on some themes they go
+         near-invisible (e.g. a light collapse arrow on a light sidebar). Force them all to
+         palette-contrasting colours — `heading` for icons, `panel`+`text` for the menu —
+         with GLOBAL selectors (the popover/arrow are portaled outside .stApp). ---- */
+      [data-testid="stDecoration"] {{ background: {p['accent']}; }}
+      [data-testid="stMainMenuButton"], [data-testid="stMainMenuButton"] svg,
+      [data-testid="stSidebarCollapseButton"], [data-testid="stSidebarCollapseButton"] button,
+      [data-testid="stSidebarCollapseButton"] svg,
+      [data-testid="stExpandSidebarButton"], [data-testid="stExpandSidebarButton"] svg {{
+        color: {p['heading']} !important; fill: {p['heading']} !important; opacity: 1 !important; }}
+      [data-testid="stMainMenuButton"]:hover, [data-testid="stSidebarCollapseButton"] button:hover,
+      [data-testid="stExpandSidebarButton"]:hover {{ background: {p['bg']} !important; }}
+      [data-testid="stAppDeployButton"] button {{
+        color: {p['heading']} !important; background: {p['panel']} !important; border: 1px solid {p['border']} !important; }}
+      [data-testid="stAppDeployButton"] button:hover {{ border-color: {p['accent']} !important; }}
+      /* the main-menu (3-dot) dropdown — portaled, so style it globally for every theme */
+      [data-testid="stMainMenuPopover"] {{ background: {p['panel']} !important; border: 1px solid {p['border']} !important; }}
+      [data-testid="stMainMenuPopover"] > div, [data-testid="stMainMenuList"] {{ background: transparent !important; }}
+      [data-testid="stMainMenuPopover"] [role="menuitem"],
+      [data-testid="stMainMenuPopover"] [role="menuitemcheckbox"],
+      [data-testid="stMainMenuItemLabel"] {{ color: {p['text']} !important; background: transparent !important; }}
+      [data-testid="stMainMenuPopover"] [role="menuitem"]:hover,
+      [data-testid="stMainMenuPopover"] [role="menuitemcheckbox"]:hover {{ background: {p['bg']} !important; }}
+      [data-testid="stMainMenuPopover"] kbd {{ color: {p['muted']} !important; background: {p['bg']} !important; border-color: {p['border']} !important; }}
+      [data-testid="stMainMenuDivider"] {{ border-color: {p['border']} !important; background: {p['border']} !important; }}
+
       .block-container {{ padding-top: 1.1rem; max-width: 1280px; }}
       section[data-testid="stSidebar"] > div {{ background-color: {p['panel']}; border-right: 1px solid {p['border']}; }}
 
