@@ -25,8 +25,9 @@ tile per commodity (Brent, Gold, Silver, Copper, Aluminium, Zinc, Steel, Iron Or
 price, **% change vs the previous close** (coloured with each theme's `up`/`down` gain/loss
 tones — previously defined but unused), and a **direct chart link** (the tile opens the
 commodity's Trading Economics page). It reads `data/commodities.json` via `commodities.py`, which
-scrapes Yahoo Finance's keyless chart endpoint for 8 of the 9 (Zinc has no free daily future —
-it's a monthly World Bank "Pink Sheet" value, set by hand). Durable history accumulates per feed
+scrapes **Trading Economics' server-rendered commodities table** (primary — all 9 incl. Zinc, with
+TE's own % change) and falls back to **Yahoo Finance's keyless chart endpoint** if TE is blocked or
+drops a symbol; **Steel** is pinned to Yahoo (USD HRC, since TE steel is CNY rebar). Durable history accumulates per feed
 via `store.py` (SQLite/Postgres/Turso — one table per feed) **and** in-repo
 `data/history.jsonl` (press releases) + `data/notifications.jsonl` (notifications),
 both maintained by a scheduled GitHub Action running `poll.py` (every 30 min).
@@ -78,14 +79,20 @@ so the ids never collide.
   rides the **30-min `poll.py` cron** (committed by `history.yml`), NOT a separate daily job —
   prices move intraday, unlike the once-a-day RBI rates. `poll.py`'s `main()` calls
   `commodities.poll_commodities()` each run and `history.yml` commits `data/commodities.json`
-  alongside the history files. The source is free + keyless — **Yahoo Finance's chart endpoint**
-  (`query1.finance.yahoo.com/v8/finance/chart/<sym>`, symbols in `SPECS`); we read daily closes and
-  report `(last − prev)/prev` as the % vs previous close. It writes **only when the liquid core
-  (Brent/Gold/Silver/Copper) parses in-bounds** (`_is_complete`), and any symbol the scrape misses
-  keeps its last committed price (a list-aware preserve, like the rates `_merge`). **Zinc** has no
-  free daily future, so it's a MONTHLY World Bank "Pink Sheet" value set by hand (`cadence: "monthly"`,
-  never overwritten). Chart links are Trading Economics per-commodity pages. The seed ships with
-  `null` prices — they fill on the next 30-min poll (or trigger `history.yml` via workflow_dispatch
-  to populate now). Yahoo may 403 some datacenter IPs (incl. this sandbox), so validate the scraper
-  from a host that can reach Yahoo Finance, like `rates.py`/`rbi_archive.py`. NB: the 30-min cron now
-  commits whenever a price ticks (→ a Streamlit Cloud redeploy), the intended freshness trade-off.
+  alongside the history files. **Source = Trading Economics primary + Yahoo fallback** (both free,
+  keyless): `fetch_te()` scrapes TE's server-rendered `/commodities` table (`tr[data-symbol]` →
+  `td#p`/`td#nch`/`td#pch`/`td#date`) for all 9 incl. **Zinc**, taking TE's own signed % vs previous
+  close; if TE is blocked/misses a symbol, `fetch_yahoo()` fills it from the chart endpoint
+  (`query1.finance.yahoo.com/v8/finance/chart/<sym>`, computing `(last − prev)/prev`). Per-commodity
+  `source` in `SPECS`: most are `"te"` (TE→Yahoo); **Steel is `"yahoo"`** (USD HRC `HRC=F`, because
+  TE steel `JBP:COM` is Chinese rebar in CNY/T — no TE fallback for it); **Zinc** is TE-only (no free
+  Yahoo future) so it's preserved from the last snapshot if TE misses. Yahoo is only queried for the
+  symbols that actually need it (Steel + any TE gaps), so a healthy TE run hits Yahoo once. It writes
+  **only when the liquid core (Brent/Gold/Silver/Copper) resolves in-bounds from either source**
+  (`_is_complete`); any symbol both sources miss keeps its last committed price. Chart links are
+  Trading Economics per-commodity pages. The seed ships with `null` prices — they fill on the next
+  30-min poll (or trigger `history.yml` via workflow_dispatch). TE's logged-out page serves
+  last-settled values (may lag intraday) and sits behind Cloudflare, and Yahoo may 403 some datacenter
+  IPs (incl. this sandbox) — so validate the scrapers from a host that can reach TE / Yahoo, like
+  `rates.py`/`rbi_archive.py`. NB: the 30-min cron commits whenever a price ticks (→ a Streamlit Cloud
+  redeploy), the intended freshness trade-off.
