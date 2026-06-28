@@ -15,6 +15,7 @@ database.
 import os
 import sys
 
+import commodities
 import feed
 import history
 import rbi_archive
@@ -110,6 +111,16 @@ def poll_feed(cfg):
 
 def main():
     counts = [poll_feed(cfg) for cfg in FEEDS]
+    # Refresh the commodity-price snapshot (data/commodities.json) on the SAME 30-min cadence
+    # as history — commodity prices move intraday, so they want frequent updates (unlike the
+    # once-a-day RBI Current Rates snapshot, data/rates.json, which stays on its own daily
+    # workflow). Best-effort + self-guarding: commodities.poll_commodities() scrapes Yahoo,
+    # writes only on a complete+in-bounds parse, and never raises — a blocked/partial fetch
+    # just preserves the committed snapshot, so it can't fail the history run.
+    try:
+        print(f"[poll:commodities] {commodities.poll_commodities()}")
+    except Exception as ex:                       # defensive — poll_commodities swallows errors
+        _annotate("warning", "commodities refresh failed", ex)
     # NOTE: the Current Rates snapshot (data/rates.json) is refreshed on its OWN cadence —
     # once a day at 1:30pm IST (after RBI's 1pm FX update) by .github/workflows/rates.yml
     # (python rates.py) — not here.

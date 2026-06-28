@@ -170,14 +170,17 @@ way as the rates snapshot:
   Steel `HRC=F`, Iron Ore `TIO=F`, Coffee `KC=F`). The LME base-metal **Zinc** has no free daily
   future, so it's a **monthly** value from the [World Bank "Pink Sheet"](https://www.worldbank.org/en/research/commodity-markets)
   (set by hand, tagged `monthly`). Chart links are Trading Economics' public per-commodity pages.
-- **Automated (best-effort):** a separate **daily** GitHub Action (`.github/workflows/commodities.yml`,
-  07:00 UTC, offset from `rates.yml`) runs `python commodities.py` → `commodities.poll_commodities()`,
-  which rewrites the file **only when the liquid core (Brent/Gold/Silver/Copper) parses sanely** —
-  a blocked/rate-limited scrape leaves the committed snapshot untouched, and any single symbol
-  that fails (or Zinc) keeps its last committed price. The seed file ships with `null` prices;
-  trigger the workflow once via **workflow_dispatch** (from a host that can reach Yahoo) to
-  populate it. Like `rates.py`, the scraper was written without live market access — validate it
-  from a machine that can reach Yahoo Finance.
+- **Automated (best-effort):** commodities ride the **same 30-min poller as history** — `poll.py`
+  calls `commodities.poll_commodities()` each run and `.github/workflows/history.yml` commits
+  `data/commodities.json` alongside the history files. (Prices move intraday, so they want frequent
+  updates — unlike the once-a-day RBI rates, which stay on their own `rates.yml`.) The refresh
+  rewrites the file **only when the liquid core (Brent/Gold/Silver/Copper) parses sanely** — a
+  blocked/rate-limited scrape leaves the committed snapshot untouched, and any single symbol that
+  fails (or Zinc) keeps its last committed price. The seed file ships with `null` prices; they fill
+  on the next 30-min poll (or trigger `history.yml` via **workflow_dispatch** to populate now). Like
+  `rates.py`, the scraper was written without live market access — validate it from a machine that
+  can reach Yahoo Finance. Note: committing on each price tick means more frequent commits during
+  market hours (each a brief Streamlit Cloud redeploy) — the trade-off for fresher prices.
 
 **Look & feel:** the app is laid out like a news website — a newspaper **masthead**
 over your choice of two layouts (sidebar **Layout** toggle, remembered via `?layout=`):
