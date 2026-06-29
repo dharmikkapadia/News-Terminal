@@ -199,14 +199,39 @@ def _rng(pair, dec=2, suffix="%"):
     return f"{lo:.{dec}f}{suffix}" if lo == hi else f"{lo:.{dec}f}–{hi:.{dec}f}{suffix}"
 
 
-def _sig(lab, val, sub="", cls=""):
+def _sig(lab, val, sub="", cls="", href=None, chg_html=""):
+    """A signal-strip tile. `chg_html` is a pre-built (already-safe) coloured % span rendered
+    next to the value; `href` turns the whole tile into a chart link (e.g. the TE FX page)."""
     sub_html = f"<div class='sub'>{html.escape(sub)}</div>" if sub else ""
-    return (f"<div class='mw-sig {cls}'><div class='lab'>{html.escape(lab)}</div>"
-            f"<div class='val'>{html.escape(val)}</div>{sub_html}</div>")
+    inner = (f"<div class='lab'>{html.escape(lab)}</div>"
+             f"<div class='val'>{html.escape(val)}{chg_html}</div>{sub_html}")
+    if href:
+        return (f"<a class='mw-sig mw-siglink {cls}' href='{html.escape(href)}' "
+                f"target='_blank' rel='noopener'>{inner}</a>")
+    return f"<div class='mw-sig {cls}'>{inner}</div>"
 
 
 def _rrow(k, v):
     return f"<div class='mw-rrow'><span class='mw-rk'>{html.escape(k)}</span><span class='mw-rv'>{html.escape(v)}</span></div>"
+
+
+def _fx_chg_html(pct):
+    """A coloured (up/down/flat) '+0.20%' span for a signed % change, or '' if unknown."""
+    if not isinstance(pct, (int, float)):
+        return ""
+    txt, cls = _cmd_change(pct)
+    return f"<span class='chg mw-{cls}'>{html.escape(txt)}</span>"
+
+
+def _fx_rrow(lab, value_str, te=None):
+    """An Exchange Rates row. For a TE-sourced pair (`te` dict carrying a chart_url) the value
+    is a chart link followed by a coloured % vs previous close; otherwise a plain _rrow."""
+    if te and te.get("chart_url"):
+        link = (f"<a class='mw-fxlink' href='{html.escape(te['chart_url'])}' "
+                f"target='_blank' rel='noopener'>{html.escape(value_str)}</a>")
+        return (f"<div class='mw-rrow'><span class='mw-rk'>{html.escape(lab)}</span>"
+                f"<span class='mw-rv'>{link}{_fx_chg_html(te.get('change_pct'))}</span></div>")
+    return _rrow(lab, value_str)
 
 
 def _panel(title, rows, note=""):
@@ -234,6 +259,7 @@ def _rates_dashboard_html(r):
     pol = r.get("policy_rates") or {}
     res = r.get("reserve_ratios") or {}
     fx = r.get("exchange_rates") or {}
+    fx_te = fx.get("fx_te") or {}            # USD/EUR/GBP enrichment (TE: % vs prev close + chart)
     lend = r.get("lending_deposit_rates") or {}
     mkt = r.get("market_trends") or {}
     cap = mkt.get("capital_market") or {}
@@ -246,11 +272,13 @@ def _rates_dashboard_html(r):
     ]
     usd = fx.get("inr_per_usd")
     usd_val = f"{usd:,.4f}" if isinstance(usd, (int, float)) else "—"
+    usd_te = fx_te.get("inr_per_usd") or {}
     eur = fx.get("inr_per_eur"); gbp = fx.get("inr_per_gbp")
     fx_sub = " · ".join(s for s in (
         f"EUR {eur:,.2f}" if isinstance(eur, (int, float)) else "",
         f"GBP {gbp:,.2f}" if isinstance(gbp, (int, float)) else "") if s) or "FBIL ref"
-    sigs.append(_sig("USD / INR", usd_val, fx_sub))
+    sigs.append(_sig("USD / INR", usd_val, fx_sub, href=usd_te.get("chart_url"),
+                     chg_html=_fx_chg_html(usd_te.get("change_pct"))))
     bench = _benchmark_gsec(mkt.get("gsec_yields"))
     if bench:
         sigs.append(_sig("10Y G-Sec", _pct(bench.get("yield"), 4), bench.get("security", "")))
@@ -300,9 +328,15 @@ def _rates_dashboard_html(r):
                           ("INR / 1 EUR", "inr_per_eur", 4), ("INR / 100 JPY", "inr_per_100_jpy", 4),
                           ("INR / 1 AED", "inr_per_aed", 4), ("INR / 10000 IDR", "inr_per_10000_idr", 4)]:
         v = fx.get(key)
-        fx_rows.append(_rrow(lab, f"{v:,.{dec}f}" if isinstance(v, (int, float)) else "—"))
-    panels.append(_panel("Exchange Rates", fx_rows,
-                         note=" · ".join(s for s in (fx.get("as_of") or "", f"Source: {fx.get('source')}" if fx.get("source") else "") if s)))
+        vs = f"{v:,.{dec}f}" if isinstance(v, (int, float)) else "—"
+        fx_rows.append(_fx_rrow(lab, vs, fx_te.get(key)))     # USD/EUR/GBP get a chart link + % change
+    # Mixed-source note: USD/EUR/GBP are Trading Economics now; the rest are RBI's FBIL reference.
+    fbil = " · ".join(s for s in (fx.get("as_of") or "",
+                                  f"Source: {fx.get('source')}" if fx.get("source") else "") if s)
+    fx_note = " · ".join(s for s in (
+        "USD/EUR/GBP: Trading Economics (intraday, % vs prev close)" if fx_te else "",
+        (f"JPY/AED/IDR: {fbil}" if fx_te else fbil) if fbil else "") if s)
+    panels.append(_panel("Exchange Rates", fx_rows, note=fx_note))
 
     mm = mkt.get("money_market") or {}
     trend_rows = [_rrow("Call Money Rate", _rng(mm.get("call_rate")))]
@@ -328,7 +362,7 @@ def _rates_dashboard_html(r):
     sub = f"snapshot · {captured}" if captured else "snapshot"
     return (
         "<div class='mw-rates'>"
-        f"<div class='mw-rates-hd'><span class='t'>Current Rates</span><span class='s'>{html.escape(sub)} · rbi.org.in</span></div>"
+        f"<div class='mw-rates-hd'><span class='t'>Current Rates</span><span class='s'>{html.escape(sub)} · rbi.org.in · FX: tradingeconomics.com</span></div>"
         f"<div class='mw-sigstrip'>{''.join(sigs)}</div>"
         f"<details><summary></summary><div class='mw-ratesgrid'>{''.join(panels)}</div></details>"
         "</div>"
@@ -660,6 +694,10 @@ def theme_css(p):
       .mw-sig .sub {{ font-family: {_MONO}; font-size: 11px; color: {p['muted']}; margin-top: 4px; }}
       .mw-sig.mpc {{ border-color: {p['accent']}; box-shadow: 0 0 0 1px {p['accent']} inset; }}
       .mw-sig.mpc .val {{ color: {p['accent']}; }}
+      /* TE-sourced FX (USD/EUR/GBP): the USD signal tile links out to its TE chart and shows a
+         coloured % vs previous close inline next to the rate (reusing up/down/flat gain-loss tones). */
+      .mw-siglink {{ text-decoration: none; color: inherit; display: block; }}
+      .mw-sig .val .chg {{ font-size: 12px; font-weight: 700; margin-left: 7px; }}
       .mw-ratesgrid {{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 12px; }}
       @media (max-width: 1100px) {{ .mw-ratesgrid {{ grid-template-columns: 1fr; }} }}
       .mw-rpanel {{ background: {p['panel']}; border: 1px solid {p['border']}; border-radius: 9px; padding: 13px 15px; }}
@@ -670,6 +708,10 @@ def theme_css(p):
       .mw-rrow:last-child {{ border-bottom: none; }}
       .mw-rk {{ font-size: 13px; color: {p['text']}; }}
       .mw-rv {{ font-family: {_MONO}; font-size: 13px; font-weight: 700; color: {p['heading']}; white-space: nowrap; }}
+      /* Exchange Rates: TE pairs render the rate as a dotted chart link + a coloured % change. */
+      .mw-fxlink {{ color: inherit; text-decoration: none; border-bottom: 1px dotted {p['muted']}; }}
+      .mw-fxlink:hover {{ color: {p['accent']}; border-bottom-color: {p['accent']}; }}
+      .mw-rv .chg {{ font-size: 11.5px; font-weight: 700; margin-left: 8px; }}
       .mw-rnote {{ font-size: 10.5px; color: {p['muted']}; margin-top: 8px; font-style: italic; }}
       .mw-rates > details > summary {{ list-style: none; cursor: pointer; outline: none; width: max-content;
         font-family: {_MONO}; font-size: 11px; font-weight: 700; letter-spacing: .04em; color: {p['accent']}; margin-top: 13px; }}
