@@ -21,7 +21,8 @@ key RBI rates (repo, LAF corridor, CRR/SLR, USD/INR, ~10y G-Sec) plus a **next-M
 countdown**, over an expandable full rate card (policy/reserve/exchange/lending rates,
 market trends). It reads `data/rates.json` via `rates.py`. **USD/INR, EUR/INR and GBP/INR
 are sourced from Trading Economics** (not RBI/FBIL): each shows a **% change vs the previous
-close** (themed `up`/`down`) and links out to its TE chart page — the USD/INR signal tile and
+close** (themed `up`/`down`) and links out to the TE INR currencies board
+(`currencies?quote=inr`) — the USD/INR signal tile (with EUR/GBP + their % in its sub line) and
 those three Exchange Rates rows; the rest of the FX panel (JPY/AED/IDR) stays RBI/FBIL. Below it sits an opt-in
 **Commodities** strip (`_commodities_dashboard_html`, sidebar **Show commodities** toggle): a
 tile per commodity (Brent, Gold, Silver, Copper, Aluminium, Zinc, Steel, Iron Ore, Coffee) with
@@ -88,9 +89,9 @@ so the ids never collide.
   the three `exchange_rates` scalars **plus a per-pair `fx_te` block** (`change_pct`, `prev_close`,
   `chart_url`, `as_of`, `source`) that drives the % change + chart links; writes **only when the
   USD/INR headline resolves in-bounds** (others preserved, marked `stale`), so JPY/AED/IDR (RBI)
-  are never touched. NB: `history.yml` now also commits `data/rates.json`. Chart links: USD/INR →
-  TE's **`/india/currency`** country page (not a `usdinr:cur` slug); EUR/GBP → `/eurinr:cur`,
-  `/gbpinr:cur`. JPY isn't quoted on the TE INR page. Validate the scraper from a host that can
+  are never touched. NB: `history.yml` now also commits `data/rates.json`. Chart links: all three
+  pairs deep-link to TE's **`/currencies?quote=inr`** board (the same page scraped, `TE_CURRENCIES_URL`),
+  not per-pair slugs. JPY isn't quoted on the TE INR page. Validate the scraper from a host that can
   reach TE / Yahoo (this sandbox is Cloudflare-challenged), like `rates.py`/`commodities.py`.
 - **Commodities** (`data/commodities.json`, `commodities.py`) follows the rates guard pattern but
   rides the **30-min `poll.py` cron** (committed by `history.yml`), NOT a separate daily job —

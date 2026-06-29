@@ -55,15 +55,16 @@ _HTML_HEADERS = {"User-Agent": _TE_UA,
                  "Accept-Language": "en-US,en;q=0.9",
                  "Referer": "https://tradingeconomics.com/"}
 # Each TE-sourced pair: the rates.json scalar it fills, the TE row `data-symbol` (note the
-# :CUR suffix), the Yahoo fallback symbol, and the TE chart page. USD/INR's chart link is
-# TE's India-currency country page, not a usdinr:cur slug (verified from the live page).
+# :CUR suffix), the Yahoo fallback symbol, and the chart link — all three open the TE INR
+# currencies board (quote=inr), the same page we scrape, so the tiles/rows deep-link to the
+# live INR FX table rather than per-pair pages.
 FX_SPECS = [
     dict(key="inr_per_usd", label="USD/INR", te="USDINR:CUR", yf="USDINR=X",
-         chart_url="https://tradingeconomics.com/india/currency"),
+         chart_url=TE_CURRENCIES_URL),
     dict(key="inr_per_eur", label="EUR/INR", te="EURINR:CUR", yf="EURINR=X",
-         chart_url="https://tradingeconomics.com/eurinr:cur"),
+         chart_url=TE_CURRENCIES_URL),
     dict(key="inr_per_gbp", label="GBP/INR", te="GBPINR:CUR", yf="GBPINR=X",
-         chart_url="https://tradingeconomics.com/gbpinr:cur"),
+         chart_url=TE_CURRENCIES_URL),
 ]
 # Sanity bounds (broad) — an INR-per-unit rate outside its range means a mis-parse.
 _FX_BOUNDS = {"inr_per_usd": (40, 200), "inr_per_eur": (40, 250), "inr_per_gbp": (50, 300)}
