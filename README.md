@@ -138,7 +138,10 @@ yields, Sensex/Nifty), each with its "as on" stamp.
 It reads a committed **`data/rates.json`** (`rates.py`), refreshed two ways:
 - **Manual (source of truth):** RBI 403s datacenter IPs and the rates box is a JS accordion,
   so a **Claude-for-Chrome** run on rbi.org.in is the reliable extractor — it emits the JSON
-  (including the next MPC date, which isn't on the home page); commit it.
+  (including the next MPC date, which isn't on the home page); commit it. A ready-to-paste,
+  schedulable prompt that does this end-to-end (read RBI → merge onto the live file → commit,
+  preserving the Trading-Economics FX overlay) lives at
+  [`prompts/rbi-rates-refresh.md`](prompts/rbi-rates-refresh.md).
 - **Automated (best-effort):** a separate **daily** GitHub Action (`.github/workflows/rates.yml`)
   runs at **1:30pm IST** — just after RBI's "1.00pm" FBIL FX update, so each run captures the
   same day's exchange rates (a midnight run would only get the prior day's). It runs

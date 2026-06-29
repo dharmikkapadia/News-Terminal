@@ -70,7 +70,11 @@ so the ids never collide.
   (runs the script, asserts `not at.exception`) across themes/filters.
 - **Current Rates** (`data/rates.json`) is refreshed two ways: (1) MANUAL — a
   Claude-for-Chrome run on rbi.org.in emits the JSON (RBI 403s CI and the rates box is a
-  JS accordion, so a real browser is the reliable extractor); commit it. (2) AUTO — a
+  JS accordion, so a real browser is the reliable extractor); commit it. The canonical,
+  schedulable browser prompt lives at `prompts/rbi-rates-refresh.md` — it reads RBI, merges
+  onto the live file (preserving the TE-owned `inr_per_usd/eur/gbp` + `fx_te` overlay) and
+  commits, so the FBIL JPY/AED/IDR + Market Trends panels stay fresh without hand-editing.
+  (2) AUTO — a
   separate **daily** GitHub Action (`.github/workflows/rates.yml`, 1:30pm IST = `0 8 * * *`
   UTC — just after RBI's "1.00pm" FBIL FX update, so each run gets the SAME day's rates) runs
   `rates.poll_rates()` via `python rates.py`; it scrapes the home page but writes
