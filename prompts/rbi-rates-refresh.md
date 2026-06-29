@@ -19,6 +19,14 @@ must be copied through unchanged): `exchange_rates.inr_per_usd`, `exchange_rates
 `exchange_rates.fx_te_captured_at`. USD/EUR/GBP are sourced from Trading Economics, not
 RBI — overwriting them here would break the % change + chart links until the next poll.
 
+> **⚠ Before you run it — set the deploy branch.** The prompt reads and commits
+> `data/rates.json` on **one** branch: the one the live Streamlit app deploys from (where
+> `data/rates.json` actually lives). Replace every `<BRANCH>` below with that branch name.
+> As of now `data/rates.json` lives on the project branch
+> (`claude/rbi-exchange-rate-updates-trayr9`), **not** `main` — `main` still holds an older,
+> unrelated project, so the `main` URLs 404. Once `main` is pointed at this project, use
+> `main`. (Quick check: `…/<BRANCH>/data/rates.json` must return HTTP 200, not 404.)
+
 ---
 
 ## ▼ Paste everything below this line into Claude for Chrome ▼
@@ -31,7 +39,7 @@ report values you actually read on the page. Produce one final JSON object and c
 
 Open this raw file and keep its contents in mind:
 
-    https://raw.githubusercontent.com/dharmikkapadia/news-terminal/main/data/rates.json
+    https://raw.githubusercontent.com/dharmikkapadia/news-terminal/<BRANCH>/data/rates.json
 
 You will **copy these fields through unchanged** (they're maintained by automation, not RBI):
 `exchange_rates.inr_per_usd`, `exchange_rates.inr_per_eur`, `exchange_rates.inr_per_gbp`,
@@ -133,12 +141,12 @@ Steps 2–3 and copying the preserved fields from Step 1. Conventions:
 
 ### Step 5 — Commit it to GitHub (no manual step)
 
-1. Open the web editor: **https://github.com/dharmikkapadia/news-terminal/edit/main/data/rates.json**
+1. Open the web editor: **https://github.com/dharmikkapadia/news-terminal/edit/<BRANCH>/data/rates.json**
 2. Select all and replace the file contents with the JSON from Step 4.
 3. Before committing, sanity‑check: it's valid JSON; the repo rate is ~4–8; USD/INR is
    40–200; Sensex is in the tens of thousands; and the `inr_per_usd/eur/gbp` + `fx_te`
    fields still match what you read in Step 1.
-4. Commit to **`main`** with message: `rates: refresh RBI snapshot (Claude-for-Chrome)`.
+4. Commit to **`<BRANCH>`** with message: `rates: refresh RBI snapshot (Claude-for-Chrome)`.
 
 Then report a one‑line summary of what changed (repo rate, USD as‑of date, Sensex/Nifty,
 next MPC), or say clearly if RBI was unreachable and you committed nothing.
