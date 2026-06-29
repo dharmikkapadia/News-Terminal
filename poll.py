@@ -18,6 +18,7 @@ import sys
 import commodities
 import feed
 import history
+import rates
 import rbi_archive
 
 # Each feed: how to fetch it (RSS), where to store it (JSONL), and how to backfill
@@ -121,9 +122,18 @@ def main():
         print(f"[poll:commodities] {commodities.poll_commodities()}")
     except Exception as ex:                       # defensive — poll_commodities swallows errors
         _annotate("warning", "commodities refresh failed", ex)
-    # NOTE: the Current Rates snapshot (data/rates.json) is refreshed on its OWN cadence —
-    # once a day at 1:30pm IST (after RBI's 1pm FX update) by .github/workflows/rates.yml
-    # (python rates.py) — not here.
+    # Refresh the Trading-Economics FX overlay (USD/EUR/GBP-INR in data/rates.json) on this
+    # SAME 30-min cadence — FX moves intraday, so it rides the history cron like commodities.
+    # poll_fx() scrapes TE (Yahoo fallback), writes only on a sane parse and never raises,
+    # and touches ONLY the three TE pairs — JPY/AED/IDR and the rest of rates.json (refreshed
+    # once a day by .github/workflows/rates.yml) are left untouched.
+    try:
+        print(f"[poll:fx] {rates.poll_fx()}")
+    except Exception as ex:                       # defensive — poll_fx swallows errors
+        _annotate("warning", "FX refresh failed", ex)
+    # NOTE: the rest of the Current Rates snapshot (data/rates.json) — policy/reserve/lending
+    # rates, market trends, MPC — is refreshed on its OWN cadence, once a day at 1:30pm IST
+    # (after RBI's 1pm FX update) by .github/workflows/rates.yml (python rates.py) — not here.
     # Hard-fail (red run + failure email) only if EVERY feed ended up with nothing —
     # one blocked feed shouldn't fail the run while the other still has history.
     if not any(counts):

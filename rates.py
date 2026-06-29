@@ -24,6 +24,7 @@ import json
 import os
 import re
 from datetime import datetime, date, timezone, timedelta
+from urllib.parse import quote
 
 import requests
 
@@ -34,6 +35,40 @@ RATES_PATH = os.environ.get("MARKETWIRE_RATES_FILE", os.path.join(_DATA_DIR, "ra
 HOME_URL = os.environ.get("MARKETWIRE_RATES_HOME", "https://www.rbi.org.in/")
 UA = "Mozilla/5.0 (compatible; MarketWire/1.0; RSS reader)"
 IST = timezone(timedelta(hours=5, minutes=30))
+
+# --- Trading Economics FX overlay (USD/EUR/GBP-INR) ----------------------------
+# USD/INR, EUR/INR and GBP/INR are sourced from Trading Economics' server-rendered
+# currencies table (quote=inr) instead of RBI/FBIL — it gives an intraday price, a
+# signed % change vs the previous close, and a per-pair chart page, mirroring the
+# commodities strip. Yahoo's keyless chart endpoint is the fallback if TE is blocked.
+# JPY/AED/IDR stay on RBI/FBIL (JPY isn't even quoted on the TE INR page).
+TE_CURRENCIES_URL = os.environ.get(
+    "MARKETWIRE_TE_CURRENCIES", "https://tradingeconomics.com/currencies?quote=inr")
+# Yahoo's keyless chart endpoint (fallback). `<symbol>` is URL-encoded ('=' in FX tickers).
+YF_CHART = os.environ.get(
+    "MARKETWIRE_YF_CHART", "https://query1.finance.yahoo.com/v8/finance/chart/")
+# A browser-ish header set — TE sits behind Cloudflare and Yahoo 403s a bare python UA.
+_TE_UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+          "(KHTML, like Gecko) Chrome/124.0 Safari/537.36")
+_HTML_HEADERS = {"User-Agent": _TE_UA,
+                 "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                 "Accept-Language": "en-US,en;q=0.9",
+                 "Referer": "https://tradingeconomics.com/"}
+# Each TE-sourced pair: the rates.json scalar it fills, the TE row `data-symbol` (note the
+# :CUR suffix), the Yahoo fallback symbol, and the TE chart page. USD/INR's chart link is
+# TE's India-currency country page, not a usdinr:cur slug (verified from the live page).
+FX_SPECS = [
+    dict(key="inr_per_usd", label="USD/INR", te="USDINR:CUR", yf="USDINR=X",
+         chart_url="https://tradingeconomics.com/india/currency"),
+    dict(key="inr_per_eur", label="EUR/INR", te="EURINR:CUR", yf="EURINR=X",
+         chart_url="https://tradingeconomics.com/eurinr:cur"),
+    dict(key="inr_per_gbp", label="GBP/INR", te="GBPINR:CUR", yf="GBPINR=X",
+         chart_url="https://tradingeconomics.com/gbpinr:cur"),
+]
+# Sanity bounds (broad) — an INR-per-unit rate outside its range means a mis-parse.
+_FX_BOUNDS = {"inr_per_usd": (40, 200), "inr_per_eur": (40, 250), "inr_per_gbp": (50, 300)}
+_MONTHS = {m: i for i, m in enumerate(
+    ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"], 1)}
 
 
 # --------------------------------------------------------------------------- #
@@ -98,10 +133,11 @@ def _fmt_range(start, end):
 # Best-effort scrape (poller only) — guarded so it can't clobber the manual file
 # --------------------------------------------------------------------------- #
 def _num(s):
-    """First number in `s` as float, else None ('₹ 13,600' -> 13600.0, '5.25%' -> 5.25)."""
+    """First number in `s` as float, else None ('₹ 13,600' -> 13600.0, '5.25%' -> 5.25,
+    '−0.12%' -> -0.12 — TE renders negatives with the unicode minus)."""
     if s is None:
         return None
-    m = re.search(r"-?\d[\d,]*\.?\d*", str(s).replace(",", ""))
+    m = re.search(r"-?\d[\d,]*\.?\d*", str(s).replace("−", "-").replace(",", ""))
     return float(m.group(0)) if m else None
 
 
@@ -358,5 +394,204 @@ def _merge(prior, scraped):
     return out
 
 
+# --------------------------------------------------------------------------- #
+# Trading Economics FX overlay (poller) — USD/EUR/GBP-INR, Yahoo fallback
+# --------------------------------------------------------------------------- #
+def _celltext(tr, cid):
+    """Text of the <td id="cid"> inside a TE row (ids repeat per row; scoping to `tr` is fine)."""
+    td = tr.find("td", id=cid)
+    return td.get_text(" ", strip=True) if td else None
+
+
+def _fx_asof(s):
+    """TE's FX date cell -> ISO date. The most-liquid pair shows a TIME ('12:09', i.e. today);
+    others show 'Jun/29'. A time-only cell maps to today (IST); a month/day that lands more than
+    a week in the future rolls back a year (a Dec date read in early Jan)."""
+    if not s:
+        return None
+    s = str(s).strip()
+    today = datetime.now(IST).date()
+    if re.match(r"^\d{1,2}:\d{2}\b", s):
+        return today.isoformat()
+    m = re.match(r"\s*([A-Za-z]{3})\s*/\s*(\d{1,2})", s)
+    if not m:
+        return None
+    mon = _MONTHS.get(m.group(1).lower())
+    if not mon:
+        return None
+    try:
+        d = date(today.year, mon, int(m.group(2)))
+    except ValueError:
+        return None
+    if (d - today).days > 7:
+        d = date(today.year - 1, mon, int(m.group(2)))
+    return d.isoformat()
+
+
+def _fx_ok(key, q):
+    """True if `q` has an in-bounds price for `key` (a sane INR-per-unit rate)."""
+    if not isinstance(q, dict):
+        return False
+    v = q.get("price")
+    lo, hi = _FX_BOUNDS.get(key, (None, None))
+    return isinstance(v, (int, float)) and (lo is None or lo <= v <= hi)
+
+
+def fetch_te_fx(url=TE_CURRENCIES_URL, timeout=25):
+    """Scrape USD/EUR/GBP-INR from TE's server-rendered currencies table into
+    {scalar_key: {price, prev_close, change_pct, as_of}}. Returns (quotes, error). Best
+    effort: a Cloudflare block / markup change yields an error (or empty parse) and the
+    caller falls back to Yahoo / preserves prior values. Mirrors commodities.fetch_te —
+    each `tr[data-symbol]` row carries `td#p` price, `td#nch` net change, `td#pch` signed
+    % vs previous close and `td#date` (the data-symbol keeps TE's ':CUR' suffix)."""
+    try:
+        resp = requests.get(url, headers=_HTML_HEADERS, timeout=timeout)
+        resp.raise_for_status()
+    except Exception as ex:
+        return {}, f"{type(ex).__name__}: {ex}"
+    try:
+        from bs4 import BeautifulSoup
+    except Exception as ex:
+        return {}, f"BeautifulSoup unavailable: {ex}"
+
+    soup = BeautifulSoup(resp.content, "html.parser")
+    want = {s["te"]: s["key"] for s in FX_SPECS}
+    out = {}
+    for tr in soup.select("tr[data-symbol]"):
+        key = want.get(tr.get("data-symbol"))
+        if not key or key in out:
+            continue
+        price = _num(_celltext(tr, "p"))
+        if price is None:
+            continue
+        nch = _num(_celltext(tr, "nch"))
+        pch = _num(_celltext(tr, "pch"))          # signed % vs previous close, straight from TE
+        if nch is not None:
+            prev = price - nch
+        elif pch not in (None, -100):
+            prev = price / (1 + pch / 100.0)
+        else:
+            prev = None
+        out[key] = {
+            "price": round(price, 4),
+            "prev_close": round(prev, 4) if prev is not None else None,
+            "change_pct": round(pch, 2) if pch is not None else None,
+            "as_of": _fx_asof(_celltext(tr, "date")),
+        }
+    if not out:
+        return {}, "no FX rows parsed (markup changed or blocked)"
+    return out, None
+
+
+def _fetch_yahoo_one(symbol, timeout=20, session=None):
+    """One Yahoo symbol's last/prev daily close, % change and as-of date, or (None, error)."""
+    url = YF_CHART + quote(symbol, safe="") + "?range=7d&interval=1d"
+    try:
+        get = (session or requests).get
+        resp = get(url, headers={"User-Agent": _TE_UA}, timeout=timeout)
+        resp.raise_for_status()
+        data = resp.json()
+    except Exception as ex:
+        return None, f"{type(ex).__name__}: {ex}"
+    try:
+        res = (data.get("chart") or {}).get("result") or []
+        if not res:
+            return None, "no result"
+        res = res[0]
+        ts = res.get("timestamp") or []
+        closes = ((res.get("indicators") or {}).get("quote") or [{}])[0].get("close") or []
+        pairs = [(t, c) for t, c in zip(ts, closes) if isinstance(c, (int, float))]
+        if len(pairs) < 2:
+            return None, "need ≥2 daily closes for a change"
+        (cur_t, cur), (_, prev) = pairs[-1], pairs[-2]
+        change_pct = ((cur - prev) / prev * 100.0) if prev else None
+        return {
+            "price": round(cur, 4),
+            "prev_close": round(prev, 4),
+            "change_pct": round(change_pct, 2) if change_pct is not None else None,
+            "as_of": datetime.fromtimestamp(cur_t, IST).strftime("%Y-%m-%d"),
+        }, None
+    except Exception as ex:
+        return None, f"parse error: {type(ex).__name__}: {ex}"
+
+
+def fetch_yahoo_fx(specs, timeout=20):
+    """Fetch the given FX specs from Yahoo into {key: {...}} (in-bounds only). Returns
+    (quotes, errors). Only the pairs TE missed are passed in, so a healthy TE run skips it."""
+    quotes, errors = {}, {}
+    if not specs:
+        return quotes, errors
+    with requests.Session() as s:
+        s.headers.update({"User-Agent": _TE_UA})
+        for spec in specs:
+            q, err = _fetch_yahoo_one(spec["yf"], timeout=timeout, session=s)
+            if err:
+                errors[spec["key"]] = err
+            elif not _fx_ok(spec["key"], q):
+                errors[spec["key"]] = f"price {q.get('price')} out of bounds"
+            else:
+                quotes[spec["key"]] = q
+    return quotes, errors
+
+
+def poll_fx(path=RATES_PATH):
+    """Overlay TE-sourced USD/EUR/GBP-INR onto the committed rates.json: replace the
+    exchange_rates scalars with the TE price and attach a per-pair `fx_te` block (signed
+    % vs previous close, previous close, chart link, as-of, source), Yahoo as fallback.
+    Writes ONLY when the USD/INR headline resolves in-bounds; any pair both sources miss
+    keeps its last committed value (marked stale). JPY/AED/IDR (RBI/FBIL) are untouched.
+    Returns a status string; never raises."""
+    te, te_err = fetch_te_fx()
+    need = [s for s in FX_SPECS if not _fx_ok(s["key"], te.get(s["key"]))]
+    yf, yf_err = fetch_yahoo_fx(need)
+
+    resolved = {}                                    # key -> (quote, source_label, spec)
+    for s in FX_SPECS:
+        for label, sym, quotes in (("Trading Economics", s["te"], te),
+                                   ("Yahoo Finance", s["yf"], yf)):
+            q = quotes.get(s["key"])
+            if _fx_ok(s["key"], q):
+                resolved[s["key"]] = (q, f"{label} · {sym}", s)
+                break
+
+    if "inr_per_usd" not in resolved:                # headline pair must resolve to write
+        return (f"FX scrape incomplete (USD/INR missing; te_err={te_err or '-'}; "
+                f"yf_err={yf_err or '-'}) — keeping committed snapshot")
+
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            snap = json.load(f)
+    except Exception:
+        snap = {}
+    fx = snap.get("exchange_rates")
+    if not isinstance(fx, dict):
+        fx = {}
+        snap["exchange_rates"] = fx
+    prior_te = fx.get("fx_te") if isinstance(fx.get("fx_te"), dict) else {}
+
+    fx_te, fresh = {}, 0
+    for s in FX_SPECS:
+        key = s["key"]
+        if key in resolved:
+            q, src, spec = resolved[key]
+            fx[key] = q["price"]
+            fx_te[key] = {
+                "label": spec["label"],
+                "prev_close": q["prev_close"],
+                "change_pct": q["change_pct"],
+                "chart_url": spec["chart_url"],
+                "as_of": q["as_of"],
+                "source": src,
+            }
+            fresh += 1
+        elif key in prior_te:
+            fx_te[key] = dict(prior_te[key], stale=True)   # both sources missed → keep last good
+    fx["fx_te"] = fx_te
+    fx["fx_te_captured_at"] = datetime.now(IST).isoformat(timespec="seconds")
+    save_rates(snap, path)
+    return f"FX updated ({fresh}/{len(FX_SPECS)} fresh from TE/Yahoo — USD/INR {fx.get('inr_per_usd')})"
+
+
 if __name__ == "__main__":
     print(poll_rates())
+    print(poll_fx())
