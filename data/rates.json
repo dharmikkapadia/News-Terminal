@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-06-28T15:53:10+05:30",
+  "captured_at": "2026-06-29T17:56:22+05:30",
   "source": "https://www.rbi.org.in/",
   "policy_rates": {
     "repo_rate": 5.25,
@@ -13,41 +13,41 @@
     "slr": 18.0
   },
   "exchange_rates": {
-    "as_of": "As at 1.00pm of June 25, 2026",
+    "as_of": "As at 1.00pm of June 29, 2026",
     "source": "FBIL",
-    "inr_per_usd": 94.641,
-    "inr_per_gbp": 124.979,
-    "inr_per_eur": 107.8237,
-    "inr_per_100_jpy": 58.38,
-    "inr_per_aed": 25.7233,
-    "inr_per_10000_idr": 52.6626,
+    "inr_per_usd": 94.602,
+    "inr_per_gbp": 125.141,
+    "inr_per_eur": 107.8879,
+    "inr_per_100_jpy": 58.31,
+    "inr_per_aed": 25.6891,
+    "inr_per_10000_idr": 52.8453,
     "fx_te": {
       "inr_per_usd": {
         "label": "USD/INR",
         "prev_close": 94.2781,
-        "change_pct": 0.38,
+        "change_pct": 0.34,
         "chart_url": "https://tradingeconomics.com/currencies?quote=inr",
         "as_of": "2026-06-29",
         "source": "Trading Economics · USDINR:CUR"
       },
       "inr_per_eur": {
         "label": "EUR/INR",
-        "prev_close": 107.3253,
-        "change_pct": 0.46,
+        "prev_close": 107.3254,
+        "change_pct": 0.52,
         "chart_url": "https://tradingeconomics.com/currencies?quote=inr",
         "as_of": "2026-06-29",
         "source": "Trading Economics · EURINR:CUR"
       },
       "inr_per_gbp": {
         "label": "GBP/INR",
-        "prev_close": 124.422,
-        "change_pct": 0.45,
+        "prev_close": 124.421,
+        "change_pct": 0.58,
         "chart_url": "https://tradingeconomics.com/currencies?quote=inr",
         "as_of": "2026-06-29",
         "source": "Trading Economics · GBPINR:CUR"
       }
     },
-    "fx_te_captured_at": "2026-06-29T17:00:37+05:30"
+    "fx_te_captured_at": "2026-06-29T17:56:22+05:30"
   },
   "lending_deposit_rates": {
     "base_rate": [
@@ -70,28 +70,28 @@
         4.2,
         5.45
       ],
-      "as_on": "as on June 24, 2026"
+      "as_on": "as on June 28, 2026"
     },
     "gsec_yields": [
       {
         "security": "6.03% GS 2029",
-        "yield": 6.1266
+        "yield": 6.1208
       },
       {
         "security": "6.36% GS 2031",
-        "yield": 6.4241
+        "yield": 6.4233
       },
       {
         "security": "6.94% GS 2036",
-        "yield": 6.7895
+        "yield": 6.775
       },
       {
         "security": "6.68% GS 2040",
-        "yield": 7.0813
+        "yield": 7.0305
       },
       {
         "security": "7.24% GS 2055",
-        "yield": 7.4033
+        "yield": 7.3526
       }
     ],
     "tbill_yields": {
@@ -99,11 +99,11 @@
       "182_day": 5.4499,
       "364_day": 5.6387
     },
-    "gsec_tbill_as_on": "as on June 24, 2026",
+    "gsec_tbill_as_on": "as on June 25, 2026",
     "capital_market": {
-      "sensex": 76991.22,
-      "nifty_50": 24021.65,
-      "as_on": "as on June 24, 2026"
+      "sensex": 77100.47,
+      "nifty_50": 24056.0,
+      "as_on": "as on June 25, 2026"
     }
   },
   "mpc": {
