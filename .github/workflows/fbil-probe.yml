@@ -1,0 +1,44 @@
+name: FBIL probe (throwaway)
+
+# One-off reachability test: does FBIL's public JSON API answer a GitHub-hosted
+# (datacenter) runner? RBI 403s these IPs; the FBIL recon showed no WAF, so this
+# settles whether FBIL can be the cloud-side source. Manual trigger only; reads
+# nothing from the repo and commits nothing. Safe to delete after.
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Curl FBIL JSON endpoints from the cloud runner
+        run: |
+          set +e
+          UA="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
+          echo "runner egress IP: $(curl -sS --max-time 20 https://api.ipify.org || echo '?')"
+          echo
+          for name in refrates ovnmibor tbill; do
+            url="https://www.fbil.org.in/wasdm/${name}/fetch?authenticated=false"
+            echo "=================== ${name} ==================="
+            code=$(curl -sS -A "$UA" -H "Accept: application/json" \
+                   --connect-timeout 25 --max-time 45 \
+                   -D "${name}.hdr" -o "${name}.json" -w "%{http_code}" "$url")
+            rc=$?
+            echo "curl exit: ${rc}   HTTP: ${code}   bytes: $(wc -c < "${name}.json" 2>/dev/null || echo 0)"
+            echo "---- response headers ----"; cat "${name}.hdr" 2>/dev/null
+            echo "---- first 900 chars of body ----"; head -c 900 "${name}.json" 2>/dev/null; echo
+            echo
+          done
+          echo "=================== gsec archive list ==================="
+          code=$(curl -sS -A "$UA" -H "Accept: application/json" \
+                 --connect-timeout 25 --max-time 45 \
+                 -o gsec.json -w "%{http_code}" \
+                 "https://www.fbil.org.in/wasdm/gsec/fetch?authenticated=false")
+          echo "HTTP: ${code}   bytes: $(wc -c < gsec.json 2>/dev/null || echo 0)"
+          head -c 900 gsec.json 2>/dev/null; echo
+          echo
+          echo "=================== PROBE DONE ==================="
