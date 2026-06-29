@@ -26,7 +26,7 @@
         "label": "USD/INR",
         "prev_close": 94.2782,
         "change_pct": 0.2,
-        "chart_url": "https://tradingeconomics.com/india/currency",
+        "chart_url": "https://tradingeconomics.com/currencies?quote=inr",
         "as_of": "2026-06-29",
         "source": "Trading Economics · USDINR:CUR"
       },
@@ -34,7 +34,7 @@
         "label": "EUR/INR",
         "prev_close": 107.3253,
         "change_pct": 0.29,
-        "chart_url": "https://tradingeconomics.com/eurinr:cur",
+        "chart_url": "https://tradingeconomics.com/currencies?quote=inr",
         "as_of": "2026-06-29",
         "source": "Trading Economics · EURINR:CUR"
       },
@@ -42,7 +42,7 @@
         "label": "GBP/INR",
         "prev_close": 124.422,
         "change_pct": 0.3,
-        "chart_url": "https://tradingeconomics.com/gbpinr:cur",
+        "chart_url": "https://tradingeconomics.com/currencies?quote=inr",
         "as_of": "2026-06-29",
         "source": "Trading Economics · GBPINR:CUR"
       }

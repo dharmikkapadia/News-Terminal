@@ -199,12 +199,19 @@ def _rng(pair, dec=2, suffix="%"):
     return f"{lo:.{dec}f}{suffix}" if lo == hi else f"{lo:.{dec}f}–{hi:.{dec}f}{suffix}"
 
 
-def _sig(lab, val, sub="", cls="", href=None, chg_html=""):
+def _sig(lab, val, sub="", cls="", href=None, chg_html="", sub_raw=None):
     """A signal-strip tile. `chg_html` is a pre-built (already-safe) coloured % span rendered
-    next to the value; `href` turns the whole tile into a chart link (e.g. the TE FX page)."""
-    sub_html = f"<div class='sub'>{html.escape(sub)}</div>" if sub else ""
+    next to the value; `sub_raw` is pre-built (already-safe) HTML for the sub line (overrides
+    `sub`, e.g. EUR/GBP with their own coloured % changes); `href` turns the whole tile into a
+    chart link (e.g. the TE FX page)."""
+    if sub_raw is not None:
+        sub_block = f"<div class='sub'>{sub_raw}</div>"
+    elif sub:
+        sub_block = f"<div class='sub'>{html.escape(sub)}</div>"
+    else:
+        sub_block = ""
     inner = (f"<div class='lab'>{html.escape(lab)}</div>"
-             f"<div class='val'>{html.escape(val)}{chg_html}</div>{sub_html}")
+             f"<div class='val'>{html.escape(val)}{chg_html}</div>{sub_block}")
     if href:
         return (f"<a class='mw-sig mw-siglink {cls}' href='{html.escape(href)}' "
                 f"target='_blank' rel='noopener'>{inner}</a>")
@@ -274,11 +281,13 @@ def _rates_dashboard_html(r):
     usd_val = f"{usd:,.4f}" if isinstance(usd, (int, float)) else "—"
     usd_te = fx_te.get("inr_per_usd") or {}
     eur = fx.get("inr_per_eur"); gbp = fx.get("inr_per_gbp")
+    eur_te = fx_te.get("inr_per_eur") or {}; gbp_te = fx_te.get("inr_per_gbp") or {}
+    # EUR/GBP sit in the USD tile's sub line — show each with its own coloured % vs prev close.
     fx_sub = " · ".join(s for s in (
-        f"EUR {eur:,.2f}" if isinstance(eur, (int, float)) else "",
-        f"GBP {gbp:,.2f}" if isinstance(gbp, (int, float)) else "") if s) or "FBIL ref"
-    sigs.append(_sig("USD / INR", usd_val, fx_sub, href=usd_te.get("chart_url"),
-                     chg_html=_fx_chg_html(usd_te.get("change_pct"))))
+        f"EUR {eur:,.2f}{_fx_chg_html(eur_te.get('change_pct'))}" if isinstance(eur, (int, float)) else "",
+        f"GBP {gbp:,.2f}{_fx_chg_html(gbp_te.get('change_pct'))}" if isinstance(gbp, (int, float)) else "") if s) or "FBIL ref"
+    sigs.append(_sig("USD / INR", usd_val, href=usd_te.get("chart_url"),
+                     chg_html=_fx_chg_html(usd_te.get("change_pct")), sub_raw=fx_sub))
     bench = _benchmark_gsec(mkt.get("gsec_yields"))
     if bench:
         sigs.append(_sig("10Y G-Sec", _pct(bench.get("yield"), 4), bench.get("security", "")))
@@ -698,6 +707,7 @@ def theme_css(p):
          coloured % vs previous close inline next to the rate (reusing up/down/flat gain-loss tones). */
       .mw-siglink {{ text-decoration: none; color: inherit; display: block; }}
       .mw-sig .val .chg {{ font-size: 12px; font-weight: 700; margin-left: 7px; }}
+      .mw-sig .sub .chg {{ font-weight: 700; margin-left: 4px; }}   /* EUR/GBP % in the USD tile sub */
       .mw-ratesgrid {{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 12px; }}
       @media (max-width: 1100px) {{ .mw-ratesgrid {{ grid-template-columns: 1fr; }} }}
       .mw-rpanel {{ background: {p['panel']}; border: 1px solid {p['border']}; border-radius: 9px; padding: 13px 15px; }}
