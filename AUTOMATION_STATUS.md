@@ -115,8 +115,14 @@ A browser-rendered RBI scraper was added to automate the genuinely-manual gap:
 - **Sandbox caveat:** the render can't be validated from the *dev sandbox* (the egress proxy is an
   allowlist — `rbi.org.in` *and* a neutral control site both get a gateway `403 connect_rejected`),
   which is why CI is the test bed. Parsing/merge/guard logic is also unit-tested locally (24/24).
-- **Now that the browser path is proven**, `rates.yml` (static requests) is redundant and can be
-  retired — the two coexist safely (shared concurrency group, guarded merges) until you do.
+- **Both kept by design (primary + fallback):** `rates-scrapling.yml` (browser) is the primary
+  daily refresh — rates accordion **plus MPC dates**; `rates.yml` (static requests) is retained as a
+  **deliberate fallback** with a *different failure mode* — if the browser stack breaks (Scrapling/
+  Playwright upgrade, browser-download hiccup) requests still refreshes the rates, and if RBI ever
+  serves the accordion JS-only the browser still works. They coexist safely via the shared
+  `marketwire-rates` concurrency group + guarded merges, and the ordering is intentional: `rates.yml`
+  at 08:00 UTC, then the browser superset at 08:30 UTC so it has the final say (and supplies MPC).
+  Do **not** delete `rates.yml` as "redundant" — the redundancy is the point.
 
 ## Suggested follow-ups (optional)
 1. Add a second external `workflow_dispatch` cron for `rates.yml` to remove the timing drift.
