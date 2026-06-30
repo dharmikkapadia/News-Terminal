@@ -19,6 +19,7 @@ import re
 from datetime import datetime, timezone, timedelta
 
 import streamlit as st
+import streamlit.components.v1 as components
 
 # Mirror Streamlit Cloud Secrets into the environment so the same config keys work
 # whether set as env vars (VM / Actions) or via the Cloud Secrets UI — needed for
@@ -592,6 +593,9 @@ def theme_css(p):
         font-family: {_ui_font}; }}
       [data-testid="stHeader"] {{ background: transparent; }}
       [data-testid="stToolbar"] {{ right: .5rem; }}
+      /* collapse the invisible 0-height scrollbar-ticker helper iframe so it adds no gap
+         (the iframe's script still runs once on load — it only writes to the parent doc) */
+      [data-testid="stElementContainer"]:has(> iframe[title="st.iframe"]) {{ display: none !important; }}
 
       /* ---- header / sidebar chrome — Streamlit's toolbar icons, the 3-dot main menu,
          its popover, the Deploy/Share button and the sidebar collapse/expand arrow inherit
@@ -824,6 +828,81 @@ def theme_css(p):
     """
 
 
+def _scroll_ticker_html(p):
+    """Market-ticker scrollbar: tint the app scrollbar GREEN while scrolling up and
+    RED while scrolling down (the theme's up/down tones), fading back to a neutral
+    idle tone when scrolling stops — like a price tape. Injected from a 0-height,
+    same-origin component iframe that styles + listens on the PARENT Streamlit
+    document (Streamlit's stApp scrolls inside [data-testid="stMain"], not window,
+    so we listen in the capture phase to catch every scroller). Idempotent across
+    reruns: the <style> + colour config refresh each run; the scroll listener and
+    its rAF paint loop attach only once (guarded on window.parent)."""
+    tokens = {
+        "__UP__": p["up"], "__DOWN__": p["down"],
+        "__IDLE__": p.get("muted", p["border"]), "__FADE__": "650",
+    }
+    js = """
+<script>
+(function () {
+  var cfg = { up: "__UP__", down: "__DOWN__", idle: "__IDLE__", fade: __FADE__ };
+  var W, D;
+  try { W = window.parent; D = W.document; } catch (e) { return; }   // cross-origin guard
+  if (!D || !D.head) return;
+
+  // 1) inject / refresh the scrollbar stylesheet (re-themed on every rerun).
+  //    Modern browsers (Chrome/Edge 121+, Firefox, Safari 18.2+) honour the standard
+  //    scrollbar-color/-width and IGNORE ::-webkit-scrollbar; Streamlit itself sets
+  //    `* { scrollbar-color: transparent transparent }`, so the colour must come from a
+  //    MORE specific scrollbar-color rule (element/attr selectors beat the `*`). The
+  //    ::-webkit-scrollbar block is the fallback for older WebKit (Safari < 18.2).
+  var css =
+    ":root{--mw-scroll:" + cfg.idle + ";}" +
+    "html,body,[data-testid='stMain'],[data-testid='stAppViewContainer']," +
+      "section[data-testid='stSidebar']>div{scrollbar-width:thin;" +
+      "scrollbar-color:var(--mw-scroll) transparent;transition:scrollbar-color .15s ease;}" +
+    "::-webkit-scrollbar{width:11px;height:11px;}" +
+    "::-webkit-scrollbar-track{background:transparent;}" +
+    "::-webkit-scrollbar-thumb{background:var(--mw-scroll);border-radius:7px;" +
+      "transition:background .18s ease;}" +
+    "::-webkit-scrollbar-thumb:hover{filter:brightness(1.15);}";
+  var tag = D.getElementById("mw-scroll-style");
+  if (!tag) { tag = D.createElement("style"); tag.id = "mw-scroll-style"; D.head.appendChild(tag); }
+  tag.textContent = css;
+
+  W.__mwScrollCfg = cfg;                         // live colours for the persistent listener
+
+  // 2) attach the direction listener + paint loop exactly once
+  if (W.__mwScrollInit) return;
+  W.__mwScrollInit = true;
+
+  var last = new WeakMap(), want = null, raf = 0, timer = null;
+  function flush() {
+    raf = 0;
+    if (want) D.documentElement.style.setProperty("--mw-scroll", want);
+  }
+  W.addEventListener("scroll", function (e) {
+    var c = W.__mwScrollCfg || cfg;
+    var el = (e.target === D || e.target === W) ? D.scrollingElement : e.target;
+    if (!el) return;
+    var y = el.scrollTop, prev = last.get(el);
+    last.set(el, y);
+    if (prev === undefined || y === prev) return;
+    want = (y > prev) ? c.down : c.up;            // down → red tape, up → green tape
+    if (!raf) raf = W.requestAnimationFrame(flush);   // coalesce to one paint per frame
+    if (timer) W.clearTimeout(timer);
+    timer = W.setTimeout(function () {            // settle back to idle once it stops
+      want = c.idle;
+      if (!raf) raf = W.requestAnimationFrame(flush);
+    }, c.fade);
+  }, true);                                       // capture phase: scroll doesn't bubble
+})();
+</script>
+"""
+    for k, v in tokens.items():
+        js = js.replace(k, v)
+    return js
+
+
 st.set_page_config(page_title="MarketWire · RBI", page_icon="◢", layout="wide")
 store.init_db()
 
@@ -881,6 +960,9 @@ st.query_params["theme"] = theme  # keep the URL in sync (shareable / sticky)
 st.query_params["sources"] = ",".join(sources)
 st.query_params["layout"] = layout
 st.markdown(theme_css(THEMES[theme]), unsafe_allow_html=True)
+# Market-ticker scrollbar (green up / red down) — 0-height helper iframe that styles
+# the parent app's scrollbar; re-themed each rerun via the current palette.
+components.html(_scroll_ticker_html(THEMES[theme]), height=0)
 
 # --- masthead ----------------------------------------------------------------
 st.markdown(_masthead_html(), unsafe_allow_html=True)
