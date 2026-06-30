@@ -253,27 +253,25 @@ def _parse_market_trends(content):
     return mt
 
 
-def fetch_rates(url=HOME_URL, timeout=20):
-    """Scrape RBI's home-page Current Rates accordion (`div#wrapper`) into the rates schema.
-    Returns (rates_dict, error).
+def parse_rates(html, url=HOME_URL):
+    """Parse already-fetched RBI home-page HTML (the Current Rates accordion, `div#wrapper`)
+    into the rates schema. `html` may be bytes or str. Returns (rates_dict, error).
+
+    Shared by the static requests scraper (fetch_rates) and the Scrapling browser scraper
+    (rates_scrapling.py): both feed the SAME proven parser, differing only in HOW the HTML
+    was fetched (a plain request vs a JS-executing browser). Keeping the parse here means a
+    markup change is fixed in one place for both paths.
 
     The widget is server-rendered: each `h3.accordionButton` is followed by a
     `div.accordionContent` whose <table> rows are `<th>label</th><td>: value</td>`; Market
     Trends is sub-sectioned by inner <h3> (Money Market / Government Securities / Capital).
-    BEST EFFORT: RBI may 403 datacenter IPs and the markup can change — either yields a
-    partial result that _is_complete() rejects. Validate from a host that can reach RBI.
     """
-    try:
-        resp = requests.get(url, headers={"User-Agent": UA}, timeout=timeout)
-        resp.raise_for_status()
-    except Exception as ex:
-        return None, f"{type(ex).__name__}: {ex}"
     try:
         from bs4 import BeautifulSoup
     except Exception as ex:
         return None, f"BeautifulSoup unavailable: {ex}"
 
-    soup = BeautifulSoup(resp.content, "html.parser")
+    soup = BeautifulSoup(html, "html.parser")
     panels = _find_panels(soup)
     if "policy rates" not in panels:
         return None, "Current Rates widget not found (markup changed or page blocked)"
@@ -318,6 +316,23 @@ def fetch_rates(url=HOME_URL, timeout=20):
 
     rates["market_trends"] = _parse_market_trends(panels.get("market trends"))
     return rates, None
+
+
+def fetch_rates(url=HOME_URL, timeout=20):
+    """Scrape RBI's home-page Current Rates accordion via a plain HTTP request, then parse it
+    with parse_rates(). Returns (rates_dict, error).
+
+    BEST EFFORT: RBI may 403 datacenter IPs and the markup can change — either yields a
+    partial result that _is_complete() rejects. For a JS-rendered accordion or an anti-bot
+    wall, rates_scrapling.py renders the page in a real browser and reuses parse_rates().
+    Validate from a host that can reach RBI.
+    """
+    try:
+        resp = requests.get(url, headers={"User-Agent": UA}, timeout=timeout)
+        resp.raise_for_status()
+    except Exception as ex:
+        return None, f"{type(ex).__name__}: {ex}"
+    return parse_rates(resp.content, url)
 
 
 # Sanity bounds — a value outside its range means a mis-parse, not a real rate.
