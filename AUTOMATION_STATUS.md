@@ -19,7 +19,7 @@ manual.
 | RBI Current Rates → `rates.json` | Daily | ✅ Working | Scraped + committed 06-28 & 06-29 (`5.25% repo`) |
 | 30-min cadence itself (external cron) | — | ⚠️ Fragile | Depends on an off-repo cron + PAT; GitHub's own scheduler is unreliable |
 | Daily scrape **timing** | — | ⚠️ Imprecise | Scheduler drift fires it hours late (still same-day, so OK) |
-| MPC meeting dates in `rates.json` | — | ✋ Manual | Not scraped; hand-maintained |
+| MPC meeting dates in `rates.json` | — | 🆕 Automating | New Scrapling browser scraper (`rates_scrapling.py`) — pending first CI run |
 | Silent-staleness alerting | — | ❌ Missing | Blocked/partial scrapes keep old data and still pass green |
 
 ## ✅ What's working
@@ -96,6 +96,23 @@ desk/VM (or by reading the actual Action run logs, as this snapshot does).
 - **RBI Current Rates source-of-truth refresh** via a Claude-for-Chrome run
   (`prompts/rbi-rates-refresh.md`) — a backstop for when the daily auto-scrape can't parse.
 - **Theme/markup screenshot QA** for `streamlit_app.py` — manual headless-Chromium harness.
+
+## Update — Scrapling browser scraper (addresses D & E)
+
+A browser-rendered RBI scraper was added to automate the genuinely-manual gap:
+- **`rates_scrapling.py`** — uses [Scrapling](https://github.com/D4Vinci/Scrapling) to render the
+  RBI home-page **rates accordion** and the **MPC schedule page** in a real browser (Chromium via
+  `DynamicFetcher`, stealth Firefox via `StealthyFetcher` as the anti-bot fallback), then feeds the
+  HTML to the *same* `rates.parse_rates()` the static scraper uses. It writes `data/rates.json`
+  through the existing guards (`_is_complete` + `_merge`), updates **MPC dates** when a plausible
+  future date parses, and **preserves the Trading-Economics FX overlay**. Never raises.
+- **`.github/workflows/rates-scrapling.yml`** — runs it daily on GitHub's runners (where RBI egress
+  is open), sharing the `marketwire-rates` concurrency group with `rates.yml` so they never race.
+- **Caveat:** the browser render against **live RBI cannot be validated from the dev sandbox** (the
+  egress proxy is an allowlist — `rbi.org.in` *and* a neutral control site both get a gateway
+  `403 connect_rejected`, so no scraping library can reach RBI from here). The parsing/merge/guard
+  logic is unit-tested (24/24), but the actual render is validated by the **first CI run**. If the
+  browser path proves out, `rates.yml` (static requests) can be retired.
 
 ## Suggested follow-ups (optional)
 1. Add a second external `workflow_dispatch` cron for `rates.yml` to remove the timing drift.

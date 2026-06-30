@@ -1,0 +1,67 @@
+name: MarketWire rates (Scrapling browser)
+
+# Browser-rendered RBI scrape via Scrapling — a JS-executing SUPERSET of the static requests
+# scraper (rates.yml). It renders the home-page Current Rates accordion AND the MPC meeting-
+# schedule page (which the static scraper can't read — MPC dates have been hand-maintained),
+# then writes data/rates.json through the SAME guards as rates.py (complete + in-bounds only,
+# deep-merged, Trading-Economics FX overlay preserved).
+#
+# Runs on GitHub's runners, where egress to rbi.org.in is OPEN. The project's allowlisted
+# sandbox cannot reach RBI (the egress proxy denies the CONNECT), so this scraper can only be
+# validated here in CI or on a real desk — the first run is its real test.
+#
+# Coexists safely with rates.yml: it shares the `marketwire-rates` concurrency group (so the
+# two rates writers never run at once) and fires at a different time. Every write is guarded +
+# deep-merged, so whichever job runs can only improve rates.json, never clobber it. Once this
+# proves out you can retire rates.yml and let the browser scraper own the daily refresh.
+
+on:
+  schedule:
+    # 14:00 IST = 08:30 UTC — 30 min after rates.yml's 08:00 UTC, still the same afternoon so
+    # the same-day FBIL FX stamp is up. For exact timing, also point an external cron at this
+    # workflow's workflow_dispatch (same recipe as README → "Reliable 30-min cadence").
+    - cron: "30 8 * * *"
+  workflow_dispatch: {}       # manual runs (Actions tab) + optional external cron
+
+permissions:
+  contents: write             # needed to push the updated rates file
+
+concurrency:
+  group: marketwire-rates     # SHARED with rates.yml — serialize the two rates writers
+  cancel-in-progress: false
+
+jobs:
+  rates-browser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Scrapling + browser
+        run: |
+          pip install "scrapling[fetchers]" beautifulsoup4 requests
+          scrapling install            # download the browser(s) Scrapling drives (Chromium + Camoufox)
+
+      - name: Render RBI (rates accordion + MPC) and update snapshot
+        env:
+          MARKETWIRE_MPC_URL: ${{ vars.MARKETWIRE_MPC_URL }}   # optional override of the MPC page
+        run: python rates_scrapling.py
+
+      - name: Commit rates if it changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/rates.json
+          if git diff --cached --quiet; then
+            echo "No rates change."
+          else
+            git commit -m "rates(browser): update $(date -u +%FT%TZ)"
+            # The 30-min history.yml may push between our checkout and push; rebase onto it and retry.
+            for i in 1 2 3 4 5; do
+              git pull --rebase --autostash origin "${GITHUB_REF_NAME}" && git push && break
+              echo "push attempt $i failed; retrying in $((i*3))s"; sleep $((i*3))
+            done
+          fi
