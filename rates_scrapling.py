@@ -36,9 +36,13 @@ import rates  # reuse parse_rates / _is_complete / _merge / save_rates / IST / R
 
 # Scrape targets (overridable for testing). HOME_URL is RBI's home page (the rates accordion);
 # MPC_URL is the meeting-schedule / overview page that carries the upcoming MPC dates.
-HOME_URL = os.environ.get("MARKETWIRE_RATES_HOME", rates.HOME_URL)
-MPC_URL = os.environ.get(
-    "MARKETWIRE_MPC_URL", "https://www.rbi.org.in/scripts/FS_Overview.aspx?fn=2752")
+# NB: an UNSET GitHub repo variable injects an EMPTY env var (not absent), so use `or` to fall
+# back — os.environ.get(..., default) would hand back "" and we'd navigate to an invalid URL.
+_HOME_DEFAULT = "https://www.rbi.org.in/"
+_MPC_DEFAULT = "https://www.rbi.org.in/scripts/FS_Overview.aspx?fn=2752"
+HOME_URL = (os.environ.get("MARKETWIRE_RATES_HOME", "").strip()
+            or (rates.HOME_URL or "").strip() or _HOME_DEFAULT)
+MPC_URL = os.environ.get("MARKETWIRE_MPC_URL", "").strip() or _MPC_DEFAULT
 # Browser fetch budget (Playwright/Camoufox timeouts are in milliseconds).
 RENDER_TIMEOUT_MS = int(os.environ.get("MARKETWIRE_RENDER_TIMEOUT_MS", "60000"))
 
@@ -69,6 +73,8 @@ def _render(url, wait_selector=None, timeout=RENDER_TIMEOUT_MS):
     (DynamicFetcher) first, then stealth Firefox with Cloudflare solving (StealthyFetcher)
     as the anti-bot fallback. Each fetcher is retried once without `wait_selector` so a
     markup change to the awaited element can't sink an otherwise-good render."""
+    if not (isinstance(url, str) and url.strip()):
+        return None, "empty/invalid url"
     attempts = []
 
     def _one(fetcher_name, **extra):
