@@ -19,7 +19,7 @@ manual.
 | RBI Current Rates → `rates.json` | Daily | ✅ Working | Scraped + committed 06-28 & 06-29 (`5.25% repo`) |
 | 30-min cadence itself (external cron) | — | ⚠️ Fragile | Depends on an off-repo cron + PAT; GitHub's own scheduler is unreliable |
 | Daily scrape **timing** | — | ⚠️ Imprecise | Scheduler drift fires it hours late (still same-day, so OK) |
-| MPC meeting dates in `rates.json` | — | 🆕 Automating | New Scrapling browser scraper (`rates_scrapling.py`) — pending first CI run |
+| MPC meeting dates in `rates.json` | Daily | ✅ Working | Browser-scraped from RBI's MPC page (`rates_scrapling.py`) — validated in CI (parsed "August 3, 4 and 5, 2026") |
 | Silent-staleness alerting | — | ❌ Missing | Blocked/partial scrapes keep old data and still pass green |
 
 ## ✅ What's working
@@ -108,11 +108,15 @@ A browser-rendered RBI scraper was added to automate the genuinely-manual gap:
   future date parses, and **preserves the Trading-Economics FX overlay**. Never raises.
 - **`.github/workflows/rates-scrapling.yml`** — runs it daily on GitHub's runners (where RBI egress
   is open), sharing the `marketwire-rates` concurrency group with `rates.yml` so they never race.
-- **Caveat:** the browser render against **live RBI cannot be validated from the dev sandbox** (the
-  egress proxy is an allowlist — `rbi.org.in` *and* a neutral control site both get a gateway
-  `403 connect_rejected`, so no scraping library can reach RBI from here). The parsing/merge/guard
-  logic is unit-tested (24/24), but the actual render is validated by the **first CI run**. If the
-  browser path proves out, `rates.yml` (static requests) can be retired.
+- **Validated in CI** (2026-06-30, two `workflow_dispatch` runs): Scrapling reaches live RBI from
+  GitHub's runners — `Fetched (200) <GET https://www.rbi.org.in/>` and
+  `Fetched (200) <GET .../FS_Overview.aspx?fn=2752>` — parsed `repo 5.25%` + `MPC: August 3, 4 and
+  5, 2026`, committed a fresh snapshot (Jun 29 → Jun 30 data), and preserved the TE FX overlay.
+- **Sandbox caveat:** the render can't be validated from the *dev sandbox* (the egress proxy is an
+  allowlist — `rbi.org.in` *and* a neutral control site both get a gateway `403 connect_rejected`),
+  which is why CI is the test bed. Parsing/merge/guard logic is also unit-tested locally (24/24).
+- **Now that the browser path is proven**, `rates.yml` (static requests) is redundant and can be
+  retired — the two coexist safely (shared concurrency group, guarded merges) until you do.
 
 ## Suggested follow-ups (optional)
 1. Add a second external `workflow_dispatch` cron for `rates.yml` to remove the timing drift.
