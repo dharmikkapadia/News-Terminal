@@ -17,10 +17,19 @@ name: MarketWire rates (Scrapling browser)
 
 on:
   schedule:
-    # 14:00 IST = 08:30 UTC — 30 min after rates.yml's 08:00 UTC, still the same afternoon so
-    # the same-day FBIL FX stamp is up. For exact timing, also point an external cron at this
-    # workflow's workflow_dispatch (same recipe as README → "Reliable 30-min cadence").
-    - cron: "30 8 * * *"
+    # Several daily slots (early-afternoon → late-evening IST) so a dropped or late GitHub
+    # scheduled run can't freeze Market Trends for a day — the exact staleness this guards
+    # against. GitHub's scheduler is best-effort and regularly delays a cron by hours or drops
+    # it outright (that's why rates-scrapling had no run at all on some days), so we give it
+    # several chances. Every write is guarded (complete + in-bounds only), deep-merged and
+    # commit-only-on-change, so the extra runs are idempotent: whichever fires first refreshes
+    # the file and the rest no-op. The later slots also give RBI time to post its *same-day*
+    # EOD G-Sec/Capital numbers (an early run only ever sees the previous day's close). For
+    # exact timing, also point an external cron at this workflow's workflow_dispatch (README →
+    # "Reliable 30-min cadence").
+    - cron: "30 8 * * *"    # 14:00 IST
+    - cron: "45 12 * * *"   # 18:15 IST
+    - cron: "15 16 * * *"   # 21:45 IST
   workflow_dispatch: {}       # manual runs (Actions tab) + optional external cron
 
 permissions:

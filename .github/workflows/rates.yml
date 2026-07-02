@@ -15,11 +15,13 @@ name: MarketWire rates
 on:
   schedule:
     # 13:30 IST = 08:00 UTC (IST = UTC+5:30). A ~30-min buffer past RBI's "1.00pm" FX
-    # stamp so the same-day reference rate has actually posted, and to absorb GitHub's
-    # best-effort scheduler drift (a run may be delayed a bit or, rarely, skipped — fine
-    # for a once-a-day snapshot). For exact timing, also point an external cron at this
+    # stamp so the same-day reference rate has actually posted. GitHub's scheduler is
+    # best-effort and may delay or drop a run, so a second evening slot backs it up — every
+    # write is guarded + commit-only-on-change, so the extra run is idempotent (it no-ops
+    # when the file is already current). For exact timing, also point an external cron at this
     # workflow's workflow_dispatch (same setup as README → "Reliable 30-min cadence").
-    - cron: "0 8 * * *"
+    - cron: "0 8 * * *"     # 13:30 IST
+    - cron: "0 15 * * *"    # 20:30 IST — evening backup if the afternoon slot is dropped
   workflow_dispatch: {}       # manual runs (Actions tab) + optional external cron
 
 permissions:

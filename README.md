@@ -142,16 +142,21 @@ It reads a committed **`data/rates.json`** (`rates.py`), refreshed two ways:
   schedulable prompt that does this end-to-end (read RBI → merge onto the live file → commit,
   preserving the Trading-Economics FX overlay) lives at
   [`prompts/rbi-rates-refresh.md`](prompts/rbi-rates-refresh.md).
-- **Automated (best-effort):** a separate **daily** GitHub Action (`.github/workflows/rates.yml`)
-  runs at **1:30pm IST** — just after RBI's "1.00pm" FBIL FX update, so each run captures the
-  same day's exchange rates (a midnight run would only get the prior day's). It runs
-  `python rates.py` → `rates.poll_rates()`, which rewrites the file
-  **only on a complete, in-bounds parse** — a blocked/partial scrape leaves the committed manual
-  snapshot untouched, and the MPC block is preserved. It's deliberately on its own once-a-day
-  cadence (not the 30-min history poller). GitHub's scheduler is best-effort; for exact timing,
-  also point an external cron at the workflow's `workflow_dispatch` (same recipe as the 30-min
-  cadence above, once a day on `rates.yml`). Like `rbi_archive.py`, the scraper needs validating
-  from a host that can reach RBI.
+- **Automated (best-effort):** GitHub Actions refresh the snapshot on a **daily** cadence, across
+  several slots from **early-afternoon to late-evening IST**. The first slot lands just after RBI's
+  "1.00pm" FBIL FX update (so each run captures the same day's exchange rates; a midnight run would
+  only get the prior day's); the later slots both give RBI time to post its **same-day** EOD
+  G-Sec/Capital numbers and back up any run GitHub's best-effort scheduler delays or drops — the
+  cause of a stale Market Trends panel when a single daily run went missing. Two guarded workflows
+  share the job: `.github/workflows/rates.yml` runs `python rates.py` → `rates.poll_rates()` (a
+  plain `requests` scrape), and `.github/workflows/rates-scrapling.yml` renders the page in a real
+  browser (Scrapling) — a JS-executing **superset** that also reads the next MPC date. Both rewrite
+  the file **only on a complete, in-bounds parse** (a blocked/partial scrape leaves the committed
+  snapshot untouched, and the MPC block is preserved), deep-merged and commit-only-on-change, so the
+  redundant runs are idempotent — whichever fires first wins, the rest no-op. It's kept off the
+  30-min history poller (RBI rates change once a day). GitHub's scheduler is best-effort; for exact
+  timing, also point an external cron at either workflow's `workflow_dispatch`. Like `rbi_archive.py`,
+  the scrapers need validating from a host that can reach RBI.
 
 This pairs with the new dark **Equity Terminal** theme (now the default) — charcoal page,
 terminal-green press tags, amber notifications, monospace numerics.
