@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-07-03T02:30:40+05:30",
+  "captured_at": "2026-07-03T03:00:43+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…)",
   "commodities": [
@@ -25,9 +25,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Trading Economics · XAUUSD:CUR",
-      "price": 4123.14,
+      "price": 4122.76,
       "prev_close": 4031.36,
-      "change_pct": 2.28,
+      "change_pct": 2.27,
       "currency": "USD",
       "as_of": "2026-07-02"
     },
@@ -53,8 +53,8 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Trading Economics · HG1:COM",
-      "price": 6.1223,
-      "prev_close": 6.1211,
+      "price": 6.1225,
+      "prev_close": 6.1215,
       "change_pct": -0.02,
       "currency": "USD",
       "as_of": "2026-07-02"
@@ -123,9 +123,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/coffee",
       "source": "Trading Economics · KC1:COM",
-      "price": 302.15,
-      "prev_close": 294.4,
-      "change_pct": -2.5,
+      "price": 302.12,
+      "prev_close": 294.34,
+      "change_pct": -2.51,
       "currency": "USD",
       "as_of": "2026-07-02"
     }
