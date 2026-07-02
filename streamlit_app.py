@@ -261,6 +261,21 @@ def _benchmark_gsec(gsecs):
     return best[1] if best else None
 
 
+def _asof_note(*notes):
+    """Join distinct 'as on …' stamps with ' · ', collapsing internal whitespace and dropping
+    duplicates. RBI stamps the SAME date on the G-Sec/T-bill and Capital-Market sub-panels, so a
+    naive join renders it twice ('as on July 01, 2026 · as on July 01, 2026'); this shows it once —
+    and still shows both when the two sections genuinely carry different dates."""
+    seen, out = set(), []
+    for n in notes:
+        n = re.sub(r"\s+", " ", (n or "").strip())
+        key = n.lower()
+        if n and key not in seen:
+            seen.add(key)
+            out.append(n)
+    return " · ".join(out)
+
+
 def _rates_dashboard_html(r):
     """The equity-desk Current Rates dashboard: a signal strip (key rates + a live
     next-MPC countdown) over an expandable full rate card. Built from data/rates.json."""
@@ -361,7 +376,7 @@ def _rates_dashboard_html(r):
         trend_rows.append(_rrow("S&P BSE Sensex", f"{cap['sensex']:,.2f}"))
     if isinstance(cap.get("nifty_50"), (int, float)):
         trend_rows.append(_rrow("Nifty 50", f"{cap['nifty_50']:,.2f}"))
-    mkt_note = " · ".join(s for s in (mkt.get("gsec_tbill_as_on") or "", cap.get("as_on") or "") if s)
+    mkt_note = _asof_note(mkt.get("gsec_tbill_as_on"), cap.get("as_on"))
     panels.append(_panel("Market Trends", trend_rows, note=mkt_note))
 
     captured = r.get("captured_at") or ""
