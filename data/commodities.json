@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-07-03T09:30:47+05:30",
+  "captured_at": "2026-07-03T09:31:17+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…)",
   "commodities": [
@@ -53,9 +53,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Trading Economics · HG1:COM",
-      "price": 6.1919,
+      "price": 6.1927,
       "prev_close": 6.1145,
-      "change_pct": 1.27,
+      "change_pct": 1.28,
       "currency": "USD",
       "as_of": "2026-07-03"
     },
