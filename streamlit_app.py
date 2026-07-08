@@ -313,7 +313,6 @@ def _rates_dashboard_html(r):
     fx_te = fx.get("fx_te") or {}            # USD/EUR/GBP enrichment (TE: % vs prev close + chart)
     lend = r.get("lending_deposit_rates") or {}
     mkt = r.get("market_trends") or {}
-    cap = mkt.get("capital_market") or {}
     # Every tile links out to its source (like the commodity tiles): the RBI-sourced ones to
     # rbi.org.in, the MPC tile to its schedule page (FX→TE, bonds→investing.com set below).
     rbi_url = r.get("source") or "https://www.rbi.org.in/"
@@ -350,8 +349,6 @@ def _rates_dashboard_html(r):
         bench = _benchmark_gsec(mkt.get("gsec_yields"))
         if bench:
             sigs.append(_sig("10Y G-Sec", _pct(bench.get("yield"), 4), bench.get("security", ""), href=rbi_url))
-        elif isinstance(cap.get("sensex"), (int, float)):
-            sigs.append(_sig("Sensex", f"{cap['sensex']:,.2f}", "S&P BSE", href=rbi_url))
 
     # --- MPC countdown ---
     cd = rates.mpc_countdown(r)
@@ -408,7 +405,8 @@ def _rates_dashboard_html(r):
 
     # Market Trends: the government-bond yield curve now comes from investing.com (tenor rows
     # with a coloured % vs previous close + a per-bond chart link), each row built like an FX
-    # row via _fx_rrow. The Call Money Rate is intentionally dropped. Sensex/Nifty stay RBI.
+    # row via _fx_rrow. The Call Money Rate and Sensex/Nifty are dropped — the panel is purely
+    # the bond yield curve.
     trend_rows = []
     if bcurve:
         # Show a representative subset of the full curve (fall back to the whole curve if the
@@ -430,21 +428,16 @@ def _rates_dashboard_html(r):
         for lab, key in [("91-day T-Bill", "91_day"), ("182-day T-Bill", "182_day"), ("364-day T-Bill", "364_day")]:
             if isinstance(tb.get(key), (int, float)):
                 trend_rows.append(_rrow(lab, _pct(tb[key], 4)))
-    if isinstance(cap.get("sensex"), (int, float)):
-        trend_rows.append(_rrow("S&P BSE Sensex", f"{cap['sensex']:,.2f}"))
-    if isinstance(cap.get("nifty_50"), (int, float)):
-        trend_rows.append(_rrow("Nifty 50", f"{cap['nifty_50']:,.2f}"))
+    # (Sensex / Nifty removed — Market Trends shows only the government-bond yield curve.)
     if bcurve:
         b_as_of = bonds.get("as_of") or ""
         try:
             b_as_of = datetime.fromisoformat(b_as_of).strftime("%d %b %Y, %H:%M IST")
         except (ValueError, TypeError):
             pass
-        mkt_note = _asof_note(
-            "Govt bonds: investing.com" + (f" · {b_as_of}" if b_as_of else "") + " · % vs prev close",
-            cap.get("as_on"))
+        mkt_note = "Govt bonds: investing.com" + (f" · {b_as_of}" if b_as_of else "") + " · % vs prev close"
     else:
-        mkt_note = _asof_note(mkt.get("gsec_tbill_as_on"), cap.get("as_on"))
+        mkt_note = _asof_note(mkt.get("gsec_tbill_as_on"))
     panels.append(_panel("Market Trends", trend_rows, note=mkt_note))
 
     captured = r.get("captured_at") or ""
