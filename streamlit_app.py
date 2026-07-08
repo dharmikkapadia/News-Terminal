@@ -6,8 +6,8 @@ items in a small SQLite store so the wire accumulates over time, and presents th
 as a news website: a newspaper masthead over a uniform grid of story cards, with
 subtle fade-in/hover motion and a summary preview that expands to the full text.
 
-Look & feel: pick a flagship theme in the sidebar (Bloomberg, Reuters, Paper,
-High Contrast). Every palette is tuned so all text stays legible.
+Look & feel: a single Trading Economics palette (soft-grey page, white cards,
+navy headlines), tuned so all text stays legible.
 
 Run locally:   streamlit run streamlit_app.py
 Deploy:        Streamlit Community Cloud, main file = streamlit_app.py
@@ -453,88 +453,30 @@ def _commodities_dashboard_html(snap):
     )
 
 # --------------------------------------------------------------------------- #
-# Themes — flagship palettes, each tuned for contrast so ALL text (headlines, body,
-# timestamps, captions, inputs, links) stays legible.
+# Theme — the single Trading Economics palette, tuned for contrast so ALL text
+# (headlines, body, timestamps, captions, inputs, links) stays legible.
 #   bg=page  panel=cards/inputs/sidebar  text=body  heading=headlines
 #   muted=timestamps/captions  accent=primary brand (Press tag, hover, focus)
 #   accent2=secondary (Notifications tag)  link=hyperlinks  border=hairlines
 #   shadow=card hover glow (rgba)  headfont=masthead/headline font stack
-#   Optional (Apple themes): bg_gradient=CSS gradient replacing the flat page bg;
-#   uifont=body font stack (defaults to _SANS); panel_blur=True → frosted-glass
-#   backdrop-filter overlay (_glass_overlay_css); src_label_color=PRESS/NOTIF badge
-#   text (defaults to bg — override when bg is semi-transparent / too light on accent).
+#   scroll_up/scroll_down/scroll_idle=market-ticker scrollbar tape colours
+#   (default to up/down/muted; see _scroll_ticker_html).
 # --------------------------------------------------------------------------- #
-_SERIF = "'Source Serif 4', Georgia, 'Times New Roman', serif"   # newspaper headlines
 _SANS = "'Libre Franklin', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"  # data-site headlines
 _MONO = "'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace"  # rate/ticker numerics
-# SF Pro on Apple devices, Helvetica Neue elsewhere — the OS font, no web fetch (Apple themes).
-_SANS_APPLE = "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', system-ui, sans-serif"
-# `up`/`down` = gain/loss greens & reds for the rates dashboard, tuned per palette.
+# `up`/`down` = gain/loss greens & reds for the rates dashboard.
 THEMES = {
-    "Bloomberg": dict(bg="#0A0A0A", panel="#161513", text="#E8E2D6", heading="#FBF7EF",
-                      muted="#9A9080", accent="#FF9E1B", accent2="#4FC3E8", link="#6FD0EE",
-                      border="#2A2622", shadow="rgba(255,158,27,.12)", headfont=_SERIF,
-                      up="#2EBD85", down="#E5484D"),
-    "Reuters": dict(bg="#FFFFFF", panel="#FFFFFF", text="#15171C", heading="#08090B",
-                    muted="#5C616B", accent="#FB6400", accent2="#0B6EFD", link="#0A66C2",
-                    border="#E5E7EB", shadow="rgba(15,23,42,.10)", headfont=_SERIF,
-                    up="#0F9D58", down="#D93025"),
-    "Paper": dict(bg="#FBFAF4", panel="#FFFFFF", text="#1C1B17", heading="#12110D",
-                  muted="#6A6456", accent="#B3471B", accent2="#1D4ED8", link="#1D4ED8",
-                  border="#E7E1D2", shadow="rgba(80,60,30,.10)", headfont=_SERIF,
-                  up="#1E7A46", down="#B3261E"),
     # Trading Economics-inspired: soft-grey page, white cards, navy headlines,
     # signal blue/green accents, crisp sans (no serif) — a markets-data look.
     "Trading Economics": dict(bg="#EEF2F6", panel="#FFFFFF", text="#1C2A38", heading="#14304F",
                               muted="#6A7889", accent="#0E72BC", accent2="#13A36B", link="#0E72BC",
                               border="#DCE3EB", shadow="rgba(16,48,90,.12)", headfont=_SANS,
                               up="#13A36B", down="#D64550",
-                              # Scroll tape borrows Equity Terminal's brighter green/red
-                              # (idle = its muted grey) while price up/down stay TE's own.
+                              # Scroll tape uses a brighter green/red (idle = a neutral
+                              # grey) than the price up/down, so it pops as a price tape.
                               scroll_up="#16C784", scroll_down="#F0616D", scroll_idle="#6B7785"),
-    "High Contrast": dict(bg="#000000", panel="#0C0C0C", text="#FFFFFF", heading="#FFFF00",
-                          muted="#D8D8D8", accent="#FFE000", accent2="#5AD1FF", link="#6BD8FF",
-                          border="#5C5C5C", shadow="rgba(255,224,0,.20)", headfont=_SERIF,
-                          up="#00E000", down="#FF5555"),
-    # Equity Terminal: dark trading-desk palette — charcoal page, terminal-green press
-    # accent, amber notifications, monospace numerics. Pairs with the Current Rates
-    # dashboard for an equity-investor look.
-    "Equity Terminal": dict(bg="#0A0D12", panel="#11161D", text="#C7D0DB", heading="#EEF3F8",
-                            muted="#6B7785", accent="#16C784", accent2="#E8B339", link="#46B3FF",
-                            border="#1E2630", shadow="rgba(22,199,132,.14)", headfont=_SANS,
-                            up="#16C784", down="#F0616D"),
-    # Apple-inspired palettes (SF Pro / Helvetica Neue, iOS gain/loss greens & reds).
-    # Apple Light: Apple.com × Bloomberg — clean white cards, #0071E3 blue accent.
-    "Apple Light": dict(bg="#F5F5F7", panel="#FFFFFF", text="#1D1D1F", heading="#1D1D1F",
-                        muted="#6E6E73", accent="#0071E3", accent2="#5AC8FA", link="#0071E3",
-                        border="#E5E5EA", shadow="rgba(0,0,0,.08)",
-                        headfont=_SANS_APPLE, uifont=_SANS_APPLE, up="#34C759", down="#FF3B30"),
-    # Stocks Dark: Apple Stocks / iOS dark mode — pure black, #1C1C1E cards.
-    "Stocks Dark": dict(bg="#000000", panel="#1C1C1E", text="rgba(255,255,255,.87)", heading="#FFFFFF",
-                        muted="#98989D", accent="#0A84FF", accent2="#5AC8FA", link="#0A84FF",
-                        border="rgba(255,255,255,.1)", shadow="rgba(10,132,255,.14)",
-                        headfont=_SANS_APPLE, uifont=_SANS_APPLE, src_label_color="rgba(255,255,255,.95)",
-                        up="#30D158", down="#FF453A"),
-    # visionOS Light: frosted white glass over a blue-lavender gradient sky.
-    "visionOS Light": dict(bg="#EEF2FF",
-                        bg_gradient=("radial-gradient(ellipse at 50% -8%, "
-                                     "#BDDDFF 0%, #CEBBFF 32%, #E8F0FF 65%, #F0F3FF 100%)"),
-                        panel="rgba(255,255,255,.65)", text="#1D1D1F", heading="#1D1D1F",
-                        muted="#6E6E73", accent="#0071E3", accent2="#5AC8FA", link="#0071E3",
-                        border="rgba(255,255,255,.85)", shadow="rgba(0,0,0,.06)",
-                        headfont=_SANS_APPLE, uifont=_SANS_APPLE, panel_blur=True,
-                        up="#1D8A4A", down="#D93025"),
-    # visionOS Dark: frosted dark glass over a purple-midnight cosmos gradient (Apple Purple accent).
-    "visionOS Dark": dict(bg="#060412",
-                        bg_gradient=("radial-gradient(ellipse at 40% 25%, "
-                                     "rgba(55,10,85,.94) 0%, rgba(22,8,42,.96) 45%, #060412 75%)"),
-                        panel="rgba(255,255,255,.07)", text="rgba(255,255,255,.87)", heading="#FFFFFF",
-                        muted="rgba(255,255,255,.45)", accent="#BF5AF2", accent2="#AA90FF", link="#DA8FFF",
-                        border="rgba(255,255,255,.1)", shadow="rgba(191,90,242,.16)",
-                        headfont=_SANS_APPLE, uifont=_SANS_APPLE, panel_blur=True,
-                        src_label_color="rgba(255,255,255,.95)", up="#30D158", down="#FF453A"),
 }
-DEFAULT_THEME = "Equity Terminal"
+DEFAULT_THEME = "Trading Economics"
 
 @st.cache_data(ttl=CACHE_TTL, show_spinner=False)
 def fetch_feed(url):
@@ -561,54 +503,17 @@ def load_commodities_cached():
     return commodities.load_commodities()
 
 
-def _glass_overlay_css(p):
-    """Extra CSS for the visionOS glass themes (`panel_blur=True`); appended inside
-    theme_css() before </style>. Strips solid backgrounds off Streamlit's intermediate
-    wrappers so the page gradient shows through every frosted panel + the sidebar, and
-    adds backdrop-filter blur to cards, inputs, the sidebar, header and rate/commodity
-    tiles. (Streamlit DOM selectors are stable 1.33+; revisit if Streamlit reshuffles them.)"""
-    if not p.get("panel_blur"):
-        return ""
-    acc, shd, brd = p["accent"], p["shadow"], p["border"]
-    return f"""
-      /* ---- glass: make intermediate wrappers transparent so the gradient shows ---- */
-      [data-testid="stAppViewContainer"], [data-testid="stMain"],
-      .block-container, [data-testid="stVerticalBlock"] {{ background: transparent !important; }}
-      /* frosted story-card panels */
-      [data-testid="stVerticalBlockBorderWrapper"] {{
-        backdrop-filter: blur(24px) !important; -webkit-backdrop-filter: blur(24px) !important; }}
-      /* frosted sidebar */
-      section[data-testid="stSidebar"] > div {{
-        backdrop-filter: blur(40px) !important; -webkit-backdrop-filter: blur(40px) !important; }}
-      /* frosted text inputs & select boxes */
-      .stTextInput div[data-baseweb="input"], .stTextInput div[data-baseweb="base-input"],
-      [data-baseweb="select"] > div {{
-        backdrop-filter: blur(16px) !important; -webkit-backdrop-filter: blur(16px) !important; }}
-      /* MPC tile: accent glow (overrides the plain box-shadow from theme_css) */
-      .mw-sig.mpc {{ box-shadow: 0 0 0 1px {acc} inset, 0 0 22px {shd} !important; }}
-      /* rate-card panels + commodity tiles: frosted */
-      .mw-rpanel, .mw-cmd {{
-        backdrop-filter: blur(16px) !important; -webkit-backdrop-filter: blur(16px) !important; }}
-      /* Streamlit top header bar: frosted strip */
-      [data-testid="stHeader"] {{ background: transparent !important;
-        backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important;
-        border-bottom: 1px solid {brd} !important; }}
-    """
-
-
 def theme_css(p):
     """Build a full CSS override for palette `p` — masthead, card grid, subtle
     animations, and every themed widget (forcing portaled overlays too)."""
-    _bg_rule = f"background: {p['bg_gradient']}" if p.get("bg_gradient") else f"background-color: {p['bg']}"
-    _ui_font = p.get("uifont", _SANS)
-    _src_lbl = p.get("src_label_color", p["bg"])
+    _src_lbl = p["bg"]  # PRESS/NOTIF badge text, over the accent background
     return f"""
     <style>
-      @import url('https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700;8..60,900&display=swap');
+      @import url('https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700;800&display=swap');
 
       /* ---- surfaces ---- */
-      .stApp {{ {_bg_rule}; color: {p['text']};
-        font-family: {_ui_font}; }}
+      .stApp {{ background-color: {p['bg']}; color: {p['text']};
+        font-family: {_SANS}; }}
       [data-testid="stHeader"] {{ background: transparent; }}
       [data-testid="stToolbar"] {{ right: .5rem; }}
       /* collapse the invisible 0-height scrollbar-ticker helper iframe so it adds no gap
@@ -841,7 +746,6 @@ def theme_css(p):
       .mw-up {{ color: {p['up']}; }}
       .mw-down {{ color: {p['down']}; }}
       .mw-flat {{ color: {p['muted']}; }}
-      {_glass_overlay_css(p)}
     </style>
     """
 
@@ -930,17 +834,11 @@ def _scroll_ticker_html(p):
 st.set_page_config(page_title="MarketWire · RBI", page_icon="◢", layout="wide")
 store.init_db()
 
-# --- theme selection ---------------------------------------------------------
-# Bind the selectbox to session_state via `key` and seed it once from the URL.
-# (Passing index= from the query param fought the widget's own state, so a new
-# pick only applied on the *next* rerun — i.e. you had to click twice.) Reading
-# st.session_state["theme"] means the choice takes effect on the first click.
-names = list(THEMES)
-if "theme" not in st.session_state:
-    _qp = st.query_params.get("theme")
-    st.session_state["theme"] = _qp if _qp in names else DEFAULT_THEME
-# Seed the Sources multiselect once from the URL (?sources=Press Releases,Notifications),
-# same first-click pattern as the theme. Absent param → all feeds selected.
+# --- theme --------------------------------------------------------------------
+# One fixed palette (Trading Economics) — no picker, so the theme is constant.
+theme = DEFAULT_THEME
+# Seed the Sources multiselect once from the URL (?sources=Press Releases,Notifications).
+# Absent param → all feeds selected.
 if "sources" not in st.session_state:
     _qs = st.query_params.get("sources")
     if _qs is None:
@@ -962,9 +860,6 @@ with st.sidebar:
         help="Stream = single-column feed (Trading Economics style). Grid = card grid.",
     )
     st.divider()
-    theme = st.selectbox("Theme", names, key="theme", help="Flagship palettes (incl. Apple-inspired) — all text stays legible in each.")
-    st.caption("Switch the look to suit your screen / lighting.")
-    st.divider()
     st.checkbox(
         "Show archive (older, date-only)", value=True, key="archive",
         help="Show older releases backfilled from RBI's listing — full text, but date "
@@ -980,7 +875,6 @@ with st.sidebar:
         help="Free commodity prices (Brent, gold, silver, copper, aluminium, zinc, steel, "
              "iron ore, coffee) with % change vs the previous close and a direct chart link.",
     )
-st.query_params["theme"] = theme  # keep the URL in sync (shareable / sticky)
 st.query_params["sources"] = ",".join(sources)
 st.query_params["layout"] = layout
 st.markdown(theme_css(THEMES[theme]), unsafe_allow_html=True)
