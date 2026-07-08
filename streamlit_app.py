@@ -248,7 +248,8 @@ def _panel(title, rows, note=""):
 
 
 def _benchmark_gsec(gsecs):
-    """Pick the ~10-year benchmark: the G-Sec whose maturity year is closest to 10y out."""
+    """Pick the ~10-year benchmark: the G-Sec whose maturity year is closest to 10y out.
+    (RBI fallback path — used only until the first investing.com bond scrape lands.)"""
     target = datetime.now(IST).year + 10
     best = None
     for g in gsecs or []:
@@ -258,6 +259,20 @@ def _benchmark_gsec(gsecs):
         dist = abs(int(m.group(1)) - target)
         if best is None or dist < best[0]:
             best = (dist, g)
+    return best[1] if best else None
+
+
+def _bond_benchmark(curve, target_years=10.0):
+    """The ~10Y bond from an investing.com curve (each row carries its maturity in `years`):
+    the tenor whose maturity is closest to `target_years`, or None."""
+    best = None
+    for b in curve or []:
+        yrs, y = b.get("years"), b.get("yield")
+        if not isinstance(yrs, (int, float)) or not isinstance(y, (int, float)):
+            continue
+        dist = abs(yrs - target_years)
+        if best is None or dist < best[0]:
+            best = (dist, b)
     return best[1] if best else None
 
 
@@ -304,11 +319,22 @@ def _rates_dashboard_html(r):
         f"GBP {gbp:,.2f}{_fx_chg_html(gbp_te.get('change_pct'))}" if isinstance(gbp, (int, float)) else "") if s) or "FBIL ref"
     sigs.append(_sig("USD / INR", usd_val, href=usd_te.get("chart_url"),
                      chg_html=_fx_chg_html(usd_te.get("change_pct")), sub_raw=fx_sub))
-    bench = _benchmark_gsec(mkt.get("gsec_yields"))
-    if bench:
-        sigs.append(_sig("10Y G-Sec", _pct(bench.get("yield"), 4), bench.get("security", "")))
-    elif isinstance(cap.get("sensex"), (int, float)):
-        sigs.append(_sig("Sensex", f"{cap['sensex']:,.2f}", "S&P BSE"))
+    # 10Y G-Sec tile: investing.com's ~10Y bond (yield + coloured % vs prev close, links to
+    # the bond board); falls back to the RBI benchmark until the first investing.com scrape.
+    bonds = mkt.get("bonds") or {}
+    bcurve = bonds.get("curve") or []
+    bbench = _bond_benchmark(bcurve)
+    if bbench:
+        sigs.append(_sig("10Y G-Sec", _pct(bbench.get("yield"), 4),
+                         sub=f"India {bbench.get('tenor', '10Y')}",
+                         href=bbench.get("chart_url") or bonds.get("board_url"),
+                         chg_html=_fx_chg_html(bbench.get("change_pct"))))
+    else:
+        bench = _benchmark_gsec(mkt.get("gsec_yields"))
+        if bench:
+            sigs.append(_sig("10Y G-Sec", _pct(bench.get("yield"), 4), bench.get("security", "")))
+        elif isinstance(cap.get("sensex"), (int, float)):
+            sigs.append(_sig("Sensex", f"{cap['sensex']:,.2f}", "S&P BSE"))
 
     # --- MPC countdown ---
     cd = rates.mpc_countdown(r)
@@ -363,20 +389,42 @@ def _rates_dashboard_html(r):
         (f"JPY/AED/IDR: {fbil}" if fx_te else fbil) if fbil else "") if s)
     panels.append(_panel("Exchange Rates", fx_rows, note=fx_note))
 
-    mm = mkt.get("money_market") or {}
-    trend_rows = [_rrow("Call Money Rate", _rng(mm.get("call_rate")))]
-    for g in (mkt.get("gsec_yields") or []):
-        if isinstance(g.get("yield"), (int, float)):
-            trend_rows.append(_rrow(g.get("security", "G-Sec"), _pct(g["yield"], 4)))
-    tb = mkt.get("tbill_yields") or {}
-    for lab, key in [("91-day T-Bill", "91_day"), ("182-day T-Bill", "182_day"), ("364-day T-Bill", "364_day")]:
-        if isinstance(tb.get(key), (int, float)):
-            trend_rows.append(_rrow(lab, _pct(tb[key], 4)))
+    # Market Trends: the government-bond yield curve now comes from investing.com (tenor rows
+    # with a coloured % vs previous close + a per-bond chart link), each row built like an FX
+    # row via _fx_rrow. The Call Money Rate is intentionally dropped. Sensex/Nifty stay RBI.
+    trend_rows = []
+    if bcurve:
+        for b in bcurve:
+            if not isinstance(b.get("yield"), (int, float)):
+                continue
+            te_like = {"chart_url": b.get("chart_url") or bonds.get("board_url"),
+                       "change_pct": b.get("change_pct")}
+            trend_rows.append(_fx_rrow(f"India {b.get('tenor', '')}".strip(),
+                                       _pct(b["yield"], 4), te_like))
+    else:
+        # RBI fallback (plain yield rows, no change) until the first investing.com scrape lands.
+        for g in (mkt.get("gsec_yields") or []):
+            if isinstance(g.get("yield"), (int, float)):
+                trend_rows.append(_rrow(g.get("security", "G-Sec"), _pct(g["yield"], 4)))
+        tb = mkt.get("tbill_yields") or {}
+        for lab, key in [("91-day T-Bill", "91_day"), ("182-day T-Bill", "182_day"), ("364-day T-Bill", "364_day")]:
+            if isinstance(tb.get(key), (int, float)):
+                trend_rows.append(_rrow(lab, _pct(tb[key], 4)))
     if isinstance(cap.get("sensex"), (int, float)):
         trend_rows.append(_rrow("S&P BSE Sensex", f"{cap['sensex']:,.2f}"))
     if isinstance(cap.get("nifty_50"), (int, float)):
         trend_rows.append(_rrow("Nifty 50", f"{cap['nifty_50']:,.2f}"))
-    mkt_note = _asof_note(mkt.get("gsec_tbill_as_on"), cap.get("as_on"))
+    if bcurve:
+        b_as_of = bonds.get("as_of") or ""
+        try:
+            b_as_of = datetime.fromisoformat(b_as_of).strftime("%d %b %Y, %H:%M IST")
+        except (ValueError, TypeError):
+            pass
+        mkt_note = _asof_note(
+            "Govt bonds: investing.com" + (f" · {b_as_of}" if b_as_of else "") + " · % vs prev close",
+            cap.get("as_on"))
+    else:
+        mkt_note = _asof_note(mkt.get("gsec_tbill_as_on"), cap.get("as_on"))
     panels.append(_panel("Market Trends", trend_rows, note=mkt_note))
 
     captured = r.get("captured_at") or ""

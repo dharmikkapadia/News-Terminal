@@ -23,7 +23,12 @@ market trends). It reads `data/rates.json` via `rates.py`. **USD/INR, EUR/INR an
 are sourced from Trading Economics** (not RBI/FBIL): each shows a **% change vs the previous
 close** (themed `up`/`down`) and links out to the TE INR currencies board
 (`currencies?quote=inr`) — the USD/INR signal tile (with EUR/GBP + their % in its sub line) and
-those three Exchange Rates rows; the rest of the FX panel (JPY/AED/IDR) stays RBI/FBIL. Below it sits an opt-in
+those three Exchange Rates rows; the rest of the FX panel (JPY/AED/IDR) stays RBI/FBIL. The
+**government-bond yields are sourced from investing.com** (not RBI): the ~10y G-Sec signal tile
+and the whole Market Trends **yield curve** (tenor rows — India 3M…10Y…40Y — each with a **%
+change vs previous close** and a per-bond chart link) come from `market_trends.bonds` in
+`data/rates.json`, scraped by `bonds.py` (browser-rendered via Scrapling); the **Call Money
+Rate** row was removed, and **Sensex/Nifty** stay RBI. Below it sits an opt-in
 **Commodities** strip (`_commodities_dashboard_html`, sidebar **Show commodities** toggle): a
 tile per commodity (Brent, Gold, Silver, Copper, Aluminium, Zinc, Steel, Iron Ore, Coffee) with
 price, **% change vs the previous close** (coloured with each theme's `up`/`down` gain/loss
@@ -118,3 +123,26 @@ so the ids never collide.
   IPs (incl. this sandbox) — so validate the scrapers from a host that can reach TE / Yahoo, like
   `rates.py`/`rbi_archive.py`. NB: the 30-min cron commits whenever a price ticks (→ a Streamlit Cloud
   redeploy), the intended freshness trade-off.
+- **Government bonds** (`bonds.py` → `market_trends.bonds` inside `data/rates.json`) are the yield
+  curve for the ~10y G-Sec tile + the Market Trends yield rows, **sourced from investing.com, not
+  RBI**. Like FX/commodities it rides the **30-min `poll.py` cron** (committed by `history.yml`),
+  NOT the daily `rates.yml` — yields move intraday. `poll.py`'s `main()` calls `bonds.poll_bonds()`
+  each run. **investing.com blocks bots and renders the table client-side**, so `bonds.py` fetches
+  it in a **real browser via Scrapling** (reusing `rates_scrapling._render`: Chromium/DynamicFetcher
+  → stealth Firefox/StealthyFetcher with Cloudflare solving), then `parse_bonds()` reads the table
+  **by header text** (`Yield`/`Prev.`/`Chg. %`) — robust to id/attr churn — mapping each bond-name
+  link (`India 10Y` → `_tenor_years`) to `{tenor, yield, prev_close, change_pct, years, chart_url}`.
+  It writes **only on a sane parse** (`_is_complete`: a ~10Y benchmark present AND every yield in
+  `2–15%`), preserving the committed curve on any failure, and **never raises** — a blocked/partial
+  render just keeps the last curve. Default scrape = the **full curve** (all maturities, `BONDS_URL`
+  = `…/rates-bonds/india-government-bonds`), so all the yield rows come from one source; set
+  `MARKETWIRE_INVESTING_BONDS_URL` to the maturity-filtered board (`?maturity_from=10&maturity_to=300`,
+  long bonds only) if you want just the 10Y+ end. The app (`_rates_dashboard_html`) reads the curve
+  (tenor rows with a coloured `up`/`down` % vs prev close via `_fx_rrow`; the 10Y tile via
+  `_bond_benchmark`) and **falls back to the RBI `gsec_yields`/`tbill_yields` rows until the first
+  investing.com scrape lands** — the **Call Money Rate row is gone** and **Sensex/Nifty stay RBI**.
+  `history.yml` now installs `scrapling[fetchers]` + `scrapling install` so the browser is present
+  on the 30-min run (heavier install — cache or split to a dedicated workflow if Actions minutes
+  bite). This sandbox **can't reach investing.com** (egress proxy 403s the CONNECT, same as RBI) and
+  has no Scrapling browser, so `poll_bonds()` no-ops safely here — **validate it in CI / on a real
+  desk** (the first Action run is its live test), like the RBI/TE scrapers.
