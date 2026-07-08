@@ -2,11 +2,13 @@ name: MarketWire history
 
 # Keeps durable RBI history IN THE REPO: fetches both feeds (Press Releases +
 # Notifications) on a schedule and commits data/history.jsonl + data/notifications.jsonl.
-# The same run also refreshes the commodity-price snapshot (data/commodities.json) AND the
-# Trading-Economics FX overlay (USD/EUR/GBP-INR inside data/rates.json) — both move intraday,
-# so they ride this 30-min cadence (the rest of the RBI Current Rates snapshot stays on its
-# own once-a-day rates.yml). The Streamlit app reads those committed files, so everything
-# survives Streamlit Cloud restarts with no external database.
+# The same run also refreshes three intraday overlays inside data/rates.json / commodities.json:
+# the commodity-price snapshot (data/commodities.json), the Trading-Economics FX overlay
+# (USD/EUR/GBP-INR) AND the India government-bond yield curve (market_trends.bonds, scraped from
+# investing.com in a real browser via Scrapling) — all move intraday, so they ride this 30-min
+# cadence (the rest of the RBI Current Rates snapshot stays on its own once-a-day rates.yml).
+# The Streamlit app reads those committed files, so everything survives Streamlit Cloud restarts
+# with no external database.
 #
 # Note: committing updates the tracked branch, so Streamlit Cloud redeploys (a
 # brief restart) whenever history changes — tune the cron below to taste. The
@@ -39,7 +41,16 @@ jobs:
         with:
           python-version: "3.12"
 
-      - run: pip install feedparser requests beautifulsoup4
+      # Scrapling + a browser are needed for the investing.com government-bond scrape
+      # (bonds.poll_bonds, called from poll.py) — investing.com blocks bots, so the yield
+      # curve is fetched by rendering the page in a real browser. `scrapling install`
+      # downloads the browser(s) Scrapling drives (Chromium + Camoufox). The bond scrape is
+      # self-guarding, so if the browser is unavailable the run still succeeds (it just keeps
+      # the committed bond curve).
+      - name: Install deps (+ Scrapling browser for the investing.com bond scrape)
+        run: |
+          pip install feedparser requests beautifulsoup4 "scrapling[fetchers]"
+          scrapling install
 
       - name: Fetch RBI and update history
         env:
@@ -49,7 +60,7 @@ jobs:
           MARKETWIRE_NOTIFICATIONS_ARCHIVE_URLS: ${{ vars.MARKETWIRE_NOTIFICATIONS_ARCHIVE_URLS }}
         run: python poll.py
 
-      - name: Commit history + commodities + fx if changed
+      - name: Commit history + commodities + fx + bonds if changed
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -57,6 +68,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No data changes."
           else
-            git commit -m "data: update history + commodities + fx $(date -u +%FT%TZ)"
+            git commit -m "data: update history + commodities + fx + bonds $(date -u +%FT%TZ)"
             git push
           fi

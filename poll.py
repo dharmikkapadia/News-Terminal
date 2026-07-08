@@ -15,6 +15,7 @@ database.
 import os
 import sys
 
+import bonds
 import commodities
 import feed
 import history
@@ -131,6 +132,17 @@ def main():
         print(f"[poll:fx] {rates.poll_fx()}")
     except Exception as ex:                       # defensive — poll_fx swallows errors
         _annotate("warning", "FX refresh failed", ex)
+    # Refresh the India government-bond yield curve (market_trends.bonds in data/rates.json)
+    # from investing.com on this SAME 30-min cadence — yields move intraday, so (like FX and
+    # commodities) they ride the history cron, NOT the daily rates.yml. investing.com blocks
+    # bots, so bonds.poll_bonds() renders the page in a real browser via Scrapling and writes
+    # only on a sane parse (10Y benchmark present + all yields in-bounds), preserving the
+    # committed curve on any failure — and never raises. Needs scrapling[fetchers] + browser
+    # (installed by history.yml); without it the render just fails and the snapshot is kept.
+    try:
+        print(f"[poll:bonds] {bonds.poll_bonds()}")
+    except Exception as ex:                       # defensive — poll_bonds swallows errors
+        _annotate("warning", "bond refresh failed", ex)
     # NOTE: the rest of the Current Rates snapshot (data/rates.json) — policy/reserve/lending
     # rates, market trends, MPC — is refreshed on its OWN cadence, once a day at 1:30pm IST
     # (after RBI's 1pm FX update) by .github/workflows/rates.yml (python rates.py) — not here.
