@@ -6,9 +6,11 @@ Powers two things:
      normalised announcement <title> against the name→symbol map built here.
 
 The committed data/nse_symbols.json ({SYMBOL: "Name Of Company"}) is generated from
-EQUITY_L.csv. refresh_symbols() re-fetches it (cookie-primed, like nse.py) on a slow
-cadence and rewrites the file ONLY on a sane parse — a blocked/partial fetch keeps the
-committed snapshot (NSE 403s datacenter IPs, so validate the fetch in CI / on a desk).
+NSE's main-board EQUITY_L.csv merged with the SME (Emerge) SME_EQUITY_L.csv, so SME
+companies in the announcements feed resolve too. refresh_symbols() re-fetches both
+(cookie-primed, like nse.py) on a slow cadence and rewrites the file ONLY on a sane parse
+— a blocked/partial fetch keeps the committed snapshot (NSE 403s datacenter IPs, so
+validate the fetch in CI / on a desk).
 """
 
 import csv
@@ -27,6 +29,11 @@ SYMBOLS_PATH = os.environ.get("MARKETWIRE_NSE_SYMBOLS_FILE",
 EQUITY_L_URL = os.environ.get(
     "MARKETWIRE_NSE_EQUITY_L",
     "https://nsearchives.nseindia.com/content/equities/EQUITY_L.csv")
+# NSE's SME (Emerge) board list — same CSV shape, merged onto the main board so SME
+# companies in the announcements feed also resolve. Set to "" to disable SME coverage.
+SME_EQUITY_L_URL = os.environ.get(
+    "MARKETWIRE_NSE_SME_EQUITY_L",
+    "https://nsearchives.nseindia.com/content/equities/SME_EQUITY_L.csv")
 # A real EQUITY_L carries ~2000+ rows; a much shorter parse means a blocked/garbage fetch,
 # so we refuse to overwrite the committed map with it.
 _MIN_ROWS = 1000
@@ -95,22 +102,37 @@ def fetch_equity_l(url=EQUITY_L_URL, timeout=30):
     return parse_csv(resp.text), None
 
 
-def refresh_symbols(path=SYMBOLS_PATH, url=EQUITY_L_URL, max_age_days=7):
-    """Refresh data/nse_symbols.json from EQUITY_L.csv — but only every `max_age_days`
-    (the list barely changes), and only overwrite on a sane parse (>= _MIN_ROWS). Preserves
-    the committed map on any failure. Never raises. Returns a status string."""
+def fetch_all(main_url=EQUITY_L_URL, sme_url=SME_EQUITY_L_URL, timeout=30):
+    """Fetch the main-board list (required) and merge the SME (Emerge) list onto it
+    (additive + best-effort — an SME failure just omits SME rows; the main board wins on
+    any symbol overlap). Returns (symbols, error); error is set only if the MAIN fetch fails."""
+    main, err = fetch_equity_l(main_url, timeout=timeout)
+    if err:
+        return {}, err
+    merged = dict(main)
+    if sme_url:
+        sme, _sme_err = fetch_equity_l(sme_url, timeout=timeout)   # best-effort
+        for sym, name in sme.items():
+            merged.setdefault(sym, name)
+    return merged, None
+
+
+def refresh_symbols(path=SYMBOLS_PATH, max_age_days=7):
+    """Refresh data/nse_symbols.json from EQUITY_L.csv (+ SME_EQUITY_L.csv) — but only every
+    `max_age_days` (the lists barely change), and only overwrite on a sane parse
+    (>= _MIN_ROWS). Preserves the committed map on any failure. Never raises. Status string."""
     try:
         if max_age_days and os.path.exists(path):
             age_days = (time.time() - os.path.getmtime(path)) / 86400.0
             if age_days < max_age_days and load_symbols(path):
                 return f"symbols fresh ({age_days:.1f}d old) — skipping fetch"
-        symbols, err = fetch_equity_l(url)
+        symbols, err = fetch_all()
         if err:
             return f"symbols fetch failed ({err}) — keeping committed map"
         if len(symbols) < _MIN_ROWS:
             return f"symbols parse too small ({len(symbols)} rows) — keeping committed map"
         save_symbols(symbols, path)
-        return f"symbols updated ({len(symbols)} companies)"
+        return f"symbols updated ({len(symbols)} companies, main+SME)"
     except Exception as ex:                         # defensive — must never raise in the cron
         return f"symbols refresh errored ({type(ex).__name__}: {ex}) — keeping committed map"
 
