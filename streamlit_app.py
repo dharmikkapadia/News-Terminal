@@ -247,6 +247,13 @@ def _panel(title, rows, note=""):
     return f"<div class='mw-rpanel'><h4>{html.escape(title)}</h4>{''.join(rows)}{note_html}</div>"
 
 
+def _srclink(url, text):
+    """A small dotted-underline source-attribution link (e.g. the header 'rbi.org.in'),
+    opening the data source in a new tab."""
+    return (f"<a class='mw-srclink' href='{html.escape(url)}' target='_blank' rel='noopener'>"
+            f"{html.escape(text)}</a>")
+
+
 def _benchmark_gsec(gsecs):
     """Pick the ~10-year benchmark: the G-Sec whose maturity year is closest to 10y out.
     (RBI fallback path — used only until the first investing.com bond scrape lands.)"""
@@ -301,12 +308,16 @@ def _rates_dashboard_html(r):
     lend = r.get("lending_deposit_rates") or {}
     mkt = r.get("market_trends") or {}
     cap = mkt.get("capital_market") or {}
+    # Every tile links out to its source (like the commodity tiles): the RBI-sourced ones to
+    # rbi.org.in, the MPC tile to its schedule page (FX→TE, bonds→investing.com set below).
+    rbi_url = r.get("source") or "https://www.rbi.org.in/"
+    mpc_url = (r.get("mpc") or {}).get("source_url") or rbi_url
 
     # --- signal strip ---
     sigs = [
-        _sig("Policy Repo", _pct(pol.get("repo_rate")), "RBI key rate"),
-        _sig("SDF · MSF", f"{_pct(pol.get('standing_deposit_facility_rate'))} · {_pct(pol.get('marginal_standing_facility_rate'))}", "LAF corridor"),
-        _sig("CRR · SLR", f"{_pct(res.get('crr'))} · {_pct(res.get('slr'))}", "reserve ratios"),
+        _sig("Policy Repo", _pct(pol.get("repo_rate")), "RBI key rate", href=rbi_url),
+        _sig("SDF · MSF", f"{_pct(pol.get('standing_deposit_facility_rate'))} · {_pct(pol.get('marginal_standing_facility_rate'))}", "LAF corridor", href=rbi_url),
+        _sig("CRR · SLR", f"{_pct(res.get('crr'))} · {_pct(res.get('slr'))}", "reserve ratios", href=rbi_url),
     ]
     usd = fx.get("inr_per_usd")
     usd_val = f"{usd:,.4f}" if isinstance(usd, (int, float)) else "—"
@@ -332,9 +343,9 @@ def _rates_dashboard_html(r):
     else:
         bench = _benchmark_gsec(mkt.get("gsec_yields"))
         if bench:
-            sigs.append(_sig("10Y G-Sec", _pct(bench.get("yield"), 4), bench.get("security", "")))
+            sigs.append(_sig("10Y G-Sec", _pct(bench.get("yield"), 4), bench.get("security", ""), href=rbi_url))
         elif isinstance(cap.get("sensex"), (int, float)):
-            sigs.append(_sig("Sensex", f"{cap['sensex']:,.2f}", "S&P BSE"))
+            sigs.append(_sig("Sensex", f"{cap['sensex']:,.2f}", "S&P BSE", href=rbi_url))
 
     # --- MPC countdown ---
     cd = rates.mpc_countdown(r)
@@ -350,9 +361,9 @@ def _rates_dashboard_html(r):
             sub = "in progress"
         else:
             sub = "decision out"
-        sigs.append(_sig("Next MPC", label, sub, cls="mpc"))
+        sigs.append(_sig("Next MPC", label, sub, cls="mpc", href=mpc_url))
     else:
-        sigs.append(_sig("Next MPC", "TBA", "schedule pending", cls="mpc"))
+        sigs.append(_sig("Next MPC", "TBA", "schedule pending", cls="mpc", href=mpc_url))
 
     # --- full rate card panels ---
     panels = [
@@ -433,9 +444,19 @@ def _rates_dashboard_html(r):
     except (ValueError, TypeError):
         pass
     sub = f"snapshot · {captured}" if captured else "snapshot"
+    # Clickable source attributions in the header (each opens its data source in a new tab).
+    src_bits = [
+        html.escape(sub),
+        _srclink(rbi_url, "rbi.org.in"),
+        "FX: " + _srclink("https://tradingeconomics.com/currencies?quote=inr", "tradingeconomics.com"),
+    ]
+    if bcurve:                                    # bonds sourced from investing.com this snapshot
+        src_bits.append("Bonds: " + _srclink(bonds.get("board_url") or
+                        "https://www.investing.com/rates-bonds/india-government-bonds", "investing.com"))
+    src_line = " · ".join(src_bits)
     return (
         "<div class='mw-rates'>"
-        f"<div class='mw-rates-hd'><span class='t'>Current Rates</span><span class='s'>{html.escape(sub)} · rbi.org.in · FX: tradingeconomics.com</span></div>"
+        f"<div class='mw-rates-hd'><span class='t'>Current Rates</span><span class='s'>{src_line}</span></div>"
         f"<div class='mw-sigstrip'>{''.join(sigs)}</div>"
         f"<details><summary></summary><div class='mw-ratesgrid'>{''.join(panels)}</div></details>"
         "</div>"
@@ -770,6 +791,10 @@ def theme_css(p):
       /* Exchange Rates: TE pairs render the rate as a dotted chart link + a coloured % change. */
       .mw-fxlink {{ color: inherit; text-decoration: none; border-bottom: 1px dotted {p['muted']}; }}
       .mw-fxlink:hover {{ color: {p['accent']}; border-bottom-color: {p['accent']}; }}
+      /* header source attributions (rbi.org.in / tradingeconomics.com / investing.com) */
+      .mw-rates-hd .s .mw-srclink {{ color: inherit; text-decoration: underline;
+        text-decoration-style: dotted; text-underline-offset: 2px; }}
+      .mw-rates-hd .s .mw-srclink:hover {{ color: {p['accent']}; }}
       .mw-rv .chg {{ font-size: 11.5px; font-weight: 700; margin-left: 8px; }}
       .mw-rnote {{ font-size: 10.5px; color: {p['muted']}; margin-top: 8px; font-style: italic; }}
       .mw-rates > details > summary {{ list-style: none; cursor: pointer; outline: none; width: max-content;
