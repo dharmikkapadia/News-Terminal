@@ -488,7 +488,10 @@ THEMES = {
     "Trading Economics": dict(bg="#EEF2F6", panel="#FFFFFF", text="#1C2A38", heading="#14304F",
                               muted="#6A7889", accent="#0E72BC", accent2="#13A36B", link="#0E72BC",
                               border="#DCE3EB", shadow="rgba(16,48,90,.12)", headfont=_SANS,
-                              up="#13A36B", down="#D64550"),
+                              up="#13A36B", down="#D64550",
+                              # Scroll tape borrows Equity Terminal's brighter green/red
+                              # (idle = its muted grey) while price up/down stay TE's own.
+                              scroll_up="#16C784", scroll_down="#F0616D", scroll_idle="#6B7785"),
     "High Contrast": dict(bg="#000000", panel="#0C0C0C", text="#FFFFFF", heading="#FFFF00",
                           muted="#D8D8D8", accent="#FFE000", accent2="#5AD1FF", link="#6BD8FF",
                           border="#5C5C5C", shadow="rgba(255,224,0,.20)", headfont=_SERIF,
@@ -853,8 +856,14 @@ def _scroll_ticker_html(p):
     reruns: the <style> + colour config refresh each run; the scroll listener and
     its rAF paint loop attach only once (guarded on window.parent)."""
     tokens = {
-        "__UP__": p["up"], "__DOWN__": p["down"],
-        "__IDLE__": p.get("muted", p["border"]), "__FADE__": "650",
+        # Scroll-tape colours default to the theme's gain/loss + idle tones, but a
+        # theme may override JUST the scrollbar (not its price up/down) via
+        # scroll_up/scroll_down/scroll_idle — e.g. Trading Economics borrows Equity
+        # Terminal's brighter green/red tape while keeping its own price palette.
+        "__UP__": p.get("scroll_up", p["up"]),
+        "__DOWN__": p.get("scroll_down", p["down"]),
+        "__IDLE__": p.get("scroll_idle", p.get("muted", p["border"])),
+        "__FADE__": "650",
     }
     js = """
 <script>
