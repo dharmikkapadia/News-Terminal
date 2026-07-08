@@ -17,11 +17,13 @@ import csv
 import io
 import json
 import os
-import time
+from datetime import datetime, timezone, timedelta
 
 import requests
 
 import nse  # normalize_name() + the browser headers / cookie-priming host
+
+IST = timezone(timedelta(hours=5, minutes=30))
 
 _DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 SYMBOLS_PATH = os.environ.get("MARKETWIRE_NSE_SYMBOLS_FILE",
@@ -62,13 +64,28 @@ def parse_csv(text):
 
 
 def load_symbols(path=SYMBOLS_PATH):
-    """The committed {SYMBOL: name} map, or {} if it isn't there yet. Never raises."""
+    """The committed {SYMBOL: name} map, or {} if absent. Handles both the wrapped format
+    ({refreshed_at, count, symbols}) written by save_symbols and a legacy flat {SYMBOL: name}."""
     try:
         with open(path, "r", encoding="utf-8") as f:
             data = json.load(f)
-        return data if isinstance(data, dict) else {}
     except Exception:
         return {}
+    if isinstance(data, dict) and isinstance(data.get("symbols"), dict):
+        return data["symbols"]
+    return data if isinstance(data, dict) else {}
+
+
+def symbols_refreshed_at(path=SYMBOLS_PATH):
+    """ISO timestamp of the last successful refresh, stored IN the committed file — or None
+    (legacy flat file / never refreshed). Gates the fetch cadence in a CHECKOUT-PROOF way:
+    file mtime can't be used because CI resets it to the checkout time on every run."""
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        return data.get("refreshed_at") if isinstance(data, dict) else None
+    except Exception:
+        return None
 
 
 def name_to_symbol(symbols=None):
@@ -78,10 +95,17 @@ def name_to_symbol(symbols=None):
     return {nse.normalize_name(name): sym for sym, name in symbols.items()}
 
 
-def save_symbols(symbols, path=SYMBOLS_PATH):
+def save_symbols(symbols, path=SYMBOLS_PATH, refreshed_at=None):
+    """Write the map as {refreshed_at, count, symbols} — the refreshed_at stamp lets the
+    cadence gate survive a fresh CI checkout (unlike file mtime)."""
+    payload = {
+        "refreshed_at": refreshed_at or datetime.now(IST).isoformat(timespec="seconds"),
+        "count": len(symbols),
+        "symbols": dict(sorted(symbols.items())),
+    }
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
-        json.dump(symbols, f, ensure_ascii=False, indent=0, sort_keys=True)
+        json.dump(payload, f, ensure_ascii=False, indent=0)
         f.write("\n")
 
 
@@ -122,9 +146,13 @@ def refresh_symbols(path=SYMBOLS_PATH, max_age_days=7):
     `max_age_days` (the lists barely change), and only overwrite on a sane parse
     (>= _MIN_ROWS). Preserves the committed map on any failure. Never raises. Status string."""
     try:
-        if max_age_days and os.path.exists(path):
-            age_days = (time.time() - os.path.getmtime(path)) / 86400.0
-            if age_days < max_age_days and load_symbols(path):
+        ra = symbols_refreshed_at(path)             # last SUCCESSFUL refresh (committed)
+        if max_age_days and ra and load_symbols(path):
+            try:
+                age_days = (datetime.now(IST) - datetime.fromisoformat(ra)).total_seconds() / 86400.0
+            except Exception:
+                age_days = None
+            if age_days is not None and age_days < max_age_days:
                 return f"symbols fresh ({age_days:.1f}d old) — skipping fetch"
         symbols, err = fetch_all()
         if err:
