@@ -283,6 +283,12 @@ def _bond_benchmark(curve, target_years=10.0):
     return best[1] if best else None
 
 
+# investing.com scrapes the FULL curve (~21 tenors) into market_trends.bonds; the Market
+# Trends panel shows only this representative subset so it stays compact. The 10Y tile still
+# picks its benchmark from the full curve, and every tenor keeps its own chart link.
+_BOND_TENORS = ("3M", "6M", "1Y", "2Y", "5Y", "10Y", "15Y", "30Y", "40Y")
+
+
 def _asof_note(*notes):
     """Join distinct 'as on …' stamps with ' · ', collapsing internal whitespace and dropping
     duplicates. RBI stamps the SAME date on the G-Sec/T-bill and Capital-Market sub-panels, so a
@@ -405,7 +411,10 @@ def _rates_dashboard_html(r):
     # row via _fx_rrow. The Call Money Rate is intentionally dropped. Sensex/Nifty stay RBI.
     trend_rows = []
     if bcurve:
-        for b in bcurve:
+        # Show a representative subset of the full curve (fall back to the whole curve if the
+        # tenor labels don't match), keeping the source's ascending-maturity order.
+        shown = [b for b in bcurve if b.get("tenor") in _BOND_TENORS] or bcurve
+        for b in shown:
             if not isinstance(b.get("yield"), (int, float)):
                 continue
             te_like = {"chart_url": b.get("chart_url") or bonds.get("board_url"),
