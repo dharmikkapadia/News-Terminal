@@ -127,11 +127,17 @@ so the ids never collide.
   curve for the ~10y G-Sec tile + the Market Trends yield rows, **sourced from investing.com, not
   RBI**. Like FX/commodities it rides the **30-min `poll.py` cron** (committed by `history.yml`),
   NOT the daily `rates.yml` — yields move intraday. `poll.py`'s `main()` calls `bonds.poll_bonds()`
-  each run. **investing.com blocks bots and renders the table client-side**, so `bonds.py` fetches
-  it in a **real browser via Scrapling** (reusing `rates_scrapling._render`: Chromium/DynamicFetcher
-  → stealth Firefox/StealthyFetcher with Cloudflare solving), then `parse_bonds()` reads the table
-  **by header text** (`Yield`/`Prev.`/`Chg. %`) — robust to id/attr churn — mapping each bond-name
-  link (`India 10Y` → `_tenor_years`) to `{tenor, yield, prev_close, change_pct, years, chart_url}`.
+  each run. **investing.com blocks bots (Cloudflare 403 on datacenter IPs) and renders the table
+  client-side**, so `bonds._render()` fetches it with Scrapling's **StealthyFetcher** tuned for it:
+  `solve_cloudflare=True`, arrive via a Google click, `block_ads`, **`network_idle=False`** (its
+  ad/trackers never idle — waiting on `load` was the original 60s-timeout bug), and **non-headless**
+  by default (`MARKETWIRE_BONDS_HEADLESS`, run under **xvfb** in CI). **`MARKETWIRE_SCRAPE_PROXY`**
+  routes through a (residential) proxy — the reliable fix from CI, since a GitHub-runner IP is
+  usually 403'd however good the fingerprint; `MARKETWIRE_BONDS_DUMP` writes the rendered HTML
+  (uploaded as the `bonds-render-dump` CI artifact) for markup diagnosis. `parse_bonds()` then reads
+  the table **by header text** (`Yield`/`Prev.`/`Chg. %`) — robust to id/attr churn — mapping each
+  bond-name link (`India 10Y` → `_tenor_years`) to `{tenor, yield, prev_close, change_pct, years,
+  chart_url}`.
   It writes **only on a sane parse** (`_is_complete`: a ~10Y benchmark present AND every yield in
   `2–15%`), preserving the committed curve on any failure, and **never raises** — a blocked/partial
   render just keeps the last curve. Default scrape = the **full curve** (all maturities, `BONDS_URL`
@@ -141,8 +147,9 @@ so the ids never collide.
   (tenor rows with a coloured `up`/`down` % vs prev close via `_fx_rrow`; the 10Y tile via
   `_bond_benchmark`) and **falls back to the RBI `gsec_yields`/`tbill_yields` rows until the first
   investing.com scrape lands** — the **Call Money Rate row is gone** and **Sensex/Nifty stay RBI**.
-  `history.yml` now installs `scrapling[fetchers]` + `scrapling install` so the browser is present
-  on the 30-min run (heavier install — cache or split to a dedicated workflow if Actions minutes
-  bite). This sandbox **can't reach investing.com** (egress proxy 403s the CONNECT, same as RBI) and
+  `history.yml` installs `scrapling[fetchers]` + `scrapling install` + **xvfb** and runs
+  `xvfb-run -a python poll.py` so the stealth browser has a virtual display (heavier install — cache
+  or split to a dedicated workflow if Actions minutes bite). This sandbox **can't reach investing.com**
+  (egress proxy 403s the CONNECT, same as RBI) and
   has no Scrapling browser, so `poll_bonds()` no-ops safely here — **validate it in CI / on a real
   desk** (the first Action run is its live test), like the RBI/TE scrapers.

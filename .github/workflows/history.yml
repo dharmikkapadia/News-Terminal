@@ -43,22 +43,42 @@ jobs:
 
       # Scrapling + a browser are needed for the investing.com government-bond scrape
       # (bonds.poll_bonds, called from poll.py) — investing.com blocks bots, so the yield
-      # curve is fetched by rendering the page in a real browser. `scrapling install`
-      # downloads the browser(s) Scrapling drives (Chromium + Camoufox). The bond scrape is
-      # self-guarding, so if the browser is unavailable the run still succeeds (it just keeps
-      # the committed bond curve).
-      - name: Install deps (+ Scrapling browser for the investing.com bond scrape)
+      # curve is fetched by rendering the page in a real STEALTH browser. `scrapling install`
+      # downloads the browser(s) Scrapling drives. xvfb gives it a virtual display so the
+      # stealth browser can run NON-headless (much harder for Cloudflare to flag). The bond
+      # scrape is self-guarding, so if the browser is unavailable / blocked the run still
+      # succeeds (it just keeps the committed bond curve).
+      - name: Install deps (+ Scrapling stealth browser + xvfb for the investing.com bonds)
         run: |
+          sudo apt-get update && sudo apt-get install -y xvfb
           pip install feedparser requests beautifulsoup4 "scrapling[fetchers]"
           scrapling install
 
-      - name: Fetch RBI and update history
+      - name: Fetch RBI and update history (+ commodities / FX / investing.com bonds)
         env:
           # Optional: set these repo variables to also backfill older items from
           # RBI's listing page(s) for each feed.
           MARKETWIRE_ARCHIVE_URLS: ${{ vars.MARKETWIRE_ARCHIVE_URLS }}
           MARKETWIRE_NOTIFICATIONS_ARCHIVE_URLS: ${{ vars.MARKETWIRE_NOTIFICATIONS_ARCHIVE_URLS }}
-        run: python poll.py
+          # investing.com bond scrape (bonds.py): run the stealth browser non-headless under
+          # xvfb; dump the rendered HTML for diagnosis; route through a proxy if configured.
+          MARKETWIRE_BONDS_HEADLESS: "false"
+          MARKETWIRE_BONDS_DUMP: ${{ runner.temp }}/bonds_dump.html
+          # Set this repo SECRET to a (residential) proxy URL to reliably get past investing.com's
+          # datacenter-IP 403 — e.g. http://user:pass@host:port. Empty = direct (often blocked).
+          MARKETWIRE_SCRAPE_PROXY: ${{ secrets.MARKETWIRE_SCRAPE_PROXY }}
+        run: xvfb-run -a python poll.py
+
+      # Upload the rendered investing.com HTML (whatever the fetch got — the real table or a
+      # Cloudflare block page) so the markup can be inspected when the bond curve doesn't update.
+      - name: Upload bonds render dump (diagnostic)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bonds-render-dump
+          path: ${{ runner.temp }}/bonds_dump.html
+          if-no-files-found: ignore
+          retention-days: 7
 
       - name: Commit history + commodities + fx + bonds if changed
         run: |
