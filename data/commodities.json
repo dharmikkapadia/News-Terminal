@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-07-08T05:00:59+05:30",
+  "captured_at": "2026-07-08T05:31:05+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…)",
   "commodities": [
@@ -11,11 +11,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
       "source": "Trading Economics · CO1:COM",
-      "price": 76.202,
+      "price": 76.214,
       "prev_close": 71.99,
-      "change_pct": 5.85,
+      "change_pct": 5.87,
       "currency": "USD",
-      "as_of": "2026-07-07"
+      "as_of": "2026-07-08"
     },
     {
       "key": "gold",
@@ -25,11 +25,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Trading Economics · XAUUSD:CUR",
-      "price": 4105.18,
-      "prev_close": 4045.54,
-      "change_pct": -1.43,
+      "price": 4101.3,
+      "prev_close": 4037.78,
+      "change_pct": -1.53,
       "currency": "USD",
-      "as_of": "2026-07-07"
+      "as_of": "2026-07-08"
     },
     {
       "key": "silver",
@@ -39,11 +39,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
       "source": "Trading Economics · XAGUSD:CUR",
-      "price": 59.94,
-      "prev_close": 57.839,
-      "change_pct": -3.39,
+      "price": 59.716,
+      "prev_close": 57.391,
+      "change_pct": -3.75,
       "currency": "USD",
-      "as_of": "2026-07-07"
+      "as_of": "2026-07-08"
     },
     {
       "key": "copper",
@@ -53,11 +53,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Trading Economics · HG1:COM",
-      "price": 6.1172,
-      "prev_close": 6.0564,
-      "change_pct": -0.98,
+      "price": 6.1158,
+      "prev_close": 6.0536,
+      "change_pct": -1.01,
       "currency": "USD",
-      "as_of": "2026-07-07"
+      "as_of": "2026-07-08"
     },
     {
       "key": "aluminium",
@@ -123,9 +123,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/coffee",
       "source": "Trading Economics · KC1:COM",
-      "price": 317.24,
-      "prev_close": 284.53,
-      "change_pct": -9.35,
+      "price": 317.28,
+      "prev_close": 284.61,
+      "change_pct": -9.34,
       "currency": "USD",
       "as_of": "2026-07-07"
     }
