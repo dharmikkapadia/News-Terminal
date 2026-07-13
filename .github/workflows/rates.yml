@@ -55,5 +55,15 @@ jobs:
             echo "No rates change."
           else
             git commit -m "rates: update $(date -u +%FT%TZ)"
-            git push
+            # The 30-min history.yml also commits data/rates.json (FX/bonds overlays) — and
+            # this cron fires at :00, the same minute as the external history dispatch — so a
+            # bare push can lose the race. Rebase onto the remote and retry; -X theirs keeps
+            # THIS run's fresh scrape on conflict ("theirs" = our replayed commit in a rebase).
+            for i in 1 2 3 4 5; do
+              git pull --rebase --autostash -X theirs origin "${GITHUB_REF_NAME}" && git push && exit 0
+              git rebase --abort 2>/dev/null || true
+              echo "push attempt $i failed; retrying in $((i*3))s"; sleep $((i*3))
+            done
+            echo "::error::push failed after 5 attempts"
+            exit 1
           fi

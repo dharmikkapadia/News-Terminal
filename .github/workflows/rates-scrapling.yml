@@ -68,9 +68,16 @@ jobs:
             echo "No rates change."
           else
             git commit -m "rates(browser): update $(date -u +%FT%TZ)"
-            # The 30-min history.yml may push between our checkout and push; rebase onto it and retry.
+            # The 30-min history.yml may push between our checkout and push; rebase onto it and
+            # retry. -X theirs keeps THIS run's fresh scrape on conflict ("theirs" = our replayed
+            # commit in a rebase); abort a half-applied rebase so the next attempt starts clean;
+            # and fail the step if the push never lands instead of exiting green with an
+            # unpushed commit.
             for i in 1 2 3 4 5; do
-              git pull --rebase --autostash origin "${GITHUB_REF_NAME}" && git push && break
+              git pull --rebase --autostash -X theirs origin "${GITHUB_REF_NAME}" && git push && exit 0
+              git rebase --abort 2>/dev/null || true
               echo "push attempt $i failed; retrying in $((i*3))s"; sleep $((i*3))
             done
+            echo "::error::push failed after 5 attempts"
+            exit 1
           fi

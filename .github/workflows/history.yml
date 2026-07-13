@@ -89,5 +89,16 @@ jobs:
             echo "No data changes."
           else
             git commit -m "data: update history + commodities + fx + bonds + symbols $(date -u +%FT%TZ)"
-            git push
+            # main has other writers (the rates workflows, branch merges) and this job's
+            # checkout->push window is ~15 min (Scrapling install + bonds render), so a bare
+            # push loses the race every few days. Rebase onto the remote and retry; -X theirs
+            # keeps THIS run's freshly-polled data files on any conflict (rebase swaps sides:
+            # "theirs" = the commit being replayed, i.e. ours — the freshest scrape).
+            for i in 1 2 3 4 5; do
+              git pull --rebase --autostash -X theirs origin "${GITHUB_REF_NAME}" && git push && exit 0
+              git rebase --abort 2>/dev/null || true
+              echo "push attempt $i failed; retrying in $((i*3))s"; sleep $((i*3))
+            done
+            echo "::error::push failed after 5 attempts"
+            exit 1
           fi
