@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-07-13T05:31:32+05:30",
+  "captured_at": "2026-07-13T06:01:30+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…)",
   "commodities": [
@@ -11,11 +11,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
       "source": "Trading Economics · CO1:COM",
-      "price": 78.499,
+      "price": 78.622,
       "prev_close": 76.01,
-      "change_pct": 3.27,
+      "change_pct": 3.44,
       "currency": "USD",
-      "as_of": "2026-07-12"
+      "as_of": "2026-07-13"
     },
     {
       "key": "gold",
@@ -25,11 +25,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Trading Economics · XAUUSD:CUR",
-      "price": 4082.35,
-      "prev_close": 4043.65,
-      "change_pct": -0.94,
+      "price": 4075.18,
+      "prev_close": 4029.31,
+      "change_pct": -1.11,
       "currency": "USD",
-      "as_of": "2026-07-12"
+      "as_of": "2026-07-13"
     },
     {
       "key": "silver",
@@ -39,11 +39,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
       "source": "Trading Economics · XAGUSD:CUR",
-      "price": 58.688,
-      "prev_close": 57.525,
-      "change_pct": -1.94,
+      "price": 58.994,
+      "prev_close": 58.136,
+      "change_pct": -1.43,
       "currency": "USD",
-      "as_of": "2026-07-12"
+      "as_of": "2026-07-13"
     },
     {
       "key": "copper",
@@ -53,11 +53,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Trading Economics · HG1:COM",
-      "price": 6.2107,
-      "prev_close": 6.1879,
-      "change_pct": -0.37,
+      "price": 6.2068,
+      "prev_close": 6.1801,
+      "change_pct": -0.43,
       "currency": "USD",
-      "as_of": "2026-07-12"
+      "as_of": "2026-07-13"
     },
     {
       "key": "aluminium",
@@ -81,11 +81,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/zinc",
       "source": "Trading Economics · LMZSDS03:COM",
-      "price": 3614.3,
-      "prev_close": 3599.6,
-      "change_pct": -0.41,
+      "price": 3598.35,
+      "prev_close": 3582.4,
+      "change_pct": -0.44,
       "currency": "USD",
-      "as_of": "2026-07-10"
+      "as_of": "2026-07-13"
     },
     {
       "key": "steel",
