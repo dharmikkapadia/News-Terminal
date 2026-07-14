@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-07-14T05:01:26+05:30",
+  "captured_at": "2026-07-14T05:31:41+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…)",
   "commodities": [
@@ -11,11 +11,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
       "source": "Trading Economics · CO1:COM",
-      "price": 84.267,
+      "price": 83.788,
       "prev_close": 76.01,
-      "change_pct": 10.86,
+      "change_pct": 10.23,
       "currency": "USD",
-      "as_of": "2026-07-13"
+      "as_of": "2026-07-14"
     },
     {
       "key": "gold",
@@ -25,11 +25,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Trading Economics · XAUUSD:CUR",
-      "price": 3995.66,
-      "prev_close": 3870.27,
-      "change_pct": -3.04,
+      "price": 4002.98,
+      "prev_close": 3884.91,
+      "change_pct": -2.87,
       "currency": "USD",
-      "as_of": "2026-07-13"
+      "as_of": "2026-07-14"
     },
     {
       "key": "silver",
@@ -39,11 +39,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
       "source": "Trading Economics · XAGUSD:CUR",
-      "price": 57.445,
-      "prev_close": 55.039,
-      "change_pct": -4.02,
+      "price": 57.632,
+      "prev_close": 55.413,
+      "change_pct": -3.71,
       "currency": "USD",
-      "as_of": "2026-07-13"
+      "as_of": "2026-07-14"
     },
     {
       "key": "copper",
@@ -53,11 +53,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Trading Economics · HG1:COM",
-      "price": 6.2253,
-      "prev_close": 6.2171,
-      "change_pct": -0.13,
+      "price": 6.2333,
+      "prev_close": 6.2331,
+      "change_pct": 0.0,
       "currency": "USD",
-      "as_of": "2026-07-13"
+      "as_of": "2026-07-14"
     },
     {
       "key": "aluminium",
