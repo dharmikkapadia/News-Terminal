@@ -15,7 +15,7 @@
   "exchange_rates": {
     "as_of": "As at 1.00pm of July 15, 2026",
     "source": "FBIL",
-    "inr_per_usd": 96.428,
+    "inr_per_usd": 96.461,
     "inr_per_gbp": 130.572,
     "inr_per_eur": 110.6431,
     "inr_per_100_jpy": 59.33,
@@ -24,8 +24,8 @@
     "fx_te": {
       "inr_per_usd": {
         "label": "USD/INR",
-        "prev_close": 96.3129,
-        "change_pct": 0.12,
+        "prev_close": 96.313,
+        "change_pct": 0.15,
         "chart_url": "https://tradingeconomics.com/currencies?quote=inr",
         "as_of": "2026-07-16",
         "source": "Trading Economics · USDINR:CUR"
@@ -47,7 +47,7 @@
         "source": "Trading Economics · GBPINR:CUR"
       }
     },
-    "fx_te_captured_at": "2026-07-16T09:01:41+05:30"
+    "fx_te_captured_at": "2026-07-16T09:31:54+05:30"
   },
   "lending_deposit_rates": {
     "base_rate": [
@@ -108,7 +108,7 @@
     "bonds": {
       "source": "investing.com",
       "board_url": "https://www.investing.com/rates-bonds/india-government-bonds",
-      "as_of": "2026-07-16T09:02:10+05:30",
+      "as_of": "2026-07-16T09:32:15+05:30",
       "benchmark_tenor": "10Y",
       "curve": [
         {
@@ -116,7 +116,7 @@
           "label": "India 3M",
           "yield": 5.25,
           "prev_close": 5.31,
-          "change_pct": -0.76,
+          "change_pct": -0.0,
           "years": 0.25,
           "chart_url": "https://www.investing.com/rates-bonds/india-3-month-bond-yield"
         },
@@ -125,7 +125,7 @@
           "label": "India 6M",
           "yield": 5.454,
           "prev_close": 5.525,
-          "change_pct": 0.13,
+          "change_pct": 0.0,
           "years": 0.5,
           "chart_url": "https://www.investing.com/rates-bonds/india-6-month-bond-yield"
         },
@@ -134,97 +134,97 @@
           "label": "India 1Y",
           "yield": 5.786,
           "prev_close": 5.834,
-          "change_pct": -1.18,
+          "change_pct": -0.0,
           "years": 1.0,
           "chart_url": "https://www.investing.com/rates-bonds/india-1-year-bond-yield"
         },
         {
           "tenor": "2Y",
           "label": "India 2Y",
-          "yield": 6.031,
+          "yield": 6.035,
           "prev_close": 6.009,
-          "change_pct": -2.69,
+          "change_pct": 0.43,
           "years": 2.0,
           "chart_url": "https://www.investing.com/rates-bonds/india-2-year-bond-yield"
         },
         {
           "tenor": "3Y",
           "label": "India 3Y",
-          "yield": 6.273,
+          "yield": 6.31,
           "prev_close": 6.306,
-          "change_pct": 0.43,
+          "change_pct": 0.06,
           "years": 3.0,
           "chart_url": "https://www.investing.com/rates-bonds/india-3-year-bond-yield"
         },
         {
           "tenor": "4Y",
           "label": "India 4Y",
-          "yield": 6.322,
+          "yield": 6.44,
           "prev_close": 6.38,
-          "change_pct": -2.01,
+          "change_pct": 0.94,
           "years": 4.0,
           "chart_url": "https://www.investing.com/rates-bonds/india-4-year-bond-yield"
         },
         {
           "tenor": "5Y",
           "label": "India 5Y",
-          "yield": 6.435,
+          "yield": 6.471,
           "prev_close": 6.457,
-          "change_pct": -0.74,
+          "change_pct": 0.22,
           "years": 5.0,
           "chart_url": "https://www.investing.com/rates-bonds/india-5-year-bond-yield"
         },
         {
           "tenor": "6Y",
           "label": "India 6Y",
-          "yield": 6.585,
+          "yield": 6.577,
           "prev_close": 6.586,
-          "change_pct": -0.48,
+          "change_pct": -0.14,
           "years": 6.0,
           "chart_url": "https://www.investing.com/rates-bonds/india-6-year-bond-yield"
         },
         {
           "tenor": "7Y",
           "label": "India 7Y",
-          "yield": 6.647,
+          "yield": 6.637,
           "prev_close": 6.643,
-          "change_pct": -0.31,
+          "change_pct": -0.09,
           "years": 7.0,
           "chart_url": "https://www.investing.com/rates-bonds/india-7-year-bond-yield"
         },
         {
           "tenor": "8Y",
           "label": "India 8Y",
-          "yield": 6.818,
+          "yield": 6.714,
           "prev_close": 6.744,
-          "change_pct": 3.76,
+          "change_pct": -0.44,
           "years": 8.0,
           "chart_url": "https://www.investing.com/rates-bonds/india-8-year-bond-yield"
         },
         {
           "tenor": "9Y",
           "label": "India 9Y",
-          "yield": 6.775,
+          "yield": 6.756,
           "prev_close": 6.778,
-          "change_pct": -0.44,
+          "change_pct": -0.32,
           "years": 9.0,
           "chart_url": "https://www.investing.com/rates-bonds/india-9-year-bond-yield"
         },
         {
           "tenor": "10Y",
           "label": "India 10Y",
-          "yield": 6.775,
+          "yield": 6.752,
           "prev_close": 6.775,
-          "change_pct": -0.32,
+          "change_pct": -0.34,
           "years": 10.0,
           "chart_url": "https://www.investing.com/rates-bonds/india-10-year-bond-yield"
         },
         {
           "tenor": "11Y",
           "label": "India 11Y",
-          "yield": 6.808,
+          "yield": 6.797,
           "prev_close": 6.811,
-          "change_pct": -0.45,
+          "change_pct": -0.21,
           "years": 11.0,
           "chart_url": "https://www.investing.com/rates-bonds/india-11-year-bond-yield"
         },
@@ -233,7 +233,7 @@
           "label": "India 12Y",
           "yield": 6.838,
           "prev_close": 6.844,
-          "change_pct": -0.35,
+          "change_pct": -0.0,
           "years": 12.0,
           "chart_url": "https://www.investing.com/rates-bonds/india-12-year-bond-yield"
         },
@@ -242,7 +242,7 @@
           "label": "India 13Y",
           "yield": 7.025,
           "prev_close": 7.037,
-          "change_pct": 0.82,
+          "change_pct": 0.0,
           "years": 13.0,
           "chart_url": "https://www.investing.com/rates-bonds/india-13-year-bond-yield"
         },
@@ -251,7 +251,7 @@
           "label": "India 14Y",
           "yield": 6.901,
           "prev_close": 6.895,
-          "change_pct": -0.4,
+          "change_pct": -0.0,
           "years": 14.0,
           "chart_url": "https://www.investing.com/rates-bonds/india-14-year-bond-yield"
         },
@@ -260,43 +260,43 @@
           "label": "India 15Y",
           "yield": 6.997,
           "prev_close": 6.989,
-          "change_pct": -0.14,
+          "change_pct": -0.0,
           "years": 15.0,
           "chart_url": "https://www.investing.com/rates-bonds/india-15-year-bond-yield"
         },
         {
           "tenor": "19Y",
           "label": "India 19Y",
-          "yield": 7.336,
+          "yield": 7.335,
           "prev_close": 7.336,
-          "change_pct": 0.82,
+          "change_pct": -0.01,
           "years": 19.0,
           "chart_url": "https://www.investing.com/rates-bonds/india-19-year-bond-yield"
         },
         {
           "tenor": "24Y",
           "label": "India 24Y",
-          "yield": 7.462,
+          "yield": 7.461,
           "prev_close": 7.462,
-          "change_pct": 0.8,
+          "change_pct": -0.01,
           "years": 24.0,
           "chart_url": "https://www.investing.com/rates-bonds/india-24-year-bond-yield"
         },
         {
           "tenor": "30Y",
           "label": "India 30Y",
-          "yield": 7.381,
+          "yield": 7.38,
           "prev_close": 7.392,
-          "change_pct": -0.19,
+          "change_pct": -0.16,
           "years": 30.0,
           "chart_url": "https://www.investing.com/rates-bonds/india-30-year-bond-yield"
         },
         {
           "tenor": "40Y",
           "label": "India 40Y",
-          "yield": 7.481,
+          "yield": 7.475,
           "prev_close": 7.479,
-          "change_pct": -0.19,
+          "change_pct": -0.05,
           "years": 40.0,
           "chart_url": "https://www.investing.com/rates-bonds/india-40-year-bond-yield"
         }
