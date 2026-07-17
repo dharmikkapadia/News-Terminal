@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-07-17T15:46:40+05:30",
+  "captured_at": "2026-07-17T19:46:46+05:30",
   "source": "https://www.rbi.org.in/",
   "policy_rates": {
     "repo_rate": 5.25,
@@ -61,7 +61,7 @@
     "savings_deposit_rate": 2.5,
     "term_deposit_rate_gt_1yr": [
       6.0,
-      6.7
+      6.75
     ]
   },
   "market_trends": {
