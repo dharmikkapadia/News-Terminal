@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-07-18T04:01:23+05:30",
+  "captured_at": "2026-07-18T04:31:30+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…)",
   "commodities": [
@@ -39,9 +39,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
       "source": "Trading Economics · XAGUSD:CUR",
-      "price": 55.908,
+      "price": 55.9,
       "prev_close": 55.497,
-      "change_pct": 0.74,
+      "change_pct": 0.73,
       "currency": "USD",
       "as_of": "2026-07-17"
     },
