@@ -85,6 +85,25 @@ CACHE_TTL = max(REFRESH_SECONDS - 30, 15)  # just under the interval so each tic
 # SEBI item would be mislabeled ARCHIVE and vanish behind the "Show archive" toggle.
 _DATE_ONLY_SOURCES = {"SEBI - Public Issues"}
 
+# Source label -> source-tag CSS class (theme_css defines a colour per class, so
+# each source reads as visually distinct). Unknown/future sources fall back to
+# "press"'s colour rather than erroring.
+_SRC_CLASS = {
+    "RBI - Press Release": "press",
+    "RBI - Notifications": "notif",
+    "SEBI - Public Issues": "sebi",
+}
+
+# SEBI's listing gives only a headline + an optional raw related-document link
+# (no article body) — showing that as a text line under every card reads as
+# clutter, unlike RBI's real summaries, so SEBI items render with no body text
+# at all (the headline still links straight to the SEBI filing).
+_NO_BODY_SOURCES = {"SEBI - Public Issues"}
+
+
+def _src_class(src):
+    return _SRC_CLASS.get(src, "press")
+
 
 def _is_archived(it):
     """Archive-sourced (date-only, no precise time) iff its ts is midnight IST
@@ -125,9 +144,10 @@ def _story_card_html(it):
     else:
         when = html.escape(it.get("published") or "—")
     src = it.get("source") or ""
-    notif = "notif" if "Notification" in src else "press"
+    cls = _src_class(src)
     arch = " <span class='mw-tag'>ARCHIVE</span>" if archived else ""
-    summary = (it.get("summary") or "").strip()
+    no_body = src in _NO_BODY_SOURCES
+    summary = "" if no_body else (it.get("summary") or "").strip()
     preview = html.escape(summary[:340]) if summary else "<span class='mw-nosum'>Open for the full text →</span>"
     title = html.escape(it.get("title") or "(untitled)")
     link = it.get("link") or ""
@@ -140,12 +160,13 @@ def _story_card_html(it):
         open_link = f"<a class='mw-open' href='{href}' target='_blank' rel='noopener'>Open on {domain} ↗</a>"
     else:
         head, open_link = title, ""
+    sum_html = "" if no_body else f"<div class='mw-sum'>{preview}</div>"
     return (
         "<div class='mw-card'>"
-        f"<div class='mw-meta'><span class='mw-src {notif}'>{html.escape(src)}</span>"
+        f"<div class='mw-meta'><span class='mw-src {cls}'>{html.escape(src)}</span>"
         f"<span class='mw-time'>{when}{arch}</span></div>"
         f"<div class='mw-head'>{head}</div>"
-        f"<div class='mw-sum'>{preview}</div>"
+        f"{sum_html}"
         f"{open_link}"
         "</div>"
     )
@@ -181,7 +202,7 @@ def _stream_row_html(it):
     dt = datetime.fromtimestamp(ts, IST) if ts else None
     archived = _is_archived(it)
     src = it.get("source") or ""
-    notif = "notif" if "Notification" in src else "press"
+    cls = _src_class(src)
     arch = "<span class='mw-tag'>ARCHIVE</span>" if archived else ""
     title = html.escape(it.get("title") or "(untitled)")
     link = it.get("link") or ""
@@ -190,18 +211,21 @@ def _stream_row_html(it):
         head = f"<a class='mw-shead' href='{href}' target='_blank' rel='noopener'>{title}</a>"
     else:
         head = f"<span class='mw-shead'>{title}</span>"
-    text = (it.get("summary") or "").strip()
-    if not text:
-        body = "<div class='mw-sbody mw-sbody-plain'><span class='mw-nosum'>Open the headline for the full text.</span></div>"
-    elif len(text) > 240:                       # long: clamp to a preview + expand
-        body = ("<details class='mw-det'><summary>"
-                f"<span class='mw-sbody'>{html.escape(text)}</span>"
-                "<span class='mw-more'></span></summary></details>")
-    else:                                       # short: show it all, no toggle
-        body = f"<div class='mw-sbody mw-sbody-plain'>{html.escape(text)}</div>"
+    if src in _NO_BODY_SOURCES:
+        body = ""                                # no body text at all for this source
+    else:
+        text = (it.get("summary") or "").strip()
+        if not text:
+            body = "<div class='mw-sbody mw-sbody-plain'><span class='mw-nosum'>Open the headline for the full text.</span></div>"
+        elif len(text) > 240:                    # long: clamp to a preview + expand
+            body = ("<details class='mw-det'><summary>"
+                    f"<span class='mw-sbody'>{html.escape(text)}</span>"
+                    "<span class='mw-more'></span></summary></details>")
+        else:                                     # short: show it all, no toggle
+            body = f"<div class='mw-sbody mw-sbody-plain'>{html.escape(text)}</div>"
     return (
         "<div class='mw-stream'>"
-        f"<div class='mw-srow'>{head}<span class='mw-stags'><span class='mw-src {notif}'>{html.escape(src)}</span>{arch}</span></div>"
+        f"<div class='mw-srow'>{head}<span class='mw-stags'><span class='mw-src {cls}'>{html.escape(src)}</span>{arch}</span></div>"
         f"{body}"
         f"<div class='mw-sfoot'><span class='mw-time'>{_relative_time(ts)}</span></div>"
         "</div>"
@@ -553,7 +577,8 @@ def _commodities_dashboard_html(snap):
 # (headlines, body, timestamps, captions, inputs, links) stays legible.
 #   bg=page  panel=cards/inputs/sidebar  text=body  heading=headlines
 #   muted=timestamps/captions  accent=primary brand (Press tag, hover, focus)
-#   accent2=secondary (Notifications tag)  link=hyperlinks  border=hairlines
+#   accent2=secondary (Notifications tag)  accent3=tertiary (SEBI tag, and any
+#   future source)  link=hyperlinks  border=hairlines
 #   shadow=card hover glow (rgba)  headfont=masthead/headline font stack
 #   scroll_up/scroll_down/scroll_idle=market-ticker scrollbar tape colours
 #   (default to up/down/muted; see _scroll_ticker_html).
@@ -563,9 +588,10 @@ _MONO = "'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace"
 # `up`/`down` = gain/loss greens & reds for the rates dashboard.
 THEMES = {
     # Trading Economics-inspired: soft-grey page, white cards, navy headlines,
-    # signal blue/green accents, crisp sans (no serif) — a markets-data look.
+    # signal blue/green/violet accents, crisp sans (no serif) — a markets-data look.
     "Trading Economics": dict(bg="#EEF2F6", panel="#FFFFFF", text="#1C2A38", heading="#14304F",
-                              muted="#6A7889", accent="#0E72BC", accent2="#13A36B", link="#0E72BC",
+                              muted="#6A7889", accent="#0E72BC", accent2="#13A36B", accent3="#7C4DCC",
+                              link="#0E72BC",
                               border="#DCE3EB", shadow="rgba(16,48,90,.12)", headfont=_SANS,
                               up="#13A36B", down="#D64550",
                               # Scroll tape uses a brighter green/red (idle = a neutral
@@ -694,6 +720,7 @@ def theme_css(p):
       .mw-src {{ font-size: 10px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase;
         padding: 3px 8px; border-radius: 3px; color: {_src_lbl}; background: {p['accent']}; white-space: nowrap; }}
       .mw-src.notif {{ background: {p['accent2']}; }}
+      .mw-src.sebi {{ background: {p['accent3']}; }}
       .mw-time {{ font-size: 11px; color: {p['muted']}; letter-spacing: .02em; margin-left: auto; text-align: right; }}
       .mw-head {{ font-family: {p['headfont']}; font-weight: 700; font-size: 17px;
         line-height: 1.24; color: {p['heading']}; margin: 0 0 8px; }}
