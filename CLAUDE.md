@@ -1,11 +1,13 @@
 # MarketWire — project notes for Claude
 
-A Streamlit reader for **RBI Press Releases** and **RBI Notifications**
-(`streamlit_app.py`): fetches both RSS feeds server-side and shows them **together**
+A Streamlit reader for **RBI Press Releases**, **RBI Notifications**, and **SEBI
+Public Issues** (`streamlit_app.py`): fetches the two RBI RSS feeds plus SEBI's
+Public Issues (DRHP filings) listing server-side and shows them **together**
 in one wire with a keyword filter, a **sort order** toggle (newest/oldest first), an
 opt-in **date-range** filter, and a sidebar **Sources** multiselect (show all feeds
 or pick individually), each item tagged with its source
-(`RBI - Press Release` / `RBI - Notifications`), plus a theme picker. The UI is laid
+(`RBI - Press Release` / `RBI - Notifications` / `SEBI - Public Issues`), plus a
+theme picker. The UI is laid
 out like a news website with a sidebar **Layout** toggle: **Stream** (default — a
 single-column feed à la Trading Economics: underlined headline, right-aligned source
 tags, clamped body with an inline `<details>` Show more/less toggle, relative
@@ -38,12 +40,16 @@ scrapes **Trading Economics' server-rendered commodities table** (primary — al
 TE's own % change) and falls back to **Yahoo Finance's keyless chart endpoint** if TE is blocked or
 drops a symbol; **Steel** is pinned to Yahoo (USD HRC, since TE steel is CNY rebar). Durable history accumulates per feed
 via `store.py` (SQLite/Postgres/Turso — one table per feed) **and** in-repo
-`data/history.jsonl` (press releases) + `data/notifications.jsonl` (notifications),
-both maintained by a scheduled GitHub Action running `poll.py` (every 30 min).
+`data/history.jsonl` (press releases) + `data/notifications.jsonl` (notifications)
++ `data/sebi_public_issues.jsonl` (SEBI), all maintained by a scheduled GitHub
+Action running `poll.py` (every 30 min).
 `rbi_archive.py` backfills older items from RBI's listing/detail pages (parameterized
 per feed by the detail-link match); `feed.py` is the shared RSS parser. Press
 releases are keyed by `prid`, notifications by `Id`; the feeds are stored separately
-so the ids never collide.
+so the ids never collide. **SEBI has no RSS and no backfill** — `sebi.py` scrapes
+its Public Issues listing page directly (see the Gotchas entry below); since its
+detail-page URLs carry no `prid=`/`Id=` query param, `store.py`/`history.py` key
+SEBI items on the link itself (unique + permanent, so this is safe).
 
 ## Workflow
 
@@ -54,10 +60,34 @@ so the ids never collide.
 
 ## Gotchas
 
-- Government feed hosts (`rbi.org.in`, etc.) **403 datacenter IPs**, so the live
-  feed is unreachable from cloud sandboxes / CI — it works from a real desk/VM.
+- Government feed hosts (`rbi.org.in`, `sebi.gov.in`, etc.) **403 datacenter IPs**,
+  so the live feed is unreachable from cloud sandboxes / CI — it works from a real
+  desk/VM.
 - To preview/test locally without the live feed, set the `MARKETWIRE_FEED` env
   var to a local RSS URL (e.g. a `python -m http.server` serving a sample file).
+- **SEBI Public Issues** (`sebi.py` → `data/sebi_public_issues.jsonl`, source tag
+  `SEBI - Public Issues`) has **no RSS**: SEBI's site-wide `sebirss.xml` (linked
+  from `/rss.html`) only carries Enforcement/Legal items, nothing from the Filings
+  module. `sebi.fetch_listing()` scrapes the listing page
+  (`HomeAction.do?doListing=yes&sid=3&ssid=15&smid=10` — `sid`=Filings, `ssid`=15
+  Public Issues, `smid`=10 Draft Offer Documents/DRHPs; other Filings subsections
+  use different `ssid`/`smid` pairs, same row markup) — page 1 only (~25 newest
+  rows), no pagination/backfill yet. Its row markup nests a SECOND `<a>` (a related
+  PDF link, usually an abridged prospectus) inside the detail-page `<a>`'s own
+  content, unescaped — `sebi._row_item()` walks only the outer `<a>`'s direct-child
+  text for the headline so the nested anchor's text doesn't leak in, and turns that
+  nested link into a "Related document" note in `summary`. Wired into `poll.py`
+  (`fetch_fn` on its `FEEDS` entry, `listing_url: None` since it has no archive
+  source) and `streamlit_app.py` (`scrape=True` on its `FEEDS` entry, fetched via
+  `fetch_sebi_listing()` instead of the RSS-based `fetch_feed()`). SEBI's date-only
+  listing (no time) means every SEBI item's `ts` is midnight IST — `_is_archived()`
+  special-cases `SEBI - Public Issues` in `_DATE_ONLY_SOURCES` so fresh SEBI items
+  aren't mislabeled `ARCHIVE`/hidden by the "Show archive" toggle (that badge means
+  "backfilled from an RBI listing" for RBI, not "this source never has a time").
+  Was written without live SEBI access — the row parser is unit-tested against a
+  literal HTML sample built from a Claude-for-Chrome capture of the real markup;
+  validate `sebi.py` itself from a host that can reach sebi.gov.in, like
+  `rbi_archive.py`.
 - Themes are injected CSS keyed by palette (`theme_css`). Streamlit **portals
   overlays** (selectbox/multiselect dropdowns, help `?` tooltips, popovers, the
   **date-picker calendar**) outside `.stApp`, so `.stApp`-scoped rules miss them and

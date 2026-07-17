@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
-"""poll.py — fetch RBI (RSS + optional archive) and merge into the repo history.
+"""poll.py — fetch every wire feed and merge into the repo history.
 
 Run by the GitHub Action (.github/workflows/history.yml) on a schedule, or by hand:
 
     python poll.py
 
-It polls BOTH RBI feeds — Press Releases (data/history.jsonl) and Notifications
-(data/notifications.jsonl) — reading the existing history, fetching the RSS feed
-(and any archive listing URLs), merging + deduping, and rewriting each file. The
-Action then commits the files so durable history lives in the repo — no external
-database.
+It polls each feed in FEEDS — the two RBI feeds (RSS + optional archive listing)
+and SEBI's Public Issues listing (scraped; no RSS exists for it) — reading the
+existing history, fetching what's new, merging + deduping, and rewriting each
+feed's JSONL file (data/history.jsonl, data/notifications.jsonl,
+data/sebi_public_issues.jsonl). The Action then commits the files so durable
+history lives in the repo — no external database.
 """
 
 import os
@@ -21,14 +22,18 @@ import feed
 import history
 import rates
 import rbi_archive
+import sebi
 import symbols
 
-# Each feed: how to fetch it (RSS), where to store it (JSONL), and how to backfill
-# older items (listing URL + the href substring that marks a detail link). Env vars
-# let a deploy override the feed/listing URLs without code changes.
+# Each feed: how to fetch it, where to store it (JSONL), and how to backfill older
+# items (listing URL + the href substring that marks a detail link). Env vars let a
+# deploy override the feed/listing URLs without code changes. `fetch_fn` defaults to
+# feed.fetch_rss (a real RSS feed); a feed with no RSS (SEBI) sets it to a scraper
+# with the same (items, error) signature instead. `listing_url` is None for feeds
+# with no separate archive-backfill source yet (the fetch above is all they get).
 FEEDS = [
     {
-        "label": "press releases",
+        "label": "RBI press releases",
         "feed_url": os.environ.get("MARKETWIRE_FEED", feed.RBI_FEED),
         "history_path": history.HISTORY_PATH,
         "listing_url": rbi_archive.LISTING_URL,
@@ -37,7 +42,7 @@ FEEDS = [
         "follow_year_archives": False,
     },
     {
-        "label": "notifications",
+        "label": "RBI notifications",
         "feed_url": os.environ.get("MARKETWIRE_NOTIFICATIONS_FEED", feed.RBI_NOTIFICATIONS_FEED),
         "history_path": history.NOTIFICATIONS_PATH,
         "listing_url": rbi_archive.NOTIFICATIONS_LISTING_URL,
@@ -46,6 +51,15 @@ FEEDS = [
         # Walk notifications back through earlier years via the listing's per-year
         # navigation links, not just the latest page.
         "follow_year_archives": True,
+    },
+    {
+        "label": "SEBI public issues",
+        "feed_url": os.environ.get("MARKETWIRE_SEBI_PUBLIC_ISSUES_URL", sebi.LISTING_URL),
+        "history_path": history.SEBI_PUBLIC_ISSUES_PATH,
+        "fetch_fn": sebi.fetch_listing,
+        # No RSS and no separate archive listing yet — each poll just reads the
+        # listing's first page (~25 newest rows), same as a live RSS feed.
+        "listing_url": None,
     },
 ]
 
@@ -58,51 +72,54 @@ def _annotate(level, title, msg):
 
 
 def poll_feed(cfg):
-    """Poll one feed (RSS + archive) and rewrite its history file. Returns the
-    stored item count (0 means we have nothing at all for this feed)."""
+    """Poll one feed (its fetch_fn, plus an archive listing if it has one) and
+    rewrite its history file. Returns the stored item count (0 means we have
+    nothing at all for this feed)."""
     label = cfg["label"]
     existing = history.load_file(cfg["history_path"])
 
-    rss, err = feed.fetch_rss(cfg["feed_url"])
+    fetch_fn = cfg.get("fetch_fn", feed.fetch_rss)
+    rss, err = fetch_fn(cfg["feed_url"])
     if err:
-        _annotate("warning", f"RBI {label} fetch failed", err)
+        _annotate("warning", f"{label} fetch failed", err)
 
-    arch = []
-    # Note: an unset GitHub repo variable injects an EMPTY env var, so use `or`
-    # (not the get() default) to fall back to the listing URL.
-    archive_env = os.environ.get(cfg["archive_env"], "").strip() or cfg["listing_url"]
-    archive_urls = [u.strip() for u in archive_env.split(",") if u.strip()]
-    for url in archive_urls:
-        got, aerr = rbi_archive.scrape_listing(
-            url, href_match=cfg["href_match"],
-            follow_year_archives=cfg.get("follow_year_archives", False))
-        if aerr:
-            _annotate("warning", f"{label} archive fetch failed", f"{url}: {aerr}")
-        arch += got
-    raw_archive = len(arch)
+    arch, raw_archive, enriched = [], 0, 0
+    if cfg.get("listing_url"):
+        # Note: an unset GitHub repo variable injects an EMPTY env var, so use `or`
+        # (not the get() default) to fall back to the listing URL.
+        archive_env = os.environ.get(cfg["archive_env"], "").strip() or cfg["listing_url"]
+        archive_urls = [u.strip() for u in archive_env.split(",") if u.strip()]
+        for url in archive_urls:
+            got, aerr = rbi_archive.scrape_listing(
+                url, href_match=cfg["href_match"],
+                follow_year_archives=cfg.get("follow_year_archives", False))
+            if aerr:
+                _annotate("warning", f"{label} archive fetch failed", f"{url}: {aerr}")
+            arch += got
+        raw_archive = len(arch)
 
-    # Enrich archive stubs (the listing has title+date+link only) with the full
-    # body from each detail page — only for items we don't already have full text
-    # for, capped per run to bound requests. RBI's detail page exposes no time, so
-    # enriched items keep a date-only (midnight) timestamp.
-    have_full = {history._key(it) for it in existing + rss if (it.get("summary") or "").strip()}
-    cap = int(os.environ.get("MARKETWIRE_ENRICH_LIMIT", "120"))
-    enriched = 0
-    for a in arch:
-        if enriched >= cap:
-            break
-        if (a.get("summary") or "").strip() or history._key(a) in have_full:
-            continue
-        det = rbi_archive.fetch_detail(a["link"], a.get("title", ""))
-        if det and det.get("summary"):
-            a["summary"] = det["summary"]
-            if det.get("ts") is not None:
-                a["ts"] = det["ts"]
-            if det.get("published"):
-                a["published"] = det["published"]
-            enriched += 1
+        # Enrich archive stubs (the listing has title+date+link only) with the full
+        # body from each detail page — only for items we don't already have full text
+        # for, capped per run to bound requests. RBI's detail page exposes no time, so
+        # enriched items keep a date-only (midnight) timestamp.
+        have_full = {history._key(it) for it in existing + rss if (it.get("summary") or "").strip()}
+        cap = int(os.environ.get("MARKETWIRE_ENRICH_LIMIT", "120"))
+        for a in arch:
+            if enriched >= cap:
+                break
+            if (a.get("summary") or "").strip() or history._key(a) in have_full:
+                continue
+            det = rbi_archive.fetch_detail(a["link"], a.get("title", ""))
+            if det and det.get("summary"):
+                a["summary"] = det["summary"]
+                if det.get("ts") is not None:
+                    a["ts"] = det["ts"]
+                if det.get("published"):
+                    a["published"] = det["published"]
+                enriched += 1
 
-    arch = [a for a in arch if (a.get("summary") or "").strip()]  # store only full (enriched) archive items
+        arch = [a for a in arch if (a.get("summary") or "").strip()]  # store only full (enriched) archive items
+
     before = len(existing)
     merged = history.dedupe(existing + rss + arch)
     history.save_file(merged, cfg["history_path"])

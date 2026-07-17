@@ -1,7 +1,9 @@
 name: MarketWire history
 
-# Keeps durable RBI history IN THE REPO: fetches both feeds (Press Releases +
-# Notifications) on a schedule and commits data/history.jsonl + data/notifications.jsonl.
+# Keeps durable wire history IN THE REPO: fetches the RBI feeds (Press Releases +
+# Notifications) plus SEBI's Public Issues listing (scraped; no RSS exists for it) on
+# a schedule and commits data/history.jsonl + data/notifications.jsonl +
+# data/sebi_public_issues.jsonl.
 # The same run also refreshes three intraday overlays inside data/rates.json / commodities.json:
 # the commodity-price snapshot (data/commodities.json), the Trading-Economics FX overlay
 # (USD/EUR/GBP-INR) AND the India government-bond yield curve (market_trends.bonds, scraped from
@@ -54,7 +56,7 @@ jobs:
           pip install feedparser requests beautifulsoup4 "scrapling[fetchers]"
           scrapling install
 
-      - name: Fetch RBI and update history (+ commodities / FX / investing.com bonds)
+      - name: Fetch RBI + SEBI and update history (+ commodities / FX / investing.com bonds)
         env:
           # Optional: set these repo variables to also backfill older items from
           # RBI's listing page(s) for each feed.
@@ -84,11 +86,11 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/history.jsonl data/notifications.jsonl data/commodities.json data/rates.json data/nse_symbols.json
+          git add data/history.jsonl data/notifications.jsonl data/sebi_public_issues.jsonl data/commodities.json data/rates.json data/nse_symbols.json
           if git diff --cached --quiet; then
             echo "No data changes."
           else
-            git commit -m "data: update history + commodities + fx + bonds + symbols $(date -u +%FT%TZ)"
+            git commit -m "data: update history + sebi + commodities + fx + bonds + symbols $(date -u +%FT%TZ)"
             # main has other writers (the rates workflows, branch merges) and this job's
             # checkout->push window is ~15 min (Scrapling install + bonds render), so a bare
             # push loses the race every few days. Rebase onto the remote and retry; -X theirs
