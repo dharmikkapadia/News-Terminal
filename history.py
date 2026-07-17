@@ -24,6 +24,10 @@ NOTIFICATIONS_PATH = os.environ.get(
     "MARKETWIRE_NOTIFICATIONS_FILE",
     os.path.join(_DATA_DIR, "notifications.jsonl"),
 )
+SEBI_PUBLIC_ISSUES_PATH = os.environ.get(
+    "MARKETWIRE_SEBI_PUBLIC_ISSUES_FILE",
+    os.path.join(_DATA_DIR, "sebi_public_issues.jsonl"),
+)
 UA = "Mozilla/5.0 (compatible; MarketWire/1.0; RSS reader)"
 _FIELDS = ("link", "title", "summary", "published", "ts")
 

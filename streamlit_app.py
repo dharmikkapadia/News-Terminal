@@ -1,9 +1,10 @@
-"""MarketWire — an RBI press-release & notifications reader.
+"""MarketWire — an RBI + SEBI regulatory-wire reader.
 
-A Streamlit app that fetches the RBI Press Releases + Notifications RSS feeds
-server-side (browsers can't read most RSS directly because of CORS), remembers
-items in a small SQLite store so the wire accumulates over time, and presents them
-as a news website: a newspaper masthead over a uniform grid of story cards, with
+A Streamlit app that fetches RBI's Press Releases + Notifications RSS feeds and
+SEBI's Public Issues (DRHP) listing server-side (browsers can't read most RSS
+directly because of CORS, and SEBI's listing has no RSS at all), remembers items
+in a small SQLite store so the wire accumulates over time, and presents them as a
+news website: a newspaper masthead over a uniform grid of story cards, with
 subtle fade-in/hover motion and a summary preview that expands to the full text.
 
 Look & feel: a single Trading Economics palette (soft-grey page, white cards,
@@ -17,6 +18,7 @@ import html
 import os
 import re
 from datetime import datetime, timezone, timedelta
+from urllib.parse import urlparse
 
 import streamlit as st
 import streamlit.components.v1 as components
@@ -35,12 +37,14 @@ import commodities  # free commodity-price snapshot (data/commodities.json) for 
 import feed         # pure RSS fetch/parse (shared with the poller)
 import history      # durable history kept as JSONL in the repo (maintained by the Action)
 import rates        # RBI Current Rates snapshot (data/rates.json) for the dashboard
+import sebi         # SEBI Public Issues listing scraper (no RSS exists for it)
 import store        # durable history backend (sqlite / Postgres / Turso)
 
-# The two RBI feeds the app reads — both are shown together in one wire, each item
-# tagged with its source `label`. Each carries its own live RSS URL, durable store
-# category, and committed history file. Override any URL via env (mirror/cache or
-# local testing) without code changes.
+# The feeds the app reads — all shown together in one wire, each item tagged with
+# its source `label`. Each carries its own live URL, durable store category, and
+# committed history file. Override any URL via env (mirror/cache or local testing)
+# without code changes. `scrape=True` feeds (SEBI — no RSS available) are fetched
+# via fetch_sebi_listing() instead of the RSS-based fetch_feed().
 FEEDS = {
     "press": dict(
         name="Press Releases",            # friendly name shown in the Sources filter
@@ -58,6 +62,15 @@ FEEDS = {
         history_path=history.NOTIFICATIONS_PATH,
         label="RBI - Notifications",
     ),
+    "sebi_public_issues": dict(
+        name="SEBI Public Issues",
+        url=os.environ.get("MARKETWIRE_SEBI_PUBLIC_ISSUES_URL", sebi.LISTING_URL),
+        category="sebi_public_issues",
+        history_url_env="MARKETWIRE_SEBI_PUBLIC_ISSUES_HISTORY_URL",
+        history_path=history.SEBI_PUBLIC_ISSUES_PATH,
+        label="SEBI - Public Issues",
+        scrape=True,
+    ),
 }
 FEED_NAMES = [cfg["name"] for cfg in FEEDS.values()]
 IST = timezone(timedelta(hours=5, minutes=30))
@@ -66,8 +79,19 @@ REFRESH_SECONDS = int(os.environ.get("MARKETWIRE_REFRESH", "300"))
 CACHE_TTL = max(REFRESH_SECONDS - 30, 15)  # just under the interval so each tick re-fetches
 
 
+# Sources whose LIVE data is inherently date-only (the site never exposes a
+# time), unlike RBI's RSS feeds where a midnight timestamp specifically means
+# "backfilled from the listing, not the live feed". Without this, every fresh
+# SEBI item would be mislabeled ARCHIVE and vanish behind the "Show archive" toggle.
+_DATE_ONLY_SOURCES = {"SEBI - Public Issues"}
+
+
 def _is_archived(it):
-    """Archive-sourced (date-only, no precise time) iff its ts is midnight IST."""
+    """Archive-sourced (date-only, no precise time) iff its ts is midnight IST
+    AND it's from a source where that actually means "backfilled" rather than
+    just "this source never has a time"."""
+    if it.get("source") in _DATE_ONLY_SOURCES:
+        return False
     ts = it.get("ts")
     if not ts:
         return False
@@ -80,9 +104,9 @@ def _masthead_html():
     today = datetime.now(IST).strftime("%A, %d %B %Y")
     return (
         "<div class='mw-masthead'>"
-        f"<div class='mw-kicker'><span>Reserve Bank of India · Wire</span><span>{today} · IST</span></div>"
+        f"<div class='mw-kicker'><span>RBI · SEBI · Wire</span><span>{today} · IST</span></div>"
         "<div class='mw-wordmark'>MarketWire</div>"
-        "<div class='mw-sub'>Press Releases &amp; Notifications</div>"
+        "<div class='mw-sub'>Press Releases, Notifications &amp; Filings</div>"
         "<div class='mw-rule'></div><div class='mw-rule-thin'></div>"
         "</div>"
     )
@@ -93,7 +117,7 @@ def _story_card_html(it):
     CSS-clamped summary preview. The full body lives in the expander beside it."""
     ts = it.get("ts")
     dt = datetime.fromtimestamp(ts, IST) if ts else None
-    archived = dt is not None and not (dt.hour or dt.minute or dt.second)
+    archived = _is_archived(it)
     if dt and not archived:
         when = dt.strftime("%d %b %Y · %H:%M IST")      # real time (live RSS)
     elif dt:
@@ -107,12 +131,13 @@ def _story_card_html(it):
     preview = html.escape(summary[:340]) if summary else "<span class='mw-nosum'>Open for the full text →</span>"
     title = html.escape(it.get("title") or "(untitled)")
     link = it.get("link") or ""
-    # Linkify the headline + show an explicit 'open' link, so the RBI page is one
+    # Linkify the headline + show an explicit 'open' link, so the source page is one
     # click away without expanding. Only for real http links (archive stubs may lack one).
     if link.startswith("http"):
         href = html.escape(link, quote=True)
+        domain = html.escape(urlparse(link).netloc or "source")
         head = f"<a href='{href}' target='_blank' rel='noopener'>{title}</a>"
-        open_link = f"<a class='mw-open' href='{href}' target='_blank' rel='noopener'>Open on rbi.org.in ↗</a>"
+        open_link = f"<a class='mw-open' href='{href}' target='_blank' rel='noopener'>Open on {domain} ↗</a>"
     else:
         head, open_link = title, ""
     return (
@@ -154,7 +179,7 @@ def _stream_row_html(it):
     Show less toggle (pure <details>) when long; then a relative timestamp."""
     ts = it.get("ts")
     dt = datetime.fromtimestamp(ts, IST) if ts else None
-    archived = dt is not None and not (dt.hour or dt.minute or dt.second)
+    archived = _is_archived(it)
     src = it.get("source") or ""
     notif = "notif" if "Notification" in src else "press"
     arch = "<span class='mw-tag'>ARCHIVE</span>" if archived else ""
@@ -555,6 +580,13 @@ def fetch_feed(url):
     return feed.fetch_rss(url)
 
 
+@st.cache_data(ttl=CACHE_TTL, show_spinner=False)
+def fetch_sebi_listing(url):
+    """Cached wrapper around sebi.fetch_listing (SEBI has no RSS to read for this
+    listing, so it's scraped instead). Returns (items, error)."""
+    return sebi.fetch_listing(url)
+
+
 @st.cache_data(ttl=600, show_spinner=False)
 def load_history(url_env, default_path):
     """Durable history from the repo for one feed: the committed JSONL, or a raw URL
@@ -906,7 +938,7 @@ def _scroll_ticker_html(p):
     return js
 
 
-st.set_page_config(page_title="MarketWire · RBI", page_icon="◢", layout="wide")
+st.set_page_config(page_title="MarketWire · RBI + SEBI", page_icon="◢", layout="wide")
 store.init_db()
 
 # --- theme --------------------------------------------------------------------
@@ -928,7 +960,7 @@ with st.sidebar:
     st.markdown("### ◢ MarketWire")
     sources = st.multiselect(
         "Sources", FEED_NAMES, key="sources",
-        help="Which RBI feeds to show — keep all selected, or pick one/some individually.",
+        help="Which feeds to show — keep all selected, or pick one/some individually.",
     )
     layout = st.radio(
         "Layout", LAYOUTS, key="layout", horizontal=True,
@@ -998,7 +1030,8 @@ def wire():
         return
     items, new_count, errors = [], 0, []
     for cfg in active:
-        rss_items, error = fetch_feed(cfg["url"])
+        fetch = fetch_sebi_listing if cfg.get("scrape") else fetch_feed
+        rss_items, error = fetch(cfg["url"])
         if error:
             errors.append(error)
         new_count += store.upsert(rss_items or [], category=cfg["category"])  # accumulate live RSS in the DB
@@ -1097,7 +1130,8 @@ def wire():
                         st.markdown(_story_card_html(it), unsafe_allow_html=True)
                         with st.expander("Full text"):
                             body = (it.get("summary") or "").strip()
-                            st.write(body or "(full text not stored yet — use the link above to open it on rbi.org.in)")
+                            domain = urlparse(it.get("link") or "").netloc or "the source"
+                            st.write(body or f"(full text not stored yet — use the link above to open it on {domain})")
     else:
         st.markdown(_stream_html(visible), unsafe_allow_html=True)
 

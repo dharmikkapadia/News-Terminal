@@ -27,7 +27,8 @@ import time
 # One table per feed so press-release `prid`s and notification `Id`s can't
 # collide on the key. category -> table name (the only values ever interpolated
 # into SQL — never raw user input).
-_TABLES = {"press": "articles", "notifications": "notifications"}
+_TABLES = {"press": "articles", "notifications": "notifications",
+           "sebi_public_issues": "sebi_public_issues"}
 
 _CREATE = """CREATE TABLE IF NOT EXISTS {table} (
     key        TEXT PRIMARY KEY,
