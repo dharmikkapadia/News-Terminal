@@ -47,7 +47,7 @@
         "source": "Trading Economics · GBPINR:CUR"
       }
     },
-    "fx_te_captured_at": "2026-07-18T19:10:59+05:30"
+    "fx_te_captured_at": "2026-07-18T19:31:34+05:30"
   },
   "lending_deposit_rates": {
     "base_rate": [
@@ -108,7 +108,7 @@
     "bonds": {
       "source": "investing.com",
       "board_url": "https://www.investing.com/rates-bonds/india-government-bonds",
-      "as_of": "2026-07-18T19:11:41+05:30",
+      "as_of": "2026-07-18T19:31:53+05:30",
       "benchmark_tenor": "10Y",
       "curve": [
         {
