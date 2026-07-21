@@ -23,7 +23,6 @@ import history
 import rates
 import rbi_archive
 import sebi
-import symbols
 
 # Each feed: how to fetch it, where to store it (JSONL), and how to backfill older
 # items (listing URL + the href substring that marks a detail link). Env vars let a
@@ -161,15 +160,6 @@ def main():
         print(f"[poll:bonds] {bonds.poll_bonds()}")
     except Exception as ex:                       # defensive — poll_bonds swallows errors
         _annotate("warning", "bond refresh failed", ex)
-    # Refresh the NSE symbol↔name map (data/nse_symbols.json) from EQUITY_L.csv (+ SME) so
-    # newly-listed companies resolve + appear in the watchlist picker. Self-gated to a weekly
-    # cadence via a refreshed_at stamp INSIDE the file (checkout-proof — file mtime resets on
-    # every CI checkout), writes only on a sane parse, preserves the committed map on failure,
-    # and never raises. Needs only `requests` (already installed).
-    try:
-        print(f"[poll:symbols] {symbols.refresh_symbols()}")
-    except Exception as ex:                       # defensive — refresh_symbols swallows errors
-        _annotate("warning", "symbols refresh failed", ex)
     # NOTE: the rest of the Current Rates snapshot (data/rates.json) — policy/reserve/lending
     # rates, market trends, MPC — is refreshed on its OWN cadence, once a day at 1:30pm IST
     # (after RBI's 1pm FX update) by .github/workflows/rates.yml (python rates.py) — not here.

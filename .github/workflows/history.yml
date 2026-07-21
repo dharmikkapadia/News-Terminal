@@ -110,11 +110,11 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/history.jsonl data/notifications.jsonl data/sebi_public_issues.jsonl data/commodities.json data/rates.json data/nse_symbols.json
+          git add data/history.jsonl data/notifications.jsonl data/sebi_public_issues.jsonl data/commodities.json data/rates.json
           if git diff --cached --quiet; then
             echo "No data changes."
           else
-            git commit -m "data: update history + sebi + commodities + fx + bonds + symbols $(date -u +%FT%TZ)"
+            git commit -m "data: update history + sebi + commodities + fx + bonds $(date -u +%FT%TZ)"
             # main has other writers (the rates workflows, branch merges) and this job's
             # checkout->push window spans the whole poll (minutes, more on the schedule
             # runs that render bonds), so a bare push can lose the race. Rebase and retry; -X theirs
