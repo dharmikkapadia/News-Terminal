@@ -15,39 +15,39 @@
   "exchange_rates": {
     "as_of": "As at 1.00pm of July 21, 2026",
     "source": "FBIL",
-    "inr_per_usd": 96.352,
-    "inr_per_gbp": 129.192,
-    "inr_per_eur": 110.029,
+    "inr_per_usd": 96.365,
+    "inr_per_gbp": 129.165,
+    "inr_per_eur": 110.0448,
     "inr_per_100_jpy": 59.23,
     "inr_per_aed": 26.2068,
     "inr_per_10000_idr": 53.7958,
     "fx_te": {
       "inr_per_usd": {
         "label": "USD/INR",
-        "prev_close": 96.2159,
-        "change_pct": -0.14,
+        "prev_close": 96.2419,
+        "change_pct": -0.13,
         "chart_url": "https://tradingeconomics.com/currencies?quote=inr",
         "as_of": "2026-07-21",
         "source": "Trading Economics · USDINR:CUR"
       },
       "inr_per_eur": {
         "label": "EUR/INR",
-        "prev_close": 109.9255,
-        "change_pct": -0.09,
+        "prev_close": 109.9572,
+        "change_pct": -0.08,
         "chart_url": "https://tradingeconomics.com/currencies?quote=inr",
         "as_of": "2026-07-21",
         "source": "Trading Economics · EURINR:CUR"
       },
       "inr_per_gbp": {
         "label": "GBP/INR",
-        "prev_close": 128.787,
-        "change_pct": -0.31,
+        "prev_close": 128.733,
+        "change_pct": -0.33,
         "chart_url": "https://tradingeconomics.com/currencies?quote=inr",
         "as_of": "2026-07-21",
         "source": "Trading Economics · GBPINR:CUR"
       }
     },
-    "fx_te_captured_at": "2026-07-21T17:31:23+05:30"
+    "fx_te_captured_at": "2026-07-21T18:01:32+05:30"
   },
   "lending_deposit_rates": {
     "base_rate": [
