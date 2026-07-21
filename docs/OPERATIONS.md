@@ -217,6 +217,33 @@ way as the rates snapshot:
   Yahoo 403s some datacenter IPs). Note: committing on each price tick means more frequent commits
   during market hours (each a brief Streamlit Cloud redeploy) — the trade-off for fresher prices.
 
+### Economic Calendar (India macro releases)
+
+Below the commodities strip, an opt-in **Economic Calendar** (sidebar **Show economic
+calendar**) shows India's macro release schedule: a signal strip of the next key events
+(with consensus + importance stars) over an expandable full table — upcoming releases plus
+the past week's **actuals coloured vs consensus** (▲ above / ▼ below — direction only, not
+a judgement).
+
+It reads a committed **`data/calendar.json`** (`econ_calendar.py` — not `calendar.py`,
+which would shadow the stdlib module), refreshed on the same 30-min poller as history so
+released actuals land promptly:
+- **Source:** Trading Economics' server-rendered India calendar
+  (`tradingeconomics.com/india/calendar`) — per-day date headers over `tr[data-url]` event
+  rows with `actual`/`previous`/`consensus`/`forecast` spans and a `data-importance`
+  rating. Override the URL via `MARKETWIRE_TE_CALENDAR`, the file path via
+  `MARKETWIRE_CALENDAR_FILE`, or point the app at a raw URL via `MARKETWIRE_CALENDAR_URL`.
+- **Accumulate + merge:** TE serves a rolling window, so each poll merges what it sees
+  onto the committed events by id — new events are added, released actuals fill in, and
+  events that rolled out of TE's window are kept until pruned (~14 days back / ~180 days
+  ahead). The snapshot therefore builds the forward schedule over time.
+- **Guarded:** the file is rewritten only on a sane parse (≥3 dated rows); a blocked or
+  changed page keeps the committed snapshot. Times are stored exactly as TE prints them
+  (TE localizes per-visitor, so no timezone is claimed). The seed ships with an empty
+  `events` list — the app hides the section until the first scrape lands (or trigger
+  `history.yml` via workflow_dispatch). For markup diagnosis, schedule runs upload the
+  fetched HTML as the `calendar-fetch-dump` artifact (`MARKETWIRE_CALENDAR_DUMP`).
+
 ### Look & feel
 
 The app is laid out like a news website — a newspaper **masthead**
