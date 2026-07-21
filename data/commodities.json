@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-07-22T02:48:36+05:30",
+  "captured_at": "2026-07-22T03:00:42+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…)",
   "commodities": [
@@ -25,9 +25,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Trading Economics · XAUUSD:CUR",
-      "price": 4077.17,
+      "price": 4077.72,
       "prev_close": 4008.04,
-      "change_pct": 1.72,
+      "change_pct": 1.74,
       "currency": "USD",
       "as_of": "2026-07-21"
     },
