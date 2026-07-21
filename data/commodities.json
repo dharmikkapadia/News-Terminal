@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-07-22T03:30:45+05:30",
+  "captured_at": "2026-07-22T04:00:44+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…)",
   "commodities": [
@@ -11,9 +11,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
       "source": "Trading Economics · CO1:COM",
-      "price": 91.227,
+      "price": 91.546,
       "prev_close": 89.22,
-      "change_pct": 2.25,
+      "change_pct": 2.61,
       "currency": "USD",
       "as_of": "2026-07-21"
     },
@@ -25,9 +25,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Trading Economics · XAUUSD:CUR",
-      "price": 4079.0,
+      "price": 4082.55,
       "prev_close": 4008.04,
-      "change_pct": 1.77,
+      "change_pct": 1.86,
       "currency": "USD",
       "as_of": "2026-07-21"
     },
@@ -39,9 +39,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
       "source": "Trading Economics · XAGUSD:CUR",
-      "price": 58.828,
+      "price": 58.872,
       "prev_close": 56.39,
-      "change_pct": 4.32,
+      "change_pct": 4.4,
       "currency": "USD",
       "as_of": "2026-07-21"
     },
@@ -53,9 +53,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Trading Economics · HG1:COM",
-      "price": 6.4842,
+      "price": 6.4933,
       "prev_close": 6.299,
-      "change_pct": 2.94,
+      "change_pct": 3.08,
       "currency": "USD",
       "as_of": "2026-07-21"
     },
@@ -123,8 +123,8 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/coffee",
       "source": "Trading Economics · KC1:COM",
-      "price": 322.77,
-      "prev_close": 320.99,
+      "price": 322.76,
+      "prev_close": 320.97,
       "change_pct": -0.55,
       "currency": "USD",
       "as_of": "2026-07-21"
