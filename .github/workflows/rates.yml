@@ -34,6 +34,8 @@ concurrency:
 jobs:
   rates:
     runs-on: ubuntu-latest
+    # Default job timeout is 6h — cap it so a hung scrape can't burn Actions minutes.
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
 
