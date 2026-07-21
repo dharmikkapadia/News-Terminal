@@ -8,9 +8,9 @@ name: MarketWire history
 # the commodity-price snapshot (data/commodities.json), the Trading-Economics FX overlay
 # (USD/EUR/GBP-INR) AND the India government-bond yield curve (market_trends.bonds, scraped from
 # investing.com in a real browser via Scrapling) — they move intraday, so FX/commodities ride
-# every run (hourly via the external dispatch cron) while the bond scrape runs only on the
-# 6-hourly schedule runs (its browser install is too heavy for every run — see below). The rest
-# of the RBI Current Rates snapshot stays on its own once-a-day rates.yml.
+# every run (every 30 min via the external dispatch cron) while the bond scrape runs only on
+# the 2-hourly schedule runs (its browser install is too heavy/flaky for every run — see
+# below). The rest of the RBI Current Rates snapshot stays on its own once-a-day rates.yml.
 # The Streamlit app reads those committed files, so everything survives Streamlit Cloud restarts
 # with no external database.
 #
@@ -21,16 +21,16 @@ name: MarketWire history
 on:
   schedule:
     # GitHub's scheduler is unreliable — it drops most frequent crons (a "*/30"
-    # actually fired roughly every 90 min here). So this is just a sparse FALLBACK
-    # every 6h. The PRIMARY cadence comes from an external cron that hits the
-    # workflow_dispatch API (see README → "Reliable hourly cadence") — HOURLY, not
-    # 30-min: GitHub bills each job rounded UP to the next minute, so 48 dispatches/day
-    # at ~1.5-2 min wall ≈ 100 billable min/day ≈ 3,000/month — 150% of the free
-    # tier's 2,000 min (it exhausted the July 2026 cycle in ~20 days). Hourly + the
-    # schedule-only bond install below lands around ~1,000 min/month with headroom.
-    # These 6-hourly schedule runs are ALSO the only ones that do the heavy
+    # actually fired roughly every 90 min here). So this is a best-effort FALLBACK;
+    # the PRIMARY 30-min cadence comes from an external cron that hits the
+    # workflow_dispatch API (see README → "Reliable 30-min cadence"). The repo is
+    # PUBLIC, so standard-runner Actions minutes are free — cadence is a freshness/
+    # redeploy trade-off, not a billing one. (While the repo was private, the 30-min
+    # cadence blew the 2,000-min/month free tier in ~20 days — July 2026; see the
+    # README's Actions-minutes section before ever making the repo private again.)
+    # These 2-hourly schedule runs are ALSO the only ones that do the heavy
     # investing.com bond scrape (Scrapling stealth browser + xvfb) — see below.
-    - cron: "7 */6 * * *"
+    - cron: "7 */2 * * *"
   workflow_dispatch: {}       # used by the external cron + manual runs (Actions tab)
 
 permissions:
@@ -43,8 +43,8 @@ concurrency:
 jobs:
   poll:
     runs-on: ubuntu-latest
-    # The default job timeout is 6 HOURS — one hung Cloudflare solve / network stall
-    # would bill 360 minutes (18% of the monthly free tier) in a single run.
+    # The default job timeout is 6 HOURS — cap it so a hung Cloudflare solve / network
+    # stall dies fast instead of blocking the next runs (concurrency group queues them).
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
@@ -59,12 +59,12 @@ jobs:
       # Scrapling + a browser are needed ONLY for the investing.com government-bond scrape
       # (bonds.poll_bonds, called from poll.py) — investing.com blocks bots, so the yield
       # curve is fetched by rendering the page in a real STEALTH browser (non-headless
-      # under xvfb — much harder for Cloudflare to flag). That install dominated the bill:
-      # it added ~a billable minute to EVERY run, which at 48 dispatches/day blew the
-      # 2,000-min/month free tier. So it now runs ONLY on the sparse 6-hourly `schedule`
-      # runs. On dispatch runs bonds.poll_bonds() finds no scrapling, no-ops safely, and
-      # keeps the committed curve — the yield curve refreshes up to 4x/day while
-      # history/FX/commodities stay at the external cron's (hourly) cadence.
+      # under xvfb — much harder for Cloudflare to flag). The install + render add minutes
+      # and Cloudflare-flake exposure to a run, so they ride ONLY the 2-hourly `schedule`
+      # runs, keeping the 30-min dispatch runs light and fast. On dispatch runs
+      # bonds.poll_bonds() finds no scrapling, no-ops safely, and keeps the committed
+      # curve — the yield curve refreshes up to ~12x/day while history/FX/commodities
+      # refresh every run.
       - name: Install Scrapling stealth browser + xvfb (bond scrape — schedule runs only)
         if: github.event_name == 'schedule'
         run: |

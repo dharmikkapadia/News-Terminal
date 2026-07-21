@@ -39,38 +39,36 @@ each with its live feed — so history survives Streamlit Cloud restarts with no
 - The workflow runs **independently of the app** — it keeps building history even
   while the Streamlit app is asleep, and only commits when something changed.
 
-#### Actions-minutes budget (private repo)
+#### Actions minutes (public repo — free)
 
-GitHub bills each job **rounded up to the next whole minute**, so on a private repo
-run *count* matters more than run length: at a 30-min dispatch cadence (~48 runs/day,
-~2 billable min each once the Scrapling browser install rode every run) the workflow
-burned ~100 min/day ≈ 3,000 min/month — **150% of the free tier's 2,000 min** (the
-July 2026 cycle exhausted in ~20 days; an earlier note here claiming 48 runs/day fit
-the tier was wrong for exactly this rounding reason). The budget now holds because:
+This repo is **public**, so GitHub Actions on standard runners is **free and
+unmetered** — the 30-min cadence costs nothing. **History lesson, should the repo
+ever go private again:** GitHub bills private-repo jobs **rounded up to the next
+whole minute**, so run *count* matters more than run length — at a 30-min cadence
+(~48 runs/day × ~2 billable min once the Scrapling browser install rode every run)
+the workflow burned ~3,000 min/month, 150% of the private free tier's 2,000, and
+exhausted the July 2026 cycle in ~20 days. If privating, drop the external cron to
+hourly (≈1,200 min/month with the structure below). Two cost/robustness measures
+from that episode are kept regardless:
 
-- the external cron fires **hourly**, not every 30 min (~24 dispatches/day);
 - the heavy Scrapling-browser + xvfb install for the investing.com **bond scrape runs
-  only on the 6-hourly `schedule` runs** (bonds no-op safely on dispatch runs and keep
-  the committed curve), so dispatch runs stay ~1 billable minute;
-- both workflows carry a `timeout-minutes` cap so one hung scrape can't burn hours.
+  only on the 2-hourly `schedule` runs** (bonds no-op safely on dispatch runs and keep
+  the committed curve), so the frequent dispatch runs stay light and fast;
+- both workflows carry a `timeout-minutes` cap so one hung scrape dies fast.
 
-That's roughly `24×1 + 4×3` ≈ **~40 min/day ≈ 1,200 min/month** including the daily
-`rates.yml` — comfortable headroom. (Making the repo **public** would remove the
-constraint entirely: standard-runner Actions minutes are free for public repos.)
-
-#### Reliable hourly cadence (external cron)
+#### Reliable 30-min cadence (external cron)
 
 GitHub's own scheduler is **best-effort and unreliable** — a `*/30` cron here actually
 fired only ~every 90 min (GitHub drops most frequent scheduled runs). So the workflow's
-built-in `schedule` is just a sparse **6-hour fallback**; the primary cadence comes from
-an **external cron** that calls the `workflow_dispatch` API every hour (do NOT set it
-faster — see the budget section above):
+built-in `schedule` is a best-effort **2-hour fallback** (also the only runs that do
+the bond scrape); the primary cadence comes from an **external cron** that calls the
+`workflow_dispatch` API every 30 min:
 
 1. Create a **fine-grained PAT** (GitHub → Settings → Developer settings → Fine-grained
    tokens): scope it to **only this repo**, permission **Actions: Read and write**
    (Metadata: read is automatic). Set an expiry and save the token.
 2. In a free cron service (e.g. [cron-job.org](https://cron-job.org)), add a job every
-   hour:
+   30 min:
    - **URL:** `https://api.github.com/repos/dharmikkapadia/News-Terminal/actions/workflows/history.yml/dispatches`
    - **Method:** `POST`
    - **Headers:** `Accept: application/vnd.github+json`, `X-GitHub-Api-Version: 2022-11-28`,
@@ -78,7 +76,7 @@ faster — see the budget section above):
    - **Body:** `{"ref":"main"}`
    - Expect HTTP **204** on success.
 
-This gives a dependable hourly cadence and bypasses GitHub's flaky scheduler.
+This gives a dependable 30-min cadence and bypasses GitHub's flaky scheduler.
 (Security: the token lives in the cron service, so keep it minimally scoped and
 rotate it on expiry.)
 - Run it yourself anytime: `python poll.py` (writes `data/history.jsonl`).
@@ -173,7 +171,7 @@ It reads a committed **`data/rates.json`** (`rates.py`), refreshed two ways:
   the file **only on a complete, in-bounds parse** (a blocked/partial scrape leaves the committed
   snapshot untouched, and the MPC block is preserved), deep-merged and commit-only-on-change, so the
   redundant runs are idempotent — whichever fires first wins, the rest no-op. It's kept off the
-  hourly history poller (RBI rates change once a day). GitHub's scheduler is best-effort; for exact
+  30-min history poller (RBI rates change once a day). GitHub's scheduler is best-effort; for exact
   timing, also point an external cron at either workflow's `workflow_dispatch`. Like `rbi_archive.py`,
   the scrapers need validating from a host that can reach RBI.
 
@@ -202,15 +200,15 @@ way as the rates snapshot:
   queried for the symbols that actually need it (Steel + any TE gaps), so a healthy TE run hits Yahoo
   once. Chart links are Trading Economics' public per-commodity pages. (Note: TE's logged-out page
   serves last-settled values, so prices can lag the live intraday tick until TE's next server rebuild
-  — fine for an hourly poll; verified to be current, not stale.)
-- **Automated (best-effort):** commodities ride the **same hourly poller as history** — `poll.py`
+  — fine for a 30-min poll; verified to be current, not stale.)
+- **Automated (best-effort):** commodities ride the **same 30-min poller as history** — `poll.py`
   calls `commodities.poll_commodities()` each run and `.github/workflows/history.yml` commits
   `data/commodities.json` alongside the history files. (Prices move intraday, so they want frequent
   updates — unlike the once-a-day RBI rates, which stay on their own `rates.yml`.) The refresh
   rewrites the file **only when the liquid core (Brent/Gold/Silver/Copper) resolves in-bounds from
   either source** — a blocked/rate-limited scrape leaves the committed snapshot untouched, and any
   symbol both sources miss (e.g. Zinc, which is TE-only) keeps its last committed price. The seed
-  file ships with `null` prices; they fill on the next hourly poll (or trigger `history.yml` via
+  file ships with `null` prices; they fill on the next 30-min poll (or trigger `history.yml` via
   **workflow_dispatch** to populate now). Like `rates.py`, the scrapers were written without live
   market access — validate them from a machine that can reach TE / Yahoo (TE sits behind Cloudflare;
   Yahoo 403s some datacenter IPs). Note: committing on each price tick means more frequent commits

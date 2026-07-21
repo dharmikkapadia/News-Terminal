@@ -42,10 +42,10 @@ drops a symbol; **Steel** is pinned to Yahoo (USD HRC, since TE steel is CNY reb
 via `store.py` (SQLite/Postgres/Turso — one table per feed) **and** in-repo
 `data/history.jsonl` (press releases) + `data/notifications.jsonl` (notifications)
 + `data/sebi_public_issues.jsonl` (SEBI), all maintained by a scheduled GitHub
-Action running `poll.py` (hourly via an external dispatch cron + a 6-hourly
-`schedule` fallback — NOT 30-min: GitHub bills each job rounded up to a whole
-minute, so 48 runs/day blew the private-repo free tier; see the README's
-"Actions-minutes budget" section before touching any cadence).
+Action running `poll.py` (every 30 min via an external dispatch cron + a 2-hourly
+`schedule` fallback, which is also the only runs that scrape bonds; the repo is
+PUBLIC so Actions minutes are free — see the README's "Actions minutes" section
+before ever making it private again).
 `rbi_archive.py` backfills older items from RBI's listing/detail pages (parameterized
 per feed by the detail-link match); `feed.py` is the shared RSS parser. Press
 releases are keyed by `prid`, notifications by `Id`; the feeds are stored separately
@@ -118,12 +118,12 @@ SEBI items on the link itself (unique + permanent, so this is safe).
   `rates.poll_rates()` via `python rates.py`; it scrapes the home page but writes
   **only on a complete + in-bounds parse** (`rates._is_complete`), so a blocked/partial
   scrape can never clobber the manual snapshot, and the MPC block (not on the home page)
-  is preserved. (Kept out of `poll.py`/the hourly history cron on purpose — rates refresh
+  is preserved. (Kept out of `poll.py`/the 30-min history cron on purpose — rates refresh
   once a day.) The scraper was written WITHOUT live RBI access — validate it from a host
   that can reach the site (like `rbi_archive.py`).
 - **FX overlay** (USD/INR, EUR/INR, GBP/INR) inside `data/rates.json` is the one part of
   the rates snapshot sourced from **Trading Economics, not RBI/FBIL** — and, like commodities,
-  it rides the **hourly `poll.py` cron** (FX moves intraday), NOT the daily `rates.yml`.
+  it rides the **30-min `poll.py` cron** (FX moves intraday), NOT the daily `rates.yml`.
   `rates.poll_fx()` (called by `poll.py`; also re-run at the end of `python rates.py`) scrapes
   TE's `currencies?quote=inr` table via `fetch_te_fx()` — same row markup as commodities
   (`tr[data-symbol]` → `td#p`/`td#nch`/`td#pch`/`td#date`), but the `data-symbol` keeps TE's
@@ -136,7 +136,7 @@ SEBI items on the link itself (unique + permanent, so this is safe).
   not per-pair slugs. JPY isn't quoted on the TE INR page. Validate the scraper from a host that can
   reach TE / Yahoo (this sandbox is Cloudflare-challenged), like `rates.py`/`commodities.py`.
 - **Commodities** (`data/commodities.json`, `commodities.py`) follows the rates guard pattern but
-  rides the **hourly `poll.py` cron** (committed by `history.yml`), NOT a separate daily job —
+  rides the **30-min `poll.py` cron** (committed by `history.yml`), NOT a separate daily job —
   prices move intraday, unlike the once-a-day RBI rates. `poll.py`'s `main()` calls
   `commodities.poll_commodities()` each run and `history.yml` commits `data/commodities.json`
   alongside the history files. **Source = Trading Economics primary + Yahoo fallback** (both free,
@@ -151,19 +151,19 @@ SEBI items on the link itself (unique + permanent, so this is safe).
   **only when the liquid core (Brent/Gold/Silver/Copper) resolves in-bounds from either source**
   (`_is_complete`); any symbol both sources miss keeps its last committed price. Chart links are
   Trading Economics per-commodity pages. The seed ships with `null` prices — they fill on the next
-  hourly poll (or trigger `history.yml` via workflow_dispatch). TE's logged-out page serves
+  30-min poll (or trigger `history.yml` via workflow_dispatch). TE's logged-out page serves
   last-settled values (may lag intraday) and sits behind Cloudflare, and Yahoo may 403 some datacenter
   IPs (incl. this sandbox) — so validate the scrapers from a host that can reach TE / Yahoo, like
-  `rates.py`/`rbi_archive.py`. NB: the hourly cron commits whenever a price ticks (→ a Streamlit Cloud
+  `rates.py`/`rbi_archive.py`. NB: the 30-min cron commits whenever a price ticks (→ a Streamlit Cloud
   redeploy), the intended freshness trade-off.
 - **Government bonds** (`bonds.py` → `market_trends.bonds` inside `data/rates.json`) are the yield
   curve for the ~10y G-Sec tile + the Market Trends yield rows, **sourced from investing.com, not
-  RBI**. It refreshes ONLY on `history.yml`'s **6-hourly `schedule` runs** (committed by
+  RBI**. It refreshes ONLY on `history.yml`'s **2-hourly `schedule` runs** (committed by
   `history.yml`), NOT the daily `rates.yml` and NOT every poll: the Scrapling-browser + xvfb
-  install is heavy enough (~a billable minute per run) that riding every dispatch blew the
-  Actions free tier — so the workflow installs it only on schedule runs, and on the hourly
-  dispatch runs `bonds.poll_bonds()` (still called by `poll.py`'s `main()` each run) finds no
-  scrapling, no-ops, and keeps the committed curve. **investing.com blocks bots (Cloudflare 403 on datacenter IPs) and renders the table
+  install + render add minutes and Cloudflare-flake exposure per run (and blew the Actions free
+  tier back when the repo was private) — so the workflow installs it only on schedule runs, and
+  on the 30-min dispatch runs `bonds.poll_bonds()` (still called by `poll.py`'s `main()` each
+  run) finds no scrapling, no-ops, and keeps the committed curve. **investing.com blocks bots (Cloudflare 403 on datacenter IPs) and renders the table
   client-side**, so `bonds._render()` fetches it with Scrapling's **StealthyFetcher** tuned for it:
   `solve_cloudflare=True`, arrive via a Google click, `block_ads`, **`network_idle=False`** (its
   ad/trackers never idle — waiting on `load` was the original 60s-timeout bug), and **non-headless**
@@ -184,8 +184,9 @@ SEBI items on the link itself (unique + permanent, so this is safe).
   `_bond_benchmark`) and **falls back to the RBI `gsec_yields`/`tbill_yields` rows until the first
   investing.com scrape lands** — the **Call Money Rate row is gone** and **Sensex/Nifty stay RBI**.
   `history.yml` installs `scrapling[fetchers]` + `scrapling install` + **xvfb** and runs
-  `xvfb-run -a python poll.py` **only on its 6-hourly `schedule` runs** (Actions minutes DID bite —
-  July 2026 — hence the split; dispatch runs use plain `python poll.py` with light deps).
+  `xvfb-run -a python poll.py` **only on its 2-hourly `schedule` runs** (the split dates from the
+  July 2026 private-repo Actions-minutes blowout, kept because it also makes the frequent dispatch
+  runs light and fast; those use plain `python poll.py` with light deps).
   This sandbox **can't reach investing.com**
   (egress proxy 403s the CONNECT, same as RBI) and
   has no Scrapling browser, so `poll_bonds()` no-ops safely here — **validate it in CI / on a real
