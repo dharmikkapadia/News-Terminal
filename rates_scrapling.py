@@ -32,6 +32,7 @@ import re
 import sys
 from datetime import datetime, date
 
+import common
 import rates  # reuse parse_rates / _is_complete / _merge / save_rates / IST / RATES_PATH / _MONTHS
 
 # Scrape targets (overridable for testing). HOME_URL is RBI's home page (the rates accordion);
@@ -59,10 +60,7 @@ _MPC_PHRASE_RE = re.compile(
 )
 
 
-def _annotate(level, title, msg):
-    """GitHub Actions annotation (surfaces on the run summary); harmless when run locally."""
-    msg = str(msg).replace("\n", " ").replace("\r", " ")
-    print(f"::{level} title={title}::{msg}")
+_annotate = common.annotate     # GitHub Actions run-summary annotation
 
 
 # --------------------------------------------------------------------------- #

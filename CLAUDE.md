@@ -108,6 +108,14 @@ SEBI items on the link itself (unique + permanent, so this is safe).
   Chromium shot), since the live RBI feed 403s here.
 - Validate `streamlit_app.py` changes headlessly with `streamlit.testing.v1.AppTest`
   (runs the script, asserts `not at.exception`) across layouts/filters.
+- **Shared plumbing lives in `common.py`** (IST, both UA families, `num`,
+  `item_key`/`link_id`, the GitHub-Actions `annotate`, the URL-or-path JSON loader,
+  the TE `tr[data-symbol]` table scraper, the Yahoo chart fetcher, `bond_benchmark`)
+  — modules keep their old names as thin aliases (`rates._num = common.num`), so fix
+  shared logic THERE, not by re-adding a per-module copy. `tests/` holds the
+  characterization suite (`python -m pytest tests/` — needs requests+bs4+pytest; the
+  AppTest smoke test additionally needs streamlit+feedparser and self-skips without
+  them). Run it before/after touching parsers or helpers.
 - **Current Rates** (`data/rates.json`) is refreshed two ways: (1) MANUAL — a
   Claude-for-Chrome run on rbi.org.in emits the JSON (RBI 403s CI and the rates box is a
   JS accordion, so a real browser is the reliable extractor); commit it. The canonical,

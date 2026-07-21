@@ -24,6 +24,8 @@ import re
 import sqlite3
 import time
 
+import common
+
 # One table per feed so press-release `prid`s and notification `Id`s can't
 # collide on the key. category -> table name (the only values ever interpolated
 # into SQL — never raw user input).
@@ -101,13 +103,7 @@ def _q(sql, style):
     return sql if style == "qmark" else sql.replace("?", "%s")
 
 
-def _key(item):
-    """Stable identity: RBI press-release `prid` or notification `Id` from the
-    link, else the link itself. (Feeds live in separate tables, so a prid and an
-    Id sharing a number never clash.)"""
-    link = item.get("link", "") or ""
-    m = re.search(r"\bprid=(\d+)", link, re.I) or re.search(r"\bid=(\d+)", link, re.I)
-    return m.group(1) if m else link
+_key = common.item_key      # prid/Id from the link, else the link itself
 
 
 def init_db():

@@ -23,18 +23,19 @@ Never raises on load; returns None when there's no readable snapshot.
 import json
 import os
 import re
-from datetime import datetime, date, timezone, timedelta
-from urllib.parse import quote
+from datetime import datetime
 
 import requests
+
+import common
 
 _DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 RATES_PATH = os.environ.get("MARKETWIRE_RATES_FILE", os.path.join(_DATA_DIR, "rates.json"))
 # The scrape TARGET (RBI home page). Distinct from MARKETWIRE_RATES_URL, which is where the
 # *app* may read the committed rates.json from a raw URL (parallel to MARKETWIRE_HISTORY_URL).
 HOME_URL = os.environ.get("MARKETWIRE_RATES_HOME", "https://www.rbi.org.in/")
-UA = "Mozilla/5.0 (compatible; MarketWire/1.0; RSS reader)"
-IST = timezone(timedelta(hours=5, minutes=30))
+UA = common.UA
+IST = common.IST
 
 # --- Trading Economics FX overlay (USD/EUR/GBP-INR) ----------------------------
 # USD/INR, EUR/INR and GBP/INR are sourced from Trading Economics' server-rendered
@@ -44,16 +45,10 @@ IST = timezone(timedelta(hours=5, minutes=30))
 # JPY/AED/IDR stay on RBI/FBIL (JPY isn't even quoted on the TE INR page).
 TE_CURRENCIES_URL = os.environ.get(
     "MARKETWIRE_TE_CURRENCIES", "https://tradingeconomics.com/currencies?quote=inr")
-# Yahoo's keyless chart endpoint (fallback). `<symbol>` is URL-encoded ('=' in FX tickers).
-YF_CHART = os.environ.get(
-    "MARKETWIRE_YF_CHART", "https://query1.finance.yahoo.com/v8/finance/chart/")
 # A browser-ish header set — TE sits behind Cloudflare and Yahoo 403s a bare python UA.
-_TE_UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-          "(KHTML, like Gecko) Chrome/124.0 Safari/537.36")
-_HTML_HEADERS = {"User-Agent": _TE_UA,
-                 "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-                 "Accept-Language": "en-US,en;q=0.9",
-                 "Referer": "https://tradingeconomics.com/"}
+# Same base as commodities', plus a TE Referer.
+_TE_UA = common.BROWSER_UA
+_HTML_HEADERS = {**common.HTML_HEADERS, "Referer": "https://tradingeconomics.com/"}
 # Each TE-sourced pair: the rates.json scalar it fills, the TE row `data-symbol` (note the
 # :CUR suffix), the Yahoo fallback symbol, and the chart link — all three open the TE INR
 # currencies board (quote=inr), the same page we scrape, so the tiles/rows deep-link to the
@@ -68,8 +63,7 @@ FX_SPECS = [
 ]
 # Sanity bounds (broad) — an INR-per-unit rate outside its range means a mis-parse.
 _FX_BOUNDS = {"inr_per_usd": (40, 200), "inr_per_eur": (40, 250), "inr_per_gbp": (50, 300)}
-_MONTHS = {m: i for i, m in enumerate(
-    ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"], 1)}
+_MONTHS = common.MONTHS     # month-abbrev map (also used by rates_scrapling's MPC parser)
 
 
 # --------------------------------------------------------------------------- #
@@ -79,20 +73,8 @@ def load_rates(source=None, url_env="MARKETWIRE_RATES_URL", default_path=RATES_P
     """Read the committed rates snapshot. `source` (or the env var) may be a raw
     http(s) URL or a file path; defaults to the local committed JSON. Never raises —
     returns the parsed dict, or None if there's nothing readable."""
-    source = source or os.environ.get(url_env, "").strip() or default_path
-    try:
-        if source.startswith(("http://", "https://")):
-            resp = requests.get(source, headers={"User-Agent": UA}, timeout=15)
-            if resp.status_code == 404:
-                return None
-            resp.raise_for_status()
-            return json.loads(resp.text)
-        with open(source, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except FileNotFoundError:
-        return None
-    except Exception:
-        return None
+    return common.load_json_snapshot(source, url_env, default_path,
+                                     headers={"User-Agent": UA})
 
 
 def mpc_countdown(rates, now=None):
@@ -133,13 +115,7 @@ def _fmt_range(start, end):
 # --------------------------------------------------------------------------- #
 # Best-effort scrape (poller only) — guarded so it can't clobber the manual file
 # --------------------------------------------------------------------------- #
-def _num(s):
-    """First number in `s` as float, else None ('₹ 13,600' -> 13600.0, '5.25%' -> 5.25,
-    '−0.12%' -> -0.12 — TE renders negatives with the unicode minus)."""
-    if s is None:
-        return None
-    m = re.search(r"-?\d[\d,]*\.?\d*", str(s).replace("−", "-").replace(",", ""))
-    return float(m.group(0)) if m else None
+_num = common.num           # shared numeric-cell parser
 
 
 def _range(s):
@@ -413,35 +389,10 @@ def _merge(prior, scraped):
 # --------------------------------------------------------------------------- #
 # Trading Economics FX overlay (poller) — USD/EUR/GBP-INR, Yahoo fallback
 # --------------------------------------------------------------------------- #
-def _celltext(tr, cid):
-    """Text of the <td id="cid"> inside a TE row (ids repeat per row; scoping to `tr` is fine)."""
-    td = tr.find("td", id=cid)
-    return td.get_text(" ", strip=True) if td else None
-
-
 def _fx_asof(s):
     """TE's FX date cell -> ISO date. The most-liquid pair shows a TIME ('12:09', i.e. today);
-    others show 'Jun/29'. A time-only cell maps to today (IST); a month/day that lands more than
-    a week in the future rolls back a year (a Dec date read in early Jan)."""
-    if not s:
-        return None
-    s = str(s).strip()
-    today = datetime.now(IST).date()
-    if re.match(r"^\d{1,2}:\d{2}\b", s):
-        return today.isoformat()
-    m = re.match(r"\s*([A-Za-z]{3})\s*/\s*(\d{1,2})", s)
-    if not m:
-        return None
-    mon = _MONTHS.get(m.group(1).lower())
-    if not mon:
-        return None
-    try:
-        d = date(today.year, mon, int(m.group(2)))
-    except ValueError:
-        return None
-    if (d - today).days > 7:
-        d = date(today.year - 1, mon, int(m.group(2)))
-    return d.isoformat()
+    others show 'Jun/29' — a time cell maps to today, unlike the commodities table."""
+    return common.te_asof(s, time_means_today=True)
 
 
 def _fx_ok(key, q):
@@ -457,78 +408,18 @@ def fetch_te_fx(url=TE_CURRENCIES_URL, timeout=25):
     """Scrape USD/EUR/GBP-INR from TE's server-rendered currencies table into
     {scalar_key: {price, prev_close, change_pct, as_of}}. Returns (quotes, error). Best
     effort: a Cloudflare block / markup change yields an error (or empty parse) and the
-    caller falls back to Yahoo / preserves prior values. Mirrors commodities.fetch_te —
-    each `tr[data-symbol]` row carries `td#p` price, `td#nch` net change, `td#pch` signed
-    % vs previous close and `td#date` (the data-symbol keeps TE's ':CUR' suffix)."""
-    try:
-        resp = requests.get(url, headers=_HTML_HEADERS, timeout=timeout)
-        resp.raise_for_status()
-    except Exception as ex:
-        return {}, f"{type(ex).__name__}: {ex}"
-    try:
-        from bs4 import BeautifulSoup
-    except Exception as ex:
-        return {}, f"BeautifulSoup unavailable: {ex}"
-
-    soup = BeautifulSoup(resp.content, "html.parser")
+    caller falls back to Yahoo / preserves prior values. Same row markup as
+    commodities.fetch_te (the data-symbol keeps TE's ':CUR' suffix); unlike commodities,
+    a time-of-day date cell means "updated today"."""
     want = {s["te"]: s["key"] for s in FX_SPECS}
-    out = {}
-    for tr in soup.select("tr[data-symbol]"):
-        key = want.get(tr.get("data-symbol"))
-        if not key or key in out:
-            continue
-        price = _num(_celltext(tr, "p"))
-        if price is None:
-            continue
-        nch = _num(_celltext(tr, "nch"))
-        pch = _num(_celltext(tr, "pch"))          # signed % vs previous close, straight from TE
-        if nch is not None:
-            prev = price - nch
-        elif pch not in (None, -100):
-            prev = price / (1 + pch / 100.0)
-        else:
-            prev = None
-        out[key] = {
-            "price": round(price, 4),
-            "prev_close": round(prev, 4) if prev is not None else None,
-            "change_pct": round(pch, 2) if pch is not None else None,
-            "as_of": _fx_asof(_celltext(tr, "date")),
-        }
-    if not out:
-        return {}, "no FX rows parsed (markup changed or blocked)"
-    return out, None
+    return common.fetch_te_table(url, want, timeout=timeout, headers=_HTML_HEADERS,
+                                 time_means_today=True, what="FX")
 
 
-def _fetch_yahoo_one(symbol, timeout=20, session=None):
-    """One Yahoo symbol's last/prev daily close, % change and as-of date, or (None, error)."""
-    url = YF_CHART + quote(symbol, safe="") + "?range=7d&interval=1d"
-    try:
-        get = (session or requests).get
-        resp = get(url, headers={"User-Agent": _TE_UA}, timeout=timeout)
-        resp.raise_for_status()
-        data = resp.json()
-    except Exception as ex:
-        return None, f"{type(ex).__name__}: {ex}"
-    try:
-        res = (data.get("chart") or {}).get("result") or []
-        if not res:
-            return None, "no result"
-        res = res[0]
-        ts = res.get("timestamp") or []
-        closes = ((res.get("indicators") or {}).get("quote") or [{}])[0].get("close") or []
-        pairs = [(t, c) for t, c in zip(ts, closes) if isinstance(c, (int, float))]
-        if len(pairs) < 2:
-            return None, "need ≥2 daily closes for a change"
-        (cur_t, cur), (_, prev) = pairs[-1], pairs[-2]
-        change_pct = ((cur - prev) / prev * 100.0) if prev else None
-        return {
-            "price": round(cur, 4),
-            "prev_close": round(prev, 4),
-            "change_pct": round(change_pct, 2) if change_pct is not None else None,
-            "as_of": datetime.fromtimestamp(cur_t, IST).strftime("%Y-%m-%d"),
-        }, None
-    except Exception as ex:
-        return None, f"parse error: {type(ex).__name__}: {ex}"
+# One Yahoo symbol's last/prev daily close, % change and as-of date, or (None, error).
+# (The shared fetcher also reports the quote currency; poll_fx copies only the fields
+# it needs into fx_te, so the extra key never reaches rates.json.)
+_fetch_yahoo_one = common.yahoo_chart_quote
 
 
 def fetch_yahoo_fx(specs, timeout=20):

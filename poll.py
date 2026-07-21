@@ -18,6 +18,7 @@ import sys
 
 import bonds
 import commodities
+import common
 import feed
 import history
 import rates
@@ -63,11 +64,7 @@ FEEDS = [
 ]
 
 
-def _annotate(level, title, msg):
-    """Emit a GitHub Actions annotation (read from stdout) so problems show on the
-    run summary, not just buried in the log. Harmless when run locally (just prints)."""
-    msg = str(msg).replace("\n", " ").replace("\r", " ")
-    print(f"::{level} title={title}::{msg}")
+_annotate = common.annotate     # GitHub Actions run-summary annotation
 
 
 def poll_feed(cfg):
