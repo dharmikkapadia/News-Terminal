@@ -44,8 +44,10 @@ via `store.py` (SQLite/Postgres/Turso — one table per feed) **and** in-repo
 + `data/sebi_public_issues.jsonl` (SEBI), all maintained by a scheduled GitHub
 Action running `poll.py` (every 30 min via an external dispatch cron + a 2-hourly
 `schedule` fallback, which is also the only runs that scrape bonds; the repo is
-PUBLIC so Actions minutes are free — see the README's "Actions minutes" section
-before ever making it private again).
+PUBLIC so Actions minutes are free — see docs/OPERATIONS.md's "Actions minutes"
+section before ever making it private again). NB: the README is a non-technical
+product page for end users — ALL technical/ops documentation lives in
+`docs/OPERATIONS.md`, so put new setup/architecture notes there, not in the README.
 `rbi_archive.py` backfills older items from RBI's listing/detail pages (parameterized
 per feed by the detail-link match); `feed.py` is the shared RSS parser. Press
 releases are keyed by `prid`, notifications by `Id`; the feeds are stored separately
