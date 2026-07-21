@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-07-20T23:47:12+05:30",
+  "captured_at": "2026-07-21T15:50:23+05:30",
   "source": "https://www.rbi.org.in/",
   "policy_rates": {
     "repo_rate": 5.25,
@@ -13,19 +13,19 @@
     "slr": 18.0
   },
   "exchange_rates": {
-    "as_of": "As at 1.00pm of July 20, 2026",
+    "as_of": "As at 1.00pm of July 21, 2026",
     "source": "FBIL",
-    "inr_per_usd": 96.343,
+    "inr_per_usd": 96.321,
     "inr_per_gbp": 129.328,
     "inr_per_eur": 110.0117,
-    "inr_per_100_jpy": 59.43,
-    "inr_per_aed": 26.2774,
-    "inr_per_10000_idr": 53.7031,
+    "inr_per_100_jpy": 59.23,
+    "inr_per_aed": 26.2068,
+    "inr_per_10000_idr": 53.7958,
     "fx_te": {
       "inr_per_usd": {
         "label": "USD/INR",
-        "prev_close": 96.1979,
-        "change_pct": -0.15,
+        "prev_close": 96.1539,
+        "change_pct": -0.17,
         "chart_url": "https://tradingeconomics.com/currencies?quote=inr",
         "as_of": "2026-07-21",
         "source": "Trading Economics · USDINR:CUR"
@@ -47,7 +47,7 @@
         "source": "Trading Economics · GBPINR:CUR"
       }
     },
-    "fx_te_captured_at": "2026-07-21T15:31:28+05:30"
+    "fx_te_captured_at": "2026-07-21T15:50:24+05:30"
   },
   "lending_deposit_rates": {
     "base_rate": [
@@ -68,30 +68,30 @@
     "money_market": {
       "call_rate": [
         4.6,
-        5.7
+        5.45
       ],
-      "as_on": "as on  July 19, 2026"
+      "as_on": "as on July 20, 2026"
     },
     "gsec_yields": [
       {
         "security": "6.03% GS 2029",
-        "yield": 6.1425
+        "yield": 6.2135
       },
       {
         "security": "6.36% GS 2031",
-        "yield": 6.4507
+        "yield": 6.4672
       },
       {
         "security": "6.94% GS 2036",
-        "yield": 6.7744
+        "yield": 6.7792
       },
       {
         "security": "6.68% GS 2040",
-        "yield": 7.0019
+        "yield": 7.0092
       },
       {
         "security": "7.24% GS 2055",
-        "yield": 7.402
+        "yield": 7.4105
       }
     ],
     "tbill_yields": {
@@ -99,11 +99,11 @@
       "182_day": 5.5693,
       "364_day": 5.7197
     },
-    "gsec_tbill_as_on": "as on  July 17, 2026",
+    "gsec_tbill_as_on": "as on July 20, 2026",
     "capital_market": {
-      "sensex": 78151.45,
-      "nifty_50": 24334.3,
-      "as_on": "as on  July 17, 2026"
+      "sensex": 77708.52,
+      "nifty_50": 24238.5,
+      "as_on": "as on July 20, 2026"
     },
     "bonds": {
       "source": "investing.com",
