@@ -32,11 +32,11 @@ the day's key numbers right above it.
   day's percentage move (green/red), and a one-click link to a full chart.
 
 - **Reads like a news site.** A newspaper-style masthead over your choice of a
-  single-column stream or a card grid, in six colour themes — from the dark
-  *Equity Terminal* trading-desk look (the default) to light newspaper styles.
-  The wire refreshes itself every few minutes; no reloading.
+  single-column stream or a card grid, in a clean light markets-data design
+  inspired by Trading Economics. The wire refreshes itself every few minutes;
+  no reloading.
 
-- **Shareable views.** Your filters, layout and theme are captured in the page URL —
+- **Shareable views.** Your source filters and layout are captured in the page URL —
   copy the link and a colleague opens exactly the view you're looking at.
 
 ## Where the data comes from
