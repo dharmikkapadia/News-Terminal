@@ -19,6 +19,7 @@ import sys
 import bonds
 import commodities
 import common
+import econ_calendar
 import feed
 import history
 import rates
@@ -157,6 +158,14 @@ def main():
         print(f"[poll:bonds] {bonds.poll_bonds()}")
     except Exception as ex:                       # defensive — poll_bonds swallows errors
         _annotate("warning", "bond refresh failed", ex)
+    # Refresh the India macro Economic Calendar (data/calendar.json) from Trading Economics
+    # on this SAME cadence — released `actual` values should land promptly. poll_calendar()
+    # MERGES onto the committed snapshot (TE serves a rolling window; merged events keep the
+    # forward schedule + recent actuals), writes only on a sane parse, and never raises.
+    try:
+        print(f"[poll:calendar] {econ_calendar.poll_calendar()}")
+    except Exception as ex:                       # defensive — poll_calendar swallows errors
+        _annotate("warning", "calendar refresh failed", ex)
     # NOTE: the rest of the Current Rates snapshot (data/rates.json) — policy/reserve/lending
     # rates, market trends, MPC — is refreshed on its OWN cadence, once a day at 1:30pm IST
     # (after RBI's 1pm FX update) by .github/workflows/rates.yml (python rates.py) — not here.

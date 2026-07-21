@@ -4,13 +4,15 @@ name: MarketWire history
 # Notifications) plus SEBI's Public Issues listing (scraped; no RSS exists for it) on
 # a schedule and commits data/history.jsonl + data/notifications.jsonl +
 # data/sebi_public_issues.jsonl.
-# The same run also refreshes three intraday overlays inside data/rates.json / commodities.json:
-# the commodity-price snapshot (data/commodities.json), the Trading-Economics FX overlay
-# (USD/EUR/GBP-INR) AND the India government-bond yield curve (market_trends.bonds, scraped from
-# investing.com in a real browser via Scrapling) — they move intraday, so FX/commodities ride
-# every run (every 30 min via the external dispatch cron) while the bond scrape runs only on
-# the 2-hourly schedule runs (its browser install is too heavy/flaky for every run — see
-# below). The rest of the RBI Current Rates snapshot stays on its own once-a-day rates.yml.
+# The same run also refreshes the intraday overlays: the commodity-price snapshot
+# (data/commodities.json), the Trading-Economics FX overlay (USD/EUR/GBP-INR in
+# data/rates.json), the India macro Economic Calendar (data/calendar.json, merged onto the
+# committed snapshot so released actuals land promptly) AND the India government-bond yield
+# curve (market_trends.bonds, scraped from investing.com in a real browser via Scrapling) —
+# they move intraday, so FX/commodities/calendar ride every run (every 30 min via the external
+# dispatch cron) while the bond scrape runs only on the 2-hourly schedule runs (its browser
+# install is too heavy/flaky for every run — see below). The rest of the RBI Current Rates
+# snapshot stays on its own once-a-day rates.yml.
 # The Streamlit app reads those committed files, so everything survives Streamlit Cloud restarts
 # with no external database.
 #
@@ -82,6 +84,8 @@ jobs:
           # xvfb; dump the rendered HTML for diagnosis; route through a proxy if configured.
           MARKETWIRE_BONDS_HEADLESS: "false"
           MARKETWIRE_BONDS_DUMP: ${{ runner.temp }}/bonds_dump.html
+          # Dump the fetched TE calendar HTML for markup diagnosis (uploaded below).
+          MARKETWIRE_CALENDAR_DUMP: ${{ runner.temp }}/calendar_dump.html
           # Set this repo SECRET to a (residential) proxy URL to reliably get past investing.com's
           # datacenter-IP 403 — e.g. http://user:pass@host:port. Empty = direct (often blocked).
           MARKETWIRE_SCRAPE_PROXY: ${{ secrets.MARKETWIRE_SCRAPE_PROXY }}
@@ -106,15 +110,27 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
+      # The fetched TE calendar page (real table or a Cloudflare block page) — for tuning
+      # econ_calendar.parse_calendar if the calendar doesn't populate. Schedule runs only,
+      # to keep the frequent dispatch runs fast.
+      - name: Upload calendar fetch dump (diagnostic)
+        if: ${{ always() && github.event_name == 'schedule' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: calendar-fetch-dump
+          path: ${{ runner.temp }}/calendar_dump.html
+          if-no-files-found: ignore
+          retention-days: 7
+
       - name: Commit history + commodities + fx + bonds if changed
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/history.jsonl data/notifications.jsonl data/sebi_public_issues.jsonl data/commodities.json data/rates.json
+          git add data/history.jsonl data/notifications.jsonl data/sebi_public_issues.jsonl data/commodities.json data/rates.json data/calendar.json
           if git diff --cached --quiet; then
             echo "No data changes."
           else
-            git commit -m "data: update history + sebi + commodities + fx + bonds $(date -u +%FT%TZ)"
+            git commit -m "data: update history + sebi + commodities + fx + bonds + calendar $(date -u +%FT%TZ)"
             # main has other writers (the rates workflows, branch merges) and this job's
             # checkout->push window spans the whole poll (minutes, more on the schedule
             # runs that render bonds), so a bare push can lose the race. Rebase and retry; -X theirs

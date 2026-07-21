@@ -17,7 +17,7 @@ Deploy:        Streamlit Community Cloud, main file = streamlit_app.py
 import html
 import os
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 from urllib.parse import urlparse
 
 import streamlit as st
@@ -35,6 +35,7 @@ except Exception:
 
 import commodities  # free commodity-price snapshot (data/commodities.json) for the dashboard
 import common       # shared constants/helpers (IST, bond benchmark, …)
+import econ_calendar  # India macro calendar snapshot (data/calendar.json), TE-sourced
 import feed         # pure RSS fetch/parse (shared with the poller)
 import history      # durable history kept as JSONL in the repo (maintained by the Action)
 import rates        # RBI Current Rates snapshot (data/rates.json) for the dashboard
@@ -562,6 +563,110 @@ def _commodities_dashboard_html(snap):
         "</div>"
     )
 
+
+def _cal_stars(imp):
+    """TE's 1–3 importance as stars ('★★★'), '' when unknown."""
+    return "★" * imp if isinstance(imp, int) and 1 <= imp <= 3 else ""
+
+
+def _cal_when(e, with_time=True):
+    """'Thu 23 Jul' (+ TE's raw time string — times are shown as TE lists them,
+    no timezone conversion is claimed)."""
+    try:
+        d = datetime.strptime(e.get("date") or "", "%Y-%m-%d")
+        label = d.strftime("%a %d %b")
+    except ValueError:
+        label = e.get("date") or "—"
+    t = (e.get("time") or "").strip()
+    return f"{label} · {t}" if (with_time and t) else label
+
+
+def _cal_actual_html(e):
+    """The released actual, coloured vs consensus (▲ above / ▼ below — direction
+    only, not a judgement: for CPI 'above' isn't good). Plain when no consensus."""
+    actual = (e.get("actual") or "").strip()
+    if not actual:
+        return ""
+    a, c = common.num(actual), common.num(e.get("consensus"))
+    if a is not None and c is not None and a != c:
+        cls, arrow = ("up", "▲") if a > c else ("down", "▼")
+        return f"<span class='mw-{cls}'>{html.escape(actual)} {arrow}</span>"
+    return f"<span class='mw-calact'>{html.escape(actual)}</span>"
+
+
+def _cal_row_html(e):
+    """One event row: when · importance stars · event (links to its TE page) ·
+    prev/consensus figures · coloured actual (when released)."""
+    figs = " · ".join(s for s in (
+        f"prev {html.escape(e['previous'])}" if (e.get("previous") or "").strip() else "",
+        f"cons {html.escape(e['consensus'])}" if (e.get("consensus") or "").strip() else "") if s)
+    actual = _cal_actual_html(e)
+    fig_html = " ".join(s for s in (figs, actual) if s) or "—"
+    name = html.escape(e.get("event") or "(event)")
+    url = e.get("url") or ""
+    ev = (f"<a class='mw-calev' href='{html.escape(url)}' target='_blank' rel='noopener'>{name}</a>"
+          if url.startswith("http") else f"<span class='mw-calev'>{name}</span>")
+    return (
+        "<div class='mw-calrow'>"
+        f"<span class='mw-caldt'>{html.escape(_cal_when(e))}</span>"
+        f"<span class='mw-calst'>{_cal_stars(e.get('importance'))}</span>"
+        f"{ev}<span class='mw-calfig'>{fig_html}</span>"
+        "</div>"
+    )
+
+
+def _cal_group_html(title, events):
+    if not events:
+        return ""
+    return (f"<div class='mw-calpanel'><h4>{html.escape(title)}</h4>"
+            + "".join(_cal_row_html(e) for e in events) + "</div>")
+
+
+def _calendar_dashboard_html(cal):
+    """The India macro Economic Calendar: a signal strip of the next key releases
+    over an expandable full table (recent releases with actuals + the upcoming
+    schedule). Built from data/calendar.json (TE-sourced, maintained by poll.py)."""
+    events = cal.get("events") or []
+    if not events:
+        return ""
+    today = datetime.now(IST).date().isoformat()
+    week_ago = (datetime.now(IST) - timedelta(days=7)).date().isoformat()
+    upcoming = [e for e in events if (e.get("date") or "") >= today]
+    recent = [e for e in events if week_ago <= (e.get("date") or "") < today]
+    recent.reverse()                                      # most recent release first
+
+    # Strip: the next few releases, high-importance first within each day.
+    strip = sorted(upcoming, key=lambda e: (e.get("date") or "",
+                                            -(e.get("importance") or 0)))[:4]
+    tiles = []
+    for e in strip:
+        sub_bits = [s for s in (
+            f"cons {e['consensus']}" if (e.get("consensus") or "").strip() else "",
+            f"prev {e['previous']}" if (e.get("previous") or "").strip() else "",
+            _cal_stars(e.get("importance"))) if s]
+        tiles.append(_sig(_cal_when(e), e.get("event") or "—",
+                          sub=" · ".join(sub_bits), cls="cal", href=e.get("url")))
+
+    captured = cal.get("captured_at") or ""
+    try:
+        captured = datetime.fromisoformat(captured).strftime("%d %b %Y, %H:%M IST")
+    except (ValueError, TypeError):
+        pass
+    src = " · ".join(s for s in (
+        f"snapshot · {captured}" if captured else "",
+        "times as listed by",) if s)
+    cal_url = cal.get("calendar_url") or "https://tradingeconomics.com/india/calendar"
+    body = _cal_group_html("Upcoming", upcoming[:40]) + _cal_group_html(
+        "Recent releases · actual vs consensus (▲ above · ▼ below)", recent[:40])
+    return (
+        "<div class='mw-cal-wrap'>"
+        f"<div class='mw-rates-hd'><span class='t'>Economic Calendar · India</span>"
+        f"<span class='s'>{html.escape(src)} {_srclink(cal_url, 'tradingeconomics.com')}</span></div>"
+        f"<div class='mw-calstrip'>{''.join(tiles)}</div>"
+        f"<details><summary></summary>{body}</details>"
+        "</div>"
+    )
+
 # --------------------------------------------------------------------------- #
 # Theme — the single Trading Economics palette, tuned for contrast so ALL text
 # (headlines, body, timestamps, captions, inputs, links) stays legible.
@@ -620,6 +725,12 @@ def load_rates_cached():
 def load_commodities_cached():
     """The committed Commodities snapshot (data/commodities.json). Cached; Refresh clears it."""
     return commodities.load_commodities()
+
+
+@st.cache_data(ttl=600, show_spinner=False)
+def load_calendar_cached():
+    """The committed Economic Calendar snapshot (data/calendar.json). Cached; Refresh clears it."""
+    return econ_calendar.load_calendar()
 
 
 def theme_css(p):
@@ -870,6 +981,34 @@ def theme_css(p):
       .mw-up {{ color: {p['up']}; }}
       .mw-down {{ color: {p['down']}; }}
       .mw-flat {{ color: {p['muted']}; }}
+      /* Economic Calendar — a strip of the next key releases over an expandable
+         full event table (mirrors the Current Rates strip + rate-card pattern). */
+      .mw-cal-wrap {{ margin: 4px 0 20px; animation: mwFade .5s ease both; }}
+      .mw-calstrip {{ display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }}
+      @media (max-width: 1100px) {{ .mw-calstrip {{ grid-template-columns: repeat(2, 1fr); }} }}
+      @media (max-width: 640px) {{ .mw-calstrip {{ grid-template-columns: 1fr; }} }}
+      .mw-sig.cal .val {{ font-size: 13.5px; font-weight: 600; line-height: 1.35; white-space: normal; }}
+      .mw-calpanel {{ background: {p['panel']}; border: 1px solid {p['border']}; border-radius: 9px;
+        padding: 13px 15px; margin-top: 12px; }}
+      .mw-calpanel h4 {{ font-family: {_MONO}; font-size: 11px; letter-spacing: .09em; text-transform: uppercase;
+        color: {p['muted']}; margin: 0 0 9px; padding-bottom: 7px; border-bottom: 1px solid {p['border']}; }}
+      .mw-calrow {{ display: flex; align-items: baseline; gap: 10px;
+        padding: 4px 0; border-bottom: 1px dotted {p['border']}; }}
+      .mw-calrow:last-child {{ border-bottom: none; }}
+      .mw-caldt {{ font-family: {_MONO}; font-size: 11.5px; color: {p['muted']}; flex: none; min-width: 138px; }}
+      .mw-calst {{ font-size: 10px; color: {p['accent']}; flex: none; min-width: 26px; letter-spacing: .1em; }}
+      [data-testid="stMarkdownContainer"] .mw-calev {{ flex: 1; font-size: 13px; color: {p['text']} !important;
+        font-weight: 600; text-decoration: none; }}
+      [data-testid="stMarkdownContainer"] a.mw-calev:hover {{ color: {p['accent']} !important; text-decoration: underline; }}
+      .mw-calfig {{ font-family: {_MONO}; font-size: 12px; color: {p['muted']}; white-space: nowrap; }}
+      .mw-calfig .mw-up, .mw-calfig .mw-down, .mw-calfig .mw-calact {{ font-weight: 700; }}
+      .mw-calact {{ color: {p['heading']}; }}
+      @media (max-width: 640px) {{ .mw-calrow {{ flex-wrap: wrap; }} .mw-calfig {{ white-space: normal; }} }}
+      .mw-cal-wrap > details > summary {{ list-style: none; cursor: pointer; outline: none; width: max-content;
+        font-family: {_MONO}; font-size: 11px; font-weight: 700; letter-spacing: .04em; color: {p['accent']}; margin-top: 13px; }}
+      .mw-cal-wrap > details > summary::-webkit-details-marker {{ display: none; }}
+      .mw-cal-wrap > details > summary::after {{ content: "▾ FULL CALENDAR"; }}
+      .mw-cal-wrap > details[open] > summary::after {{ content: "▴ HIDE CALENDAR"; }}
     </style>
     """
 
@@ -999,6 +1138,11 @@ with st.sidebar:
         help="Free commodity prices (Brent, gold, silver, copper, aluminium, zinc, steel, "
              "iron ore, coffee) with % change vs the previous close and a direct chart link.",
     )
+    st.checkbox(
+        "Show economic calendar", value=True, key="calendar_dash",
+        help="India macro releases from Trading Economics — upcoming schedule with "
+             "consensus forecasts, plus the past week's actuals, with importance stars.",
+    )
 st.query_params["sources"] = ",".join(sources)
 st.query_params["layout"] = layout
 st.markdown(theme_css(THEMES[theme]), unsafe_allow_html=True)
@@ -1014,6 +1158,7 @@ if refresh.button("⟳ Refresh", use_container_width=True):
     load_history.clear()
     load_rates_cached.clear()
     load_commodities_cached.clear()
+    load_calendar_cached.clear()
     st.rerun()
 
 # --- Current Rates dashboard (equity desk) -----------------------------------
@@ -1028,6 +1173,12 @@ if st.session_state.get("commodities_dash", True):
     _cmds = load_commodities_cached()
     if _cmds:
         st.markdown(_commodities_dashboard_html(_cmds), unsafe_allow_html=True)
+
+# --- Economic Calendar (India macro releases · TE-sourced) --------------------
+if st.session_state.get("calendar_dash", True):
+    _cal = load_calendar_cached()
+    if _cal and (_cal.get("events") or []):
+        st.markdown(_calendar_dashboard_html(_cal), unsafe_allow_html=True)
 
 @st.fragment(run_every=REFRESH_SECONDS)
 def wire():

@@ -34,7 +34,11 @@ Rate** row was removed, and **Sensex/Nifty** stay RBI. Below it sits an opt-in
 tile per commodity (Brent, Gold, Silver, Copper, Aluminium, Zinc, Steel, Iron Ore, Coffee) with
 price, **% change vs the previous close** (coloured with the palette's `up`/`down` gain/loss
 tones), and a **direct chart link** (the tile opens the
-commodity's Trading Economics page). It reads `data/commodities.json` via `commodities.py`, which
+commodity's Trading Economics page). Below that sits an opt-in **Economic Calendar**
+(`_calendar_dashboard_html`, sidebar **Show economic calendar** toggle): a strip of the next
+key India macro releases over an expandable full table (previous/consensus/actual with
+importance stars), read from `data/calendar.json` via `econ_calendar.py` (see the Gotchas
+entry). It reads `data/commodities.json` via `commodities.py`, which
 scrapes **Trading Economics' server-rendered commodities table** (primary — all 9 incl. Zinc, with
 TE's own % change) and falls back to **Yahoo Finance's keyless chart endpoint** if TE is blocked or
 drops a symbol; **Steel** is pinned to Yahoo (USD HRC, since TE steel is CNY rebar). Durable history accumulates per feed
@@ -108,6 +112,25 @@ SEBI items on the link itself (unique + permanent, so this is safe).
   Chromium shot), since the live RBI feed 403s here.
 - Validate `streamlit_app.py` changes headlessly with `streamlit.testing.v1.AppTest`
   (runs the script, asserts `not at.exception`) across layouts/filters.
+- **Economic Calendar** (`econ_calendar.py` → `data/calendar.json`, rendered by
+  `_calendar_dashboard_html`) scrapes **Trading Economics' India calendar page**
+  (`tradingeconomics.com/india/calendar`, server-rendered like its quotes tables —
+  per-day `<thead>` date headers over `tr[data-url]` event rows, field spans by id
+  `actual`/`previous`/`consensus`/`forecast`, importance via `data-importance`). The module
+  is deliberately NOT named `calendar.py` — that would shadow stdlib `calendar`, which
+  `feed.py`/`sebi.py`/`rbi_archive.py` import. It rides the **30-min `poll.py` cron** (so
+  released actuals land promptly) and **ACCUMULATES**: TE serves a rolling window, so each
+  poll MERGES by event id onto the committed snapshot (non-empty fresh fields win — actuals
+  fill in; rolled-out events are kept until pruned past today−14d/+180d), meaning the
+  forward schedule builds up over time; the seed ships with `events: []` and the app hides
+  the section until the first scrape lands. Writes only on a sane parse (≥3 dated rows) —
+  a Cloudflare block keeps the committed file. **Times are stored/shown exactly as TE
+  prints them** (TE localizes per-visitor by cookie, so no timezone is claimed — don't
+  "fix" this by converting). The actual is coloured vs consensus as ▲ above / ▼ below
+  (direction only — deliberately NOT good/bad, which is indicator-specific). Written
+  without live TE access: fixture-tested in `tests/test_calendar.py`, the first CI poll is
+  the live test, and `MARKETWIRE_CALENDAR_DUMP` (uploaded as the `calendar-fetch-dump`
+  artifact on schedule runs) captures the fetched HTML for parser tuning.
 - **Shared plumbing lives in `common.py`** (IST, both UA families, `num`,
   `item_key`/`link_id`, the GitHub-Actions `annotate`, the URL-or-path JSON loader,
   the TE `tr[data-symbol]` table scraper, the Yahoo chart fetcher, `bond_benchmark`)

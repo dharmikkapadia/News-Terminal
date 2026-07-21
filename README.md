@@ -31,6 +31,11 @@ the day's key numbers right above it.
   copper, aluminium, zinc, steel, iron ore and coffee — each with its price, the
   day's percentage move (green/red), and a one-click link to a full chart.
 
+- **The macro calendar, built in.** An optional economic calendar shows India's
+  upcoming data releases — CPI, GDP, PMI, trade, RBI decisions and more — with
+  consensus forecasts and importance ratings, plus the past week's results and
+  whether each came in above or below expectations.
+
 - **Reads like a news site.** A newspaper-style masthead over your choice of a
   single-column stream or a card grid, in a clean light markets-data design
   inspired by Trading Economics. The wire refreshes itself every few minutes;
