@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-07-22T02:00:39+05:30",
+  "captured_at": "2026-07-22T02:30:49+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…)",
   "commodities": [
@@ -11,9 +11,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
       "source": "Trading Economics · CO1:COM",
-      "price": 91.367,
+      "price": 91.435,
       "prev_close": 89.22,
-      "change_pct": 2.41,
+      "change_pct": 2.48,
       "currency": "USD",
       "as_of": "2026-07-21"
     },
@@ -25,9 +25,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Trading Economics · XAUUSD:CUR",
-      "price": 4082.7,
+      "price": 4077.17,
       "prev_close": 4008.04,
-      "change_pct": 1.86,
+      "change_pct": 1.72,
       "currency": "USD",
       "as_of": "2026-07-21"
     },
@@ -39,9 +39,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
       "source": "Trading Economics · XAGUSD:CUR",
-      "price": 58.69,
+      "price": 58.793,
       "prev_close": 56.39,
-      "change_pct": 4.08,
+      "change_pct": 4.26,
       "currency": "USD",
       "as_of": "2026-07-21"
     },
@@ -53,9 +53,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Trading Economics · HG1:COM",
-      "price": 6.4792,
+      "price": 6.4801,
       "prev_close": 6.299,
-      "change_pct": 2.86,
+      "change_pct": 2.88,
       "currency": "USD",
       "as_of": "2026-07-21"
     },
@@ -95,9 +95,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/steel",
       "source": "Yahoo Finance · HRC=F",
-      "price": 1181.0,
+      "price": 1182.0,
       "prev_close": 1154.0,
-      "change_pct": 2.34,
+      "change_pct": 2.43,
       "currency": "USD",
       "as_of": "2026-07-21"
     },
