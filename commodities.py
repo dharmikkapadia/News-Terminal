@@ -32,29 +32,23 @@ Never raises on load; returns None when there's no readable snapshot.
 
 import json
 import os
-import re
-from datetime import datetime, date, timezone, timedelta
-from urllib.parse import quote
+from datetime import datetime
 
 import requests
+
+import common
 
 _DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 COMMODITIES_PATH = os.environ.get(
     "MARKETWIRE_COMMODITIES_FILE", os.path.join(_DATA_DIR, "commodities.json"))
 # Trading Economics' server-rendered commodities table (primary source).
 TE_URL = os.environ.get("MARKETWIRE_TE_COMMODITIES", "https://tradingeconomics.com/commodities")
-# Yahoo's keyless chart endpoint (fallback). `<symbol>` is URL-encoded (futures tickers contain '=').
-YF_CHART = os.environ.get(
-    "MARKETWIRE_YF_CHART", "https://query1.finance.yahoo.com/v8/finance/chart/")
 # Public per-commodity chart pages (the "view chart" links).
 TE_BASE = "https://tradingeconomics.com/commodity/"
 # A browser-ish UA + headers — TE sits behind Cloudflare and Yahoo 403s the bare python UA.
-UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-      "(KHTML, like Gecko) Chrome/124.0 Safari/537.36")
-_HTML_HEADERS = {"User-Agent": UA,
-                 "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-                 "Accept-Language": "en-US,en;q=0.9"}
-IST = timezone(timedelta(hours=5, minutes=30))
+UA = common.BROWSER_UA
+_HTML_HEADERS = common.HTML_HEADERS
+IST = common.IST
 
 # The commodity universe. Each: stable key, display name, unit, category, the Trading Economics
 # row symbol (`te`), the Yahoo fallback symbol (`yf`, None ⇒ no free future), the TE chart slug,
@@ -94,8 +88,6 @@ _BOUNDS = {
 # The liquid core that must resolve (from EITHER source) in-bounds for a scrape to be trusted
 # enough to overwrite the committed file (the rest are preserved if missing — see poll_commodities).
 _CORE = ("brent", "gold", "silver", "copper")
-_MONTHS = {m: i for i, m in enumerate(
-    ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"], 1)}
 
 
 # --------------------------------------------------------------------------- #
@@ -106,20 +98,8 @@ def load_commodities(source=None, url_env="MARKETWIRE_COMMODITIES_URL",
     """Read the committed commodities snapshot. `source` (or the env var) may be a raw
     http(s) URL or a file path; defaults to the local committed JSON. Never raises —
     returns the parsed dict, or None if there's nothing readable."""
-    source = source or os.environ.get(url_env, "").strip() or default_path
-    try:
-        if source.startswith(("http://", "https://")):
-            resp = requests.get(source, headers={"User-Agent": UA}, timeout=15)
-            if resp.status_code == 404:
-                return None
-            resp.raise_for_status()
-            return json.loads(resp.text)
-        with open(source, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except FileNotFoundError:
-        return None
-    except Exception:
-        return None
+    return common.load_json_snapshot(source, url_env, default_path,
+                                     headers={"User-Agent": UA})
 
 
 def chart_url(spec):
@@ -130,14 +110,8 @@ def chart_url(spec):
 # --------------------------------------------------------------------------- #
 # Parsing helpers
 # --------------------------------------------------------------------------- #
-def _num(s):
-    """First signed number in `s` as float, tolerant of commas and the unicode minus
-    ('−4.34%' -> -4.34, '4,087.01' -> 4087.01), else None."""
-    if s is None:
-        return None
-    s = str(s).replace("−", "-")
-    m = re.search(r"-?\d[\d,]*\.?\d*", s)
-    return float(m.group(0).replace(",", "")) if m else None
+_num = common.num           # shared numeric-cell parser
+_te_date = common.te_asof   # 'Jun/26' -> ISO date; a time-of-day cell -> None (default)
 
 
 def _in_bounds(key, v):
@@ -147,117 +121,22 @@ def _in_bounds(key, v):
     return lo is None or (lo <= v <= hi)
 
 
-def _te_date(s):
-    """TE's row date 'Jun/26' -> ISO '2026-06-26' (current IST year; rolls back a year if the
-    parsed date lands more than a week in the future, e.g. a Dec date read in early Jan)."""
-    if not s:
-        return None
-    m = re.match(r"\s*([A-Za-z]{3})\s*/\s*(\d{1,2})", str(s))
-    if not m:
-        return None
-    mon = _MONTHS.get(m.group(1).lower())
-    if not mon:
-        return None
-    today = datetime.now(IST).date()
-    try:
-        d = date(today.year, mon, int(m.group(2)))
-    except ValueError:
-        return None
-    if (d - today).days > 7:
-        d = date(today.year - 1, mon, int(m.group(2)))
-    return d.isoformat()
-
-
 # --------------------------------------------------------------------------- #
 # Primary scrape — Trading Economics server-rendered table
 # --------------------------------------------------------------------------- #
-def _celltext(tr, cid):
-    """Text of the <td id="cid"> inside a row (TE repeats ids per row; scoping to `tr` is fine)."""
-    td = tr.find("td", id=cid)
-    return td.get_text(" ", strip=True) if td else None
-
-
 def fetch_te(url=TE_URL, timeout=25):
     """Scrape TE's commodities table into {our_key: {price, prev_close, change_pct, currency,
     as_of}}. Returns (quotes, error). Best effort: a Cloudflare block / markup change yields an
     error (or an empty parse) and the caller falls back to Yahoo / preserves prior values."""
-    try:
-        resp = requests.get(url, headers=_HTML_HEADERS, timeout=timeout)
-        resp.raise_for_status()
-    except Exception as ex:
-        return {}, f"{type(ex).__name__}: {ex}"
-    try:
-        from bs4 import BeautifulSoup
-    except Exception as ex:
-        return {}, f"BeautifulSoup unavailable: {ex}"
-
-    soup = BeautifulSoup(resp.content, "html.parser")
     want = {s["te"]: s["key"] for s in SPECS if s.get("te")}
-    out = {}
-    for tr in soup.select("tr[data-symbol]"):
-        key = want.get(tr.get("data-symbol"))
-        if not key or key in out:
-            continue
-        price = _num(_celltext(tr, "p"))
-        if price is None:
-            continue
-        nch = _num(_celltext(tr, "nch"))
-        pch = _num(_celltext(tr, "pch"))             # signed % vs previous close, straight from TE
-        if nch is not None:
-            prev = price - nch
-        elif pch not in (None, -100):
-            prev = price / (1 + pch / 100.0)
-        else:
-            prev = None
-        out[key] = {
-            "price": round(price, 4),
-            "prev_close": round(prev, 4) if prev is not None else None,
-            "change_pct": round(pch, 2) if pch is not None else None,
-            "currency": "USD",
-            "as_of": _te_date(_celltext(tr, "date")),
-        }
-    if not out:
-        return {}, "no target rows parsed (markup changed or blocked)"
-    return out, None
+    return common.fetch_te_table(url, want, timeout=timeout, headers=_HTML_HEADERS,
+                                 currency="USD")
 
 
 # --------------------------------------------------------------------------- #
 # Fallback scrape — Yahoo Finance chart endpoint
 # --------------------------------------------------------------------------- #
-def fetch_one(symbol, timeout=20, session=None):
-    """Fetch one Yahoo symbol's last close, previous close, % change and as-of date.
-    Returns ({price, prev_close, change_pct, currency, as_of}, error)."""
-    url = YF_CHART + quote(symbol, safe="") + "?range=7d&interval=1d"
-    try:
-        get = (session or requests).get
-        resp = get(url, headers={"User-Agent": UA}, timeout=timeout)
-        resp.raise_for_status()
-        data = resp.json()
-    except Exception as ex:
-        return None, f"{type(ex).__name__}: {ex}"
-    try:
-        res = (data.get("chart") or {}).get("result") or []
-        if not res:
-            return None, "no result"
-        res = res[0]
-        meta = res.get("meta") or {}
-        ts = res.get("timestamp") or []
-        quote_blk = ((res.get("indicators") or {}).get("quote") or [{}])[0]
-        closes = quote_blk.get("close") or []
-        pairs = [(t, c) for t, c in zip(ts, closes) if isinstance(c, (int, float))]
-        if len(pairs) < 2:
-            return None, "need ≥2 daily closes for a change"
-        (cur_t, cur), (_, prev) = pairs[-1], pairs[-2]
-        change_pct = ((cur - prev) / prev * 100.0) if prev else None
-        return {
-            "price": round(cur, 4),
-            "prev_close": round(prev, 4),
-            "change_pct": round(change_pct, 2) if change_pct is not None else None,
-            "currency": meta.get("currency"),
-            "as_of": datetime.fromtimestamp(cur_t, IST).strftime("%Y-%m-%d"),
-        }, None
-    except Exception as ex:
-        return None, f"parse error: {type(ex).__name__}: {ex}"
+fetch_one = common.yahoo_chart_quote    # one symbol's last/prev close, % change, as-of
 
 
 def fetch_yahoo(specs, timeout=20):

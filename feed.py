@@ -7,15 +7,17 @@ same way. Returns (items, error); never raises.
 import calendar
 import html
 import re
-from datetime import datetime, timezone, timedelta
+from datetime import datetime
 
 import requests
 import feedparser
 
+import common
+
 RBI_FEED = "https://rbi.org.in/pressreleases_rss.xml"
 RBI_NOTIFICATIONS_FEED = "https://rbi.org.in/notifications_rss.xml"
-UA = "Mozilla/5.0 (compatible; MarketWire/1.0; RSS reader)"
-IST = timezone(timedelta(hours=5, minutes=30))
+UA = common.UA
+IST = common.IST
 _TAG_RE = re.compile(r"<[^>]+>")
 # RBI's pubDate omits a timezone (e.g. "Thu, 25 Jun 2026 22:45:00"), which
 # feedparser can't parse — so it leaves published_parsed=None. Parse it ourselves

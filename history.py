@@ -11,9 +11,10 @@ update is a small git diff rather than a rewritten binary blob.
 
 import json
 import os
-import re
 
 import requests
+
+import common
 
 _DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 HISTORY_PATH = os.environ.get(
@@ -28,17 +29,10 @@ SEBI_PUBLIC_ISSUES_PATH = os.environ.get(
     "MARKETWIRE_SEBI_PUBLIC_ISSUES_FILE",
     os.path.join(_DATA_DIR, "sebi_public_issues.jsonl"),
 )
-UA = "Mozilla/5.0 (compatible; MarketWire/1.0; RSS reader)"
+UA = common.UA
 _FIELDS = ("link", "title", "summary", "published", "ts")
 
-
-def _key(it):
-    """Stable identity: RBI press-release `prid` or notification `Id` from the
-    link, else the link. (The two feeds are stored separately, so a prid and an
-    Id sharing a number never clash.)"""
-    link = it.get("link", "") or ""
-    m = re.search(r"\bprid=(\d+)", link, re.I) or re.search(r"\bid=(\d+)", link, re.I)
-    return m.group(1) if m else link
+_key = common.item_key      # prid/Id from the link, else the link itself
 
 
 def dedupe(items):

@@ -36,9 +36,11 @@ cloud sandbox — run it from a host that can reach sebi.gov.in:
 
 import calendar
 import re
-from datetime import datetime, timezone, timedelta
+from datetime import datetime
 
 import requests
+
+import common
 
 try:
     from bs4 import BeautifulSoup
@@ -49,8 +51,8 @@ except Exception:
 # sid=3 (Filings) / ssid=15 (Public Issues) / smid=10 (Draft Offer Documents
 # filed with SEBI, i.e. DRHPs) — see the module docstring for the sid/ssid/smid scheme.
 LISTING_URL = "https://www.sebi.gov.in/sebiweb/home/HomeAction.do?doListing=yes&sid=3&ssid=15&smid=10"
-UA = "Mozilla/5.0 (compatible; MarketWire/1.0; RSS reader)"
-IST = timezone(timedelta(hours=5, minutes=30))
+UA = common.UA
+IST = common.IST
 _DATE_RE = re.compile(r"[A-Z][a-z]{2}\s+\d{1,2},\s+\d{4}")
 
 

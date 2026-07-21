@@ -17,7 +17,7 @@ Deploy:        Streamlit Community Cloud, main file = streamlit_app.py
 import html
 import os
 import re
-from datetime import datetime, timezone, timedelta
+from datetime import datetime
 from urllib.parse import urlparse
 
 import streamlit as st
@@ -34,6 +34,7 @@ except Exception:
     pass  # no secrets configured — fine
 
 import commodities  # free commodity-price snapshot (data/commodities.json) for the dashboard
+import common       # shared constants/helpers (IST, bond benchmark, …)
 import feed         # pure RSS fetch/parse (shared with the poller)
 import history      # durable history kept as JSONL in the repo (maintained by the Action)
 import rates        # RBI Current Rates snapshot (data/rates.json) for the dashboard
@@ -73,7 +74,7 @@ FEEDS = {
     ),
 }
 FEED_NAMES = [cfg["name"] for cfg in FEEDS.values()]
-IST = timezone(timedelta(hours=5, minutes=30))
+IST = common.IST
 # The wire re-runs itself on this interval (seconds) with no clicks; override via env.
 REFRESH_SECONDS = int(os.environ.get("MARKETWIRE_REFRESH", "300"))
 CACHE_TTL = max(REFRESH_SECONDS - 30, 15)  # just under the interval so each tick re-fetches
@@ -199,7 +200,6 @@ def _stream_row_html(it):
     (no separate 'open' link); the body is clamped small with an inline Show more /
     Show less toggle (pure <details>) when long; then a relative timestamp."""
     ts = it.get("ts")
-    dt = datetime.fromtimestamp(ts, IST) if ts else None
     archived = _is_archived(it)
     src = it.get("source") or ""
     cls = _src_class(src)
@@ -318,18 +318,8 @@ def _benchmark_gsec(gsecs):
     return best[1] if best else None
 
 
-def _bond_benchmark(curve, target_years=10.0):
-    """The ~10Y bond from an investing.com curve (each row carries its maturity in `years`):
-    the tenor whose maturity is closest to `target_years`, or None."""
-    best = None
-    for b in curve or []:
-        yrs, y = b.get("years"), b.get("yield")
-        if not isinstance(yrs, (int, float)) or not isinstance(y, (int, float)):
-            continue
-        dist = abs(yrs - target_years)
-        if best is None or dist < best[0]:
-            best = (dist, b)
-    return best[1] if best else None
+# The ~10Y bond from an investing.com curve — shared with bonds.py's benchmark().
+_bond_benchmark = common.bond_benchmark
 
 
 # investing.com scrapes the FULL curve (~21 tenors) into market_trends.bonds; the Market

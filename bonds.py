@@ -31,6 +31,7 @@ import re
 from datetime import datetime
 from urllib.parse import urljoin
 
+import common
 import rates              # reuse RATES_PATH / IST / save_rates (single source of truth)
 
 # The investing.com India Government Bonds board. Default = the FULL curve (all maturities:
@@ -53,17 +54,9 @@ IST = rates.IST
 # Sane bounds for an Indian sovereign yield (percent). Anything outside ⇒ a mis-parse; the
 # whole write is then skipped so a garbage render can't clobber the committed curve.
 _YIELD_BOUNDS = (2.0, 15.0)
-_BENCH_YEARS = 10.0                      # the tenor the "10Y G-Sec" tile tracks
 
 
-def _num(s):
-    """First signed number in `s` as float, tolerant of commas and the unicode minus
-    ('−0.34%' -> -0.34, '6,68' stays as digits), else None."""
-    if s is None:
-        return None
-    s = str(s).replace("−", "-")
-    m = re.search(r"-?\d[\d,]*\.?\d*", s)
-    return float(m.group(0).replace(",", "")) if m else None
+_num = common.num           # shared numeric-cell parser
 
 
 def _signed_num(cell):
@@ -191,17 +184,7 @@ def parse_bonds(html_text, url=BONDS_URL):
     return curve, None
 
 
-def benchmark(curve, target_years=_BENCH_YEARS):
-    """The ~10Y benchmark bond (maturity closest to `target_years`), or None."""
-    best = None
-    for b in curve or []:
-        yrs, y = b.get("years"), b.get("yield")
-        if not isinstance(yrs, (int, float)) or not isinstance(y, (int, float)):
-            continue
-        d = abs(yrs - target_years)
-        if best is None or d < best[0]:
-            best = (d, b)
-    return best[1] if best else None
+benchmark = common.bond_benchmark   # ~10Y benchmark picker (shared with the app)
 
 
 def _is_complete(curve):

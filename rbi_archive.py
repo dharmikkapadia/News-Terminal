@@ -31,9 +31,11 @@ listing URL and the matching `href_match` for the feed you want.
 import calendar
 import re
 import sys
-from datetime import datetime, timezone, timedelta
+from datetime import datetime
 
 import requests
+
+import common
 
 try:
     from bs4 import BeautifulSoup
@@ -64,8 +66,8 @@ def _notif_match(raw_href, resolved_low):
 
 PRESS_HREF_MATCH = _press_match
 NOTIFICATIONS_HREF_MATCH = _notif_match
-UA = "Mozilla/5.0 (compatible; MarketWire/1.0; RSS reader)"
-IST = timezone(timedelta(hours=5, minutes=30))
+UA = common.UA
+IST = common.IST
 
 # Dates as RBI tends to show them, most specific first.
 _DATE_PATTERNS = [
@@ -91,10 +93,7 @@ def _parse_date(text):
     return None, ""
 
 
-def _key(link):
-    """RBI press-release `prid` or notification `Id` from a detail link, else None."""
-    m = re.search(r"\bprid=(\d+)", link, re.I) or re.search(r"\bid=(\d+)", link, re.I)
-    return m.group(1) if m else None
+_key = common.link_id       # prid/Id from a detail link, else None
 
 
 _YEAR_TEXT_RE = re.compile(r"^(?:19|20)\d{2}$")  # an <a> whose text is just a year
