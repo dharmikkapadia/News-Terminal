@@ -56,9 +56,9 @@ manual.
 
 ### A. The 30-min cadence depends on an off-repo cron + token
 GitHub's native scheduler is best-effort and drops frequent crons, so the workflows' built-in
-`schedule` is only a **sparse 6-hour fallback**. The real 30-min cadence comes from an
+`schedule` is only a **sparse 2-hour fallback**. The real 30-min cadence comes from an
 **external cron service** (e.g. cron-job.org) hitting the `workflow_dispatch` API with a
-fine-grained PAT (see README → "Reliable 30-min cadence"). Evidence: nearly every recent
+fine-grained PAT (see docs/OPERATIONS.md → "Reliable 30-min cadence"). Evidence: nearly every recent
 history run is `event: workflow_dispatch`, with only the occasional `schedule` run mixed in.
 **Single points of failure:** if that cron service goes down or the **PAT expires**, the
 cadence silently collapses to once every 6 hours with no error anywhere.

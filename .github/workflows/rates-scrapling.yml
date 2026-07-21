@@ -25,8 +25,8 @@ on:
     # commit-only-on-change, so the extra runs are idempotent: whichever fires first refreshes
     # the file and the rest no-op. The later slots also give RBI time to post its *same-day*
     # EOD G-Sec/Capital numbers (an early run only ever sees the previous day's close). For
-    # exact timing, also point an external cron at this workflow's workflow_dispatch (README →
-    # "Reliable 30-min cadence").
+    # exact timing, also point an external cron at this workflow's workflow_dispatch
+    # (docs/OPERATIONS.md → "Reliable 30-min cadence").
     - cron: "30 8 * * *"    # 14:00 IST
     - cron: "45 12 * * *"   # 18:15 IST
     - cron: "15 16 * * *"   # 21:45 IST

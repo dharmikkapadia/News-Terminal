@@ -19,7 +19,7 @@ on:
     # best-effort and may delay or drop a run, so a second evening slot backs it up — every
     # write is guarded + commit-only-on-change, so the extra run is idempotent (it no-ops
     # when the file is already current). For exact timing, also point an external cron at this
-    # workflow's workflow_dispatch (same setup as README → "Reliable 30-min cadence").
+    # workflow's workflow_dispatch (same setup as docs/OPERATIONS.md → "Reliable 30-min cadence").
     - cron: "0 8 * * *"     # 13:30 IST
     - cron: "0 15 * * *"    # 20:30 IST — evening backup if the afternoon slot is dropped
   workflow_dispatch: {}       # manual runs (Actions tab) + optional external cron

@@ -23,11 +23,11 @@ on:
     # GitHub's scheduler is unreliable — it drops most frequent crons (a "*/30"
     # actually fired roughly every 90 min here). So this is a best-effort FALLBACK;
     # the PRIMARY 30-min cadence comes from an external cron that hits the
-    # workflow_dispatch API (see README → "Reliable 30-min cadence"). The repo is
-    # PUBLIC, so standard-runner Actions minutes are free — cadence is a freshness/
-    # redeploy trade-off, not a billing one. (While the repo was private, the 30-min
-    # cadence blew the 2,000-min/month free tier in ~20 days — July 2026; see the
-    # README's Actions-minutes section before ever making the repo private again.)
+    # workflow_dispatch API (see docs/OPERATIONS.md → "Reliable 30-min cadence"). The
+    # repo is PUBLIC, so standard-runner Actions minutes are free — cadence is a
+    # freshness/redeploy trade-off, not a billing one. (While the repo was private, the
+    # 30-min cadence blew the 2,000-min/month free tier in ~20 days — July 2026; see
+    # docs/OPERATIONS.md's Actions-minutes section before making the repo private again.)
     # These 2-hourly schedule runs are ALSO the only ones that do the heavy
     # investing.com bond scrape (Scrapling stealth browser + xvfb) — see below.
     - cron: "7 */2 * * *"
