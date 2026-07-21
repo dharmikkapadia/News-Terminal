@@ -6,18 +6,17 @@ Public Issues (DRHP filings) listing server-side and shows them **together**
 in one wire with a keyword filter, a **sort order** toggle (newest/oldest first), an
 opt-in **date-range** filter, and a sidebar **Sources** multiselect (show all feeds
 or pick individually), each item tagged with its source
-(`RBI - Press Release` / `RBI - Notifications` / `SEBI - Public Issues`), plus a
-theme picker. The UI is laid
+(`RBI - Press Release` / `RBI - Notifications` / `SEBI - Public Issues`). The UI is laid
 out like a news website with a sidebar **Layout** toggle: **Stream** (default — a
 single-column feed à la Trading Economics: underlined headline, right-aligned source
 tags, clamped body with an inline `<details>` Show more/less toggle, relative
 timestamp; `_stream_html`/`_stream_row_html`) or
 **Grid** (uniform card grid via `st.columns` + bordered `st.container`s,
-`_story_card_html`, clamped preview + **Full text** expander). A serif **masthead**
-tops both, with subtle fade-in/hover CSS, and six flagship themes
-(Bloomberg, Reuters, Paper, Trading Economics, High Contrast, and **Equity Terminal**
-— a dark trading-desk palette, the default — each with its own `headfont` stack and
-`up`/`down` gain/loss colours). Above the wire sits an opt-in **Current Rates dashboard**
+`_story_card_html`, clamped preview + **Full text** expander). A **masthead**
+tops both, with subtle fade-in/hover CSS, in a SINGLE fixed **Trading Economics**
+palette (`THEMES` in `streamlit_app.py` — light markets-data look: soft-grey page,
+white cards, navy headlines, sans `headfont`, `up`/`down` gain/loss colours; there is
+NO theme picker and no `?theme=` param). Above the wire sits an opt-in **Current Rates dashboard**
 (`_rates_dashboard_html`, sidebar **Show rates dashboard** toggle): a signal strip of
 key RBI rates (repo, LAF corridor, CRR/SLR, USD/INR, ~10y G-Sec) plus a **next-MPC
 countdown**, over an expandable full rate card (policy/reserve/exchange/lending rates,
@@ -33,8 +32,8 @@ change vs previous close** and a per-bond chart link) come from `market_trends.b
 Rate** row was removed, and **Sensex/Nifty** stay RBI. Below it sits an opt-in
 **Commodities** strip (`_commodities_dashboard_html`, sidebar **Show commodities** toggle): a
 tile per commodity (Brent, Gold, Silver, Copper, Aluminium, Zinc, Steel, Iron Ore, Coffee) with
-price, **% change vs the previous close** (coloured with each theme's `up`/`down` gain/loss
-tones — previously defined but unused), and a **direct chart link** (the tile opens the
+price, **% change vs the previous close** (coloured with the palette's `up`/`down` gain/loss
+tones), and a **direct chart link** (the tile opens the
 commodity's Trading Economics page). It reads `data/commodities.json` via `commodities.py`, which
 scrapes **Trading Economics' server-rendered commodities table** (primary — all 9 incl. Zinc, with
 TE's own % change) and falls back to **Yahoo Finance's keyless chart endpoint** if TE is blocked or
@@ -93,21 +92,22 @@ SEBI items on the link itself (unique + permanent, so this is safe).
   literal HTML sample built from a Claude-for-Chrome capture of the real markup;
   validate `sebi.py` itself from a host that can reach sebi.gov.in, like
   `rbi_archive.py`.
-- Themes are injected CSS keyed by palette (`theme_css`). Streamlit **portals
-  overlays** (selectbox/multiselect dropdowns, help `?` tooltips, popovers, the
-  **date-picker calendar**) outside `.stApp`, so `.stApp`-scoped rules miss them and
-  light themes render dark-on-dark. Style them with **global** selectors +
-  `!important`, setting BOTH background and text colour — e.g.
+- The palette is injected CSS (`theme_css`, fed the single Trading Economics palette
+  from `THEMES`). Streamlit **portals overlays** (selectbox/multiselect dropdowns,
+  help `?` tooltips, popovers, the **date-picker calendar**) outside `.stApp`, so
+  `.stApp`-scoped rules miss them and they'd fall back to Streamlit's own base theme.
+  Style them with **global** selectors + `!important`, setting BOTH background and
+  text colour — e.g.
   `[data-testid="stTooltipContent"]`, `[data-baseweb="popover"]`, `[role="option"]`,
   `[data-baseweb="calendar"]`, `span[data-baseweb="tag"]` (multiselect chips). When
-  adding any new hover/popup UI, restyle it for the themes.
+  adding any new hover/popup UI, restyle it in `theme_css`.
 - Story cards are bordered `st.container`s; the grid styles them via
   `[data-testid="stVerticalBlockBorderWrapper"]`. Card body is custom HTML
   (`_story_card_html`) so the summary preview is CSS line-clamped — verify any
-  theme/markup change with the screenshot harness (`streamlit run` + a headless
-  Chromium shot per theme), since the live RBI feed 403s here.
+  palette/markup change with the screenshot harness (`streamlit run` + a headless
+  Chromium shot), since the live RBI feed 403s here.
 - Validate `streamlit_app.py` changes headlessly with `streamlit.testing.v1.AppTest`
-  (runs the script, asserts `not at.exception`) across themes/filters.
+  (runs the script, asserts `not at.exception`) across layouts/filters.
 - **Current Rates** (`data/rates.json`) is refreshed two ways: (1) MANUAL — a
   Claude-for-Chrome run on rbi.org.in emits the JSON (RBI 403s CI and the rates box is a
   JS accordion, so a real browser is the reliable extractor); commit it. The canonical,

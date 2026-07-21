@@ -178,14 +178,14 @@ It reads a committed **`data/rates.json`** (`rates.py`), refreshed two ways:
   timing, also point an external cron at either workflow's `workflow_dispatch`. Like `rbi_archive.py`,
   the scrapers need validating from a host that can reach RBI.
 
-This pairs with the dark **Equity Terminal** theme (the default) — charcoal page,
-terminal-green press tags, amber notifications, monospace numerics.
+The dashboard renders in the app's single **Trading Economics** palette — monospace
+numerics, green/red gain-loss tones.
 
 ### Commodities strip (free prices · % vs prev close · chart links)
 
 Below the rates panel, an opt-in **Commodities** strip (sidebar **Show commodities**) shows
 **Brent, Gold, Silver, Copper, Aluminium, Zinc, Steel (HRC), Iron Ore and Coffee** — each as a
-tile with the price, the **% change vs its previous close** (coloured with the theme's
+tile with the price, the **% change vs its previous close** (coloured with the palette's
 `up`/`down` gain/loss tones), and a **direct chart link** (the whole tile opens the commodity's
 [Trading Economics](https://tradingeconomics.com/commodities) page in a new tab).
 
@@ -231,14 +231,13 @@ over your choice of two layouts (sidebar **Layout** toggle, remembered via `?lay
 Both tag every item with its colour-coded source, link the headline straight to RBI,
 and use subtle fade-in/hover motion.
 
-**Themes:** six flagship palettes in the sidebar — **Equity Terminal** (dark trading-desk,
-the default), **Bloomberg** (dark amber), **Reuters** (light orange), **Paper** (warm light),
-**Trading Economics** (light, navy/blue data-site look with a sans headline font), and
-**High Contrast** (black/yellow). Each theme carries its own headline font stack (`headfont` —
-serif for the newspaper looks, sans for the data-site looks) and `up`/`down` gain/loss colours
-for the rates dashboard. Every palette is tuned so all
-text stays legible (including portaled overlays like dropdowns and the date-picker),
-and your choice is remembered in the URL (`?theme=…`), so it sticks and is shareable.
+**Palette:** a single fixed **Trading Economics**-inspired palette (`THEMES` in
+`streamlit_app.py`) — soft-grey page, white cards, navy headlines, signal
+blue/green/violet accents, a sans headline font (`headfont`), and `up`/`down`
+gain/loss colours for the rates/commodities dashboards. There is no theme picker and
+no `?theme=` URL param. The palette is tuned so all text stays legible, including
+portaled overlays like dropdowns and the date-picker (see the CLAUDE.md gotcha on
+Streamlit portaling).
 
 ## Run locally
 
