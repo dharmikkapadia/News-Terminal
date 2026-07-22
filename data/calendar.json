@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-07-22T15:30:47+05:30",
+  "captured_at": "2026-07-22T16:00:44+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -341,8 +341,9 @@
       "actual": "",
       "previous": "6.14%",
       "consensus": "",
-      "forecast": "",
-      "first_seen": "2026-07-21T22:01:55+05:30"
+      "forecast": "6.6%",
+      "first_seen": "2026-07-21T22:01:55+05:30",
+      "updated_at": "2026-07-22T16:00:44+05:30"
     },
     {
       "id": "400209",
@@ -354,8 +355,9 @@
       "actual": "",
       "previous": "27.41%",
       "consensus": "",
-      "forecast": "",
-      "first_seen": "2026-07-21T22:01:55+05:30"
+      "forecast": "20.0%",
+      "first_seen": "2026-07-21T22:01:55+05:30",
+      "updated_at": "2026-07-22T16:00:44+05:30"
     },
     {
       "id": "400981",
@@ -367,8 +369,9 @@
       "actual": "",
       "previous": "9.87%",
       "consensus": "",
-      "forecast": "",
-      "first_seen": "2026-07-21T22:01:55+05:30"
+      "forecast": "11.0%",
+      "first_seen": "2026-07-21T22:01:55+05:30",
+      "updated_at": "2026-07-22T16:00:44+05:30"
     },
     {
       "id": "402549",
@@ -380,8 +383,9 @@
       "actual": "",
       "previous": "7.48%",
       "consensus": "",
-      "forecast": "",
-      "first_seen": "2026-07-21T22:01:55+05:30"
+      "forecast": "8.5%",
+      "first_seen": "2026-07-21T22:01:55+05:30",
+      "updated_at": "2026-07-22T16:00:44+05:30"
     },
     {
       "id": "396544",
@@ -406,8 +410,9 @@
       "actual": "",
       "previous": "$-30.43B",
       "consensus": "",
-      "forecast": "",
-      "first_seen": "2026-07-22T14:30:48+05:30"
+      "forecast": "$-31.0B",
+      "first_seen": "2026-07-22T14:30:48+05:30",
+      "updated_at": "2026-07-22T16:00:44+05:30"
     },
     {
       "id": "403128",
@@ -434,6 +439,19 @@
       "consensus": "",
       "forecast": "",
       "first_seen": "2026-07-22T14:30:48+05:30"
+    },
+    {
+      "id": "401121",
+      "date": "2026-08-17",
+      "time": "10:30 AM",
+      "event": "Unemployment Rate",
+      "url": "https://tradingeconomics.com/india/unemployment-rate",
+      "importance": null,
+      "actual": "",
+      "previous": "5.5%",
+      "consensus": "",
+      "forecast": "5.4%",
+      "first_seen": "2026-07-22T16:00:44+05:30"
     }
   ]
 }
