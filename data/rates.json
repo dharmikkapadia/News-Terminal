@@ -24,7 +24,7 @@
     "fx_te": {
       "inr_per_usd": {
         "label": "USD/INR",
-        "prev_close": 96.3421,
+        "prev_close": 96.342,
         "change_pct": 0.35,
         "chart_url": "https://tradingeconomics.com/currencies?quote=inr",
         "as_of": "2026-07-22",
@@ -47,7 +47,7 @@
         "source": "Trading Economics · GBPINR:CUR"
       }
     },
-    "fx_te_captured_at": "2026-07-23T02:00:43+05:30"
+    "fx_te_captured_at": "2026-07-23T02:30:53+05:30"
   },
   "lending_deposit_rates": {
     "base_rate": [
