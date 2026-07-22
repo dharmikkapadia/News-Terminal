@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-07-22T15:00:40+05:30",
+  "captured_at": "2026-07-22T15:30:47+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -195,8 +195,9 @@
       "actual": "",
       "previous": "3%",
       "consensus": "",
-      "forecast": "",
-      "first_seen": "2026-07-21T22:01:55+05:30"
+      "forecast": "3.0%",
+      "first_seen": "2026-07-21T22:01:55+05:30",
+      "updated_at": "2026-07-22T15:30:47+05:30"
     },
     {
       "id": "419618",
@@ -299,8 +300,9 @@
       "actual": "",
       "previous": "1.03%",
       "consensus": "",
-      "forecast": "",
-      "first_seen": "2026-07-21T22:01:55+05:30"
+      "forecast": "0.5%",
+      "first_seen": "2026-07-21T22:01:55+05:30",
+      "updated_at": "2026-07-22T15:30:47+05:30"
     },
     {
       "id": "401894",
@@ -312,8 +314,9 @@
       "actual": "",
       "previous": "4.38%",
       "consensus": "",
-      "forecast": "",
-      "first_seen": "2026-07-21T22:01:55+05:30"
+      "forecast": "4.5%",
+      "first_seen": "2026-07-21T22:01:55+05:30",
+      "updated_at": "2026-07-22T15:30:47+05:30"
     },
     {
       "id": "401904",
