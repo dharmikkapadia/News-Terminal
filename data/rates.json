@@ -15,7 +15,7 @@
   "exchange_rates": {
     "as_of": "As at 1.00pm of July 21, 2026",
     "source": "FBIL",
-    "inr_per_usd": 96.588,
+    "inr_per_usd": 96.59,
     "inr_per_gbp": 129.329,
     "inr_per_eur": 110.2463,
     "inr_per_100_jpy": 59.23,
@@ -47,7 +47,7 @@
         "source": "Trading Economics · GBPINR:CUR"
       }
     },
-    "fx_te_captured_at": "2026-07-22T12:06:58+05:30"
+    "fx_te_captured_at": "2026-07-22T12:30:53+05:30"
   },
   "lending_deposit_rates": {
     "base_rate": [
