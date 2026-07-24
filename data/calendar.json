@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-07-24T10:00:56+05:30",
+  "captured_at": "2026-07-24T10:30:48+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -23,11 +23,12 @@
       "event": "HSBC Composite PMI Flash",
       "url": "https://tradingeconomics.com/india/composite-pmi",
       "importance": null,
-      "actual": "",
+      "actual": "54.3",
       "previous": "57.1",
       "consensus": "",
       "forecast": "58.4",
-      "first_seen": "2026-07-21T22:01:55+05:30"
+      "first_seen": "2026-07-21T22:01:55+05:30",
+      "updated_at": "2026-07-24T10:30:48+05:30"
     },
     {
       "id": "399277",
