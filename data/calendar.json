@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-07-24T10:30:48+05:30",
+  "captured_at": "2026-07-24T11:00:36+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -37,11 +37,12 @@
       "event": "HSBC Manufacturing PMI Flash",
       "url": "https://tradingeconomics.com/india/manufacturing-pmi",
       "importance": null,
-      "actual": "",
+      "actual": "53.9",
       "previous": "54.2",
       "consensus": "",
       "forecast": "56",
-      "first_seen": "2026-07-21T22:01:55+05:30"
+      "first_seen": "2026-07-21T22:01:55+05:30",
+      "updated_at": "2026-07-24T11:00:36+05:30"
     },
     {
       "id": "399290",
@@ -50,11 +51,12 @@
       "event": "HSBC Services PMI Flash",
       "url": "https://tradingeconomics.com/india/services-pmi",
       "importance": null,
-      "actual": "",
+      "actual": "53.1",
       "previous": "57.4",
       "consensus": "",
       "forecast": "59",
-      "first_seen": "2026-07-21T22:01:55+05:30"
+      "first_seen": "2026-07-21T22:01:55+05:30",
+      "updated_at": "2026-07-24T11:00:36+05:30"
     },
     {
       "id": "396355",
@@ -182,9 +184,10 @@
       "importance": null,
       "actual": "",
       "previous": "54.2",
-      "consensus": "",
-      "forecast": "",
-      "first_seen": "2026-07-21T22:01:55+05:30"
+      "consensus": "53.9",
+      "forecast": "53.9",
+      "first_seen": "2026-07-21T22:01:55+05:30",
+      "updated_at": "2026-07-24T11:00:36+05:30"
     },
     {
       "id": "419624",
@@ -221,10 +224,11 @@
       "url": "https://tradingeconomics.com/india/composite-pmi",
       "importance": null,
       "actual": "",
-      "previous": "",
-      "consensus": "",
-      "forecast": "",
-      "first_seen": "2026-07-21T22:01:55+05:30"
+      "previous": "57.1",
+      "consensus": "54.3",
+      "forecast": "54.3",
+      "first_seen": "2026-07-21T22:01:55+05:30",
+      "updated_at": "2026-07-24T11:00:36+05:30"
     },
     {
       "id": "396449",
@@ -235,9 +239,10 @@
       "importance": null,
       "actual": "",
       "previous": "57.4",
-      "consensus": "",
-      "forecast": "",
-      "first_seen": "2026-07-21T22:01:55+05:30"
+      "consensus": "53.1",
+      "forecast": "53.1",
+      "first_seen": "2026-07-21T22:01:55+05:30",
+      "updated_at": "2026-07-24T11:00:36+05:30"
     },
     {
       "id": "396460",
