@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-07-25T03:30:40+05:30",
+  "captured_at": "2026-07-25T04:00:36+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…)",
   "commodities": [
@@ -123,9 +123,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/coffee",
       "source": "Trading Economics · KC1:COM",
-      "price": 314.09,
+      "price": 314.12,
       "prev_close": 309.4,
-      "change_pct": 1.52,
+      "change_pct": 1.53,
       "currency": "USD",
       "as_of": "2026-07-24"
     }
