@@ -11,10 +11,16 @@ the day's key numbers right above it.
 
 ## What you get
 
-- **One wire, three official sources.** RBI Press Releases, RBI Notifications, and
-  SEBI Public Issues (new draft IPO filings) appear together in a single stream, each
-  clearly tagged. Search by keyword, filter by source or date range, and sort
-  newest-first or oldest-first.
+- **One wire, five sources.** RBI Press Releases, RBI Notifications and SEBI Public
+  Issues (new draft IPO filings) — the official announcements — appear together in a
+  single stream alongside market news from Trading Economics, split into an India feed
+  and a world feed, each clearly tagged. Search by keyword, filter by source or date
+  range, and sort newest-first or oldest-first.
+
+- **Market news beside the official record.** The Trading Economics wire carries the
+  releases and market moves as they land — inflation prints, rupee and bond moves, central
+  bank decisions worldwide — so the context sits next to the RBI notification it explains.
+  Turn either feed off in the sidebar if you only want the regulators.
 
 - **News that doesn't disappear.** RBI's own feeds show only the latest handful of
   items and drop them as new ones publish. MarketWire keeps everything it has ever
@@ -46,9 +52,9 @@ the day's key numbers right above it.
 
 ## Where the data comes from
 
-Announcements come straight from RBI and SEBI. Market numbers are drawn from public
-sources — RBI/FBIL, Trading Economics, investing.com and Yahoo Finance — and refresh
-automatically throughout the day.
+Announcements come straight from RBI and SEBI, and market news from Trading Economics.
+Market numbers are drawn from public sources — RBI/FBIL, Trading Economics,
+investing.com and Yahoo Finance — and refresh automatically throughout the day.
 
 MarketWire is an information tool, not investment advice. Always confirm figures
 with the primary source before acting on them.

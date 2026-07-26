@@ -8,7 +8,9 @@ unchanged before and after the refactor.
 from datetime import datetime, timedelta, timezone
 
 import bonds
+import common
 import commodities
+import feed
 import history
 import rates
 import rbi_archive
@@ -50,6 +52,25 @@ def test_item_key_prid_id_and_link_fallback():
         assert fn({"link": sebi_link}) == sebi_link
         assert fn({"link": ""}) == ""
         assert fn({}) == ""
+
+
+def test_item_key_prefers_an_explicit_key():
+    """TE stream items set their own `key` (their links repeat across headlines);
+    everything else keeps deriving it from the link."""
+    for fn in (history._key, store._key):
+        assert fn({"key": "te:abc123", "link": "https://tradingeconomics.com/india/gdp"}) == "te:abc123"
+        assert fn({"key": "  te:abc123  ", "link": ""}) == "te:abc123"
+        # An empty/blank/non-string key falls back to the link exactly as before.
+        assert fn({"key": "", "link": "https://rbi.org.in/x.aspx?prid=61234"}) == "61234"
+        assert fn({"key": "   ", "link": "https://x/a"}) == "https://x/a"
+        assert fn({"key": None, "link": "https://x/a"}) == "https://x/a"
+
+
+def test_strip_html_shared_by_feed_and_te_stream():
+    assert feed.strip_html is common.strip_html
+    assert common.strip_html("<p>Trade gap <b>narrowed</b> to $18.8B.</p>") == "Trade gap narrowed to $18.8B."
+    assert common.strip_html("a &amp; b\n  c") == "a & b c"
+    assert common.strip_html("") == "" and common.strip_html(None) == ""
 
 
 def test_rbi_archive_link_key_returns_none_without_match():

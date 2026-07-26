@@ -7,8 +7,10 @@ MarketWire works under the hood and how to run, deploy, and operate it.
 
 MarketWire is a Streamlit app (`streamlit_app.py`) that fetches **RBI Press Releases**
 and **RBI Notifications** (RSS, server-side — browsers can't read most RSS directly due
-to CORS) plus **SEBI's Public Issues listing** (scraped; SEBI has no RSS for it), strips
-the HTML, **remembers items in a small SQLite store so the wire accumulates over time**,
+to CORS) plus **SEBI's Public Issues listing** and **Trading Economics' news stream**,
+split into **TE India News** and **TE World News** (all three scraped; none has an RSS
+feed), strips the HTML,
+**remembers items in a small SQLite store so the wire accumulates over time**,
 and shows the feeds together with a keyword filter, a **sort order** toggle
 (newest-first / oldest-first), and an opt-in **date-range** filter. Every item is tagged
 with its source, and each feed keeps its own durable history. A sidebar **Sources**
@@ -33,11 +35,12 @@ On an always-on **VM**, a plain sqlite path is already durable. For durable hist
 ### Durable history in the repo (GitHub Action, no external DB)
 
 History can live **in this repo** instead of an external database. A scheduled
-GitHub Action (`.github/workflows/history.yml`) runs the poller, which fetches both
-RBI feeds and writes **`data/history.jsonl`** (press releases) and
-**`data/notifications.jsonl`** (notifications) — JSON-lines so each update is a
-small git diff — then commits them. The app reads those committed files and merges
-each with its live feed — so history survives Streamlit Cloud restarts with no DB.
+GitHub Action (`.github/workflows/history.yml`) runs the poller, which fetches every
+feed and writes one JSON-lines file each — **`data/history.jsonl`** (press releases),
+**`data/notifications.jsonl`** (notifications), **`data/sebi_public_issues.jsonl`**,
+**`data/te_india_news.jsonl`** and **`data/te_world_news.jsonl`** — JSON-lines so each
+update is a small git diff — then commits them. The app reads those committed files and
+merges each with its live feed — so history survives Streamlit Cloud restarts with no DB.
 
 - The workflow runs **independently of the app** — it keeps building history even
   while the Streamlit app is asleep, and only commits when something changed.
@@ -145,6 +148,58 @@ with `python rbi_archive.py` (or `python rbi_archive.py https://www.rbi.org.in/S
 for notifications — it auto-selects the right matcher). For deeper history, add RBI
 month/year listing URLs (comma-separated) via the `MARKETWIRE_ARCHIVE_URLS` (press) /
 `MARKETWIRE_NOTIFICATIONS_ARCHIVE_URLS` (notifications) env var / repo variable.
+
+### Trading Economics news stream (TE India News · TE World News)
+
+Two more wire sources come off **[Trading Economics' stream](https://tradingeconomics.com/stream)**
+(`te_stream.py`), selectable individually in the sidebar **Sources** filter and on by
+default: **TE India News** (`data/te_india_news.jsonl`, tag `TE - India News`) and
+**TE World News** (`data/te_world_news.jsonl`, tag `TE - World News`). They ride the same
+30-min `poll.py` cron as history and are committed by `history.yml`, and — like the RBI
+and SEBI feeds — accumulate **without a cap**.
+
+- **No documented feed, and TE is unreachable from CI**, so each feed is an ordered
+  **candidate chain** rather than one URL: TE's stream XHR endpoint
+  (`/ws/stream.ashx?start=0&size=50`), the server-rendered `/stream` page, and an RSS
+  mirror; India's chain adds its country-filtered variants and ends with the plain global
+  stream **filtered to India-tagged items here**, so it produces something whatever TE
+  does with its country URLs. Each candidate is fetched once, the response is **sniffed**
+  (JSON / RSS / HTML) and handed to the matching parser, and the **first one that yields
+  items wins** — a wrong guess in the chain costs a request, not the feed. Override either
+  chain (comma-separated) with `MARKETWIRE_TE_INDIA_STREAM_URL` /
+  `MARKETWIRE_TE_WORLD_STREAM_URL`; the file paths with `MARKETWIRE_TE_INDIA_NEWS_FILE` /
+  `MARKETWIRE_TE_WORLD_NEWS_FILE`; the app's read-from-URL with
+  `MARKETWIRE_TE_INDIA_NEWS_URL` / `MARKETWIRE_TE_WORLD_NEWS_URL`.
+- **India matching** (`_is_india`): TE's own country tag, else the item's country page
+  (`/india/…` — the most reliable signal, since stream items link to indicator pages),
+  else a whole-word "India/Indian" in the **headline** only (body text name-drops far too
+  many countries).
+- **Identity:** TE items carry no stable public id across those three shapes and TE points
+  many headlines at the same indicator page, so each item sets its own
+  **`key` = `te:<sha1(link|title)>`** — identical whichever candidate served it, and stable
+  as an item's printed time ages from "2 minutes ago" to a date. `common.item_key()` honours
+  an explicit `key`; `history.save_file()` writes one only when the source set it (so the
+  RBI/SEBI files keep their exact shape) and `store.load()` returns the stored key, so
+  identity round-trips through both history backends. Trade-off: an identical headline on
+  the identical page on a later day merges into the first — rare, since TE headlines carry
+  the numbers.
+- **Timestamps:** relative stamps ("14 minutes ago") are timezone-free and exact; absolute
+  dates are read as IST like the rest of the wire. `history.dedupe()` keeps the
+  **first-seen** ts, so an item polled within 30 minutes of publication keeps that accurate
+  stamp forever, and `published` is rewritten to an absolute IST string as soon as a ts
+  resolves — a stale "2 hours ago" is never frozen into the history file. TE labels are in
+  `_DATE_ONLY_SOURCES`, so a midnight stamp never mislabels one **ARCHIVE** (that badge
+  means "backfilled from an RBI listing").
+- **Guarded + non-fatal:** every entry point returns `(items, error)` and never raises; an
+  empty or blocked fetch simply leaves the committed history untouched. There's no archive
+  backfill — TE serves a rolling window only.
+- **Written without live TE access** (this sandbox and GitHub runners are Cloudflare- and
+  datacenter-IP-blocked): the three parsers are fixture-tested in `tests/test_te_stream.py`
+  and the first live Action run is the integration test. Schedule runs upload each
+  candidate's raw body as the **`te-stream-dump`** artifact (`MARKETWIRE_TE_STREAM_DUMP`,
+  one file per candidate) — use it to see which shape TE actually served, then pin the feed
+  to that URL via the env override. Validate by hand from a host that can reach TE:
+  `python te_stream.py`.
 
 ### Current Rates dashboard (equity desk)
 

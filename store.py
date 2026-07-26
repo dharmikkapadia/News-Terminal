@@ -30,7 +30,8 @@ import common
 # collide on the key. category -> table name (the only values ever interpolated
 # into SQL — never raw user input).
 _TABLES = {"press": "articles", "notifications": "notifications",
-           "sebi_public_issues": "sebi_public_issues"}
+           "sebi_public_issues": "sebi_public_issues",
+           "te_india_news": "te_india_news", "te_world_news": "te_world_news"}
 
 _CREATE = """CREATE TABLE IF NOT EXISTS {table} (
     key        TEXT PRIMARY KEY,
@@ -151,18 +152,23 @@ def upsert(items, category="press"):
 
 
 def load(limit=1000, category="press"):
-    """All stored items for a feed, newest first (by published date, then fetch time)."""
+    """All stored items for a feed, newest first (by published date, then fetch time).
+
+    The stored `key` comes back with each row so identity round-trips exactly —
+    it matters for sources whose key isn't derivable from the link (Trading
+    Economics items), and is the same value common.item_key() would compute for
+    the RBI/SEBI feeds."""
     table = _table(category)
     conn, style = _connect()
     try:
         rows = conn.execute(
-            _q(f"SELECT link, title, summary, published, ts FROM {table} "
+            _q(f"SELECT key, link, title, summary, published, ts FROM {table} "
                "ORDER BY COALESCE(ts, 0) DESC, fetched_ts DESC LIMIT ?", style),
             (limit,),
         ).fetchall()
     finally:
         conn.close()
-    cols = ("link", "title", "summary", "published", "ts")
+    cols = ("key", "link", "title", "summary", "published", "ts")
     return [dict(zip(cols, r)) for r in rows]
 
 

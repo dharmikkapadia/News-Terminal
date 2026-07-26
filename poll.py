@@ -25,6 +25,7 @@ import history
 import rates
 import rbi_archive
 import sebi
+import te_stream
 
 # Each feed: how to fetch it, where to store it (JSONL), and how to backfill older
 # items (listing URL + the href substring that marks a detail link). Env vars let a
@@ -60,6 +61,24 @@ FEEDS = [
         "fetch_fn": sebi.fetch_listing,
         # No RSS and no separate archive listing yet — each poll just reads the
         # listing's first page (~25 newest rows), same as a live RSS feed.
+        "listing_url": None,
+    },
+    {
+        "label": "TE India news",
+        # A COMMA-SEPARATED candidate chain, not one URL — te_stream tries each in
+        # order (JSON endpoint / stream page / RSS) and keeps the first that yields
+        # items, since TE publishes no documented feed for the stream. The env
+        # override (MARKETWIRE_TE_INDIA_STREAM_URL) is applied in te_stream itself.
+        "feed_url": te_stream.INDIA_URLS,
+        "history_path": history.TE_INDIA_NEWS_PATH,
+        "fetch_fn": te_stream.fetch_india,
+        "listing_url": None,        # TE serves a rolling window only — no archive to backfill
+    },
+    {
+        "label": "TE world news",
+        "feed_url": te_stream.WORLD_URLS,       # MARKETWIRE_TE_WORLD_STREAM_URL overrides
+        "history_path": history.TE_WORLD_NEWS_PATH,
+        "fetch_fn": te_stream.fetch_world,
         "listing_url": None,
     },
 ]

@@ -13,6 +13,7 @@ Each consuming module keeps its public names as thin aliases (e.g.
 `rates._num = common.num`), so call sites and the test suite are unchanged.
 """
 
+import html as _html
 import json
 import os
 import re
@@ -43,6 +44,7 @@ MONTHS = {m: i for i, m in enumerate(
 
 _ID_RE_PRID = re.compile(r"\bprid=(\d+)", re.I)
 _ID_RE_ID = re.compile(r"\bid=(\d+)", re.I)
+_TAG_RE = re.compile(r"<[^>]+>")
 
 
 def num(s):
@@ -55,6 +57,14 @@ def num(s):
     return float(m.group(0).replace(",", "")) if m else None
 
 
+def strip_html(s):
+    """Turn an HTML summary (RSS description, a scraped blurb) into plain,
+    single-spaced text."""
+    if not s:
+        return ""
+    return re.sub(r"\s+", " ", _html.unescape(_TAG_RE.sub(" ", s))).strip()
+
+
 def link_id(link):
     """RBI press-release `prid` or notification `Id` from a detail link, else None."""
     m = _ID_RE_PRID.search(link or "") or _ID_RE_ID.search(link or "")
@@ -62,9 +72,14 @@ def link_id(link):
 
 
 def item_key(item):
-    """Stable identity for a wire item: the RBI `prid`/`Id` from its link, else the
-    link itself (SEBI links carry no id param but are unique + permanent). The feeds
-    are stored separately, so a prid and an Id sharing a number never clash."""
+    """Stable identity for a wire item: an explicit `key` the source set (Trading
+    Economics stream items — their links repeat across headlines, so te_stream.py
+    derives its own), else the RBI `prid`/`Id` from the link, else the link itself
+    (SEBI links carry no id param but are unique + permanent). The feeds are stored
+    separately, so a prid and an Id sharing a number never clash."""
+    explicit = item.get("key")
+    if isinstance(explicit, str) and explicit.strip():
+        return explicit.strip()
     link = item.get("link", "") or ""
     return link_id(link) or link
 

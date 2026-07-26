@@ -1,9 +1,10 @@
 name: MarketWire history
 
 # Keeps durable wire history IN THE REPO: fetches the RBI feeds (Press Releases +
-# Notifications) plus SEBI's Public Issues listing (scraped; no RSS exists for it) on
-# a schedule and commits data/history.jsonl + data/notifications.jsonl +
-# data/sebi_public_issues.jsonl.
+# Notifications), SEBI's Public Issues listing and Trading Economics' news stream
+# (India + World — both scraped; no RSS exists for either) on a schedule and commits
+# data/history.jsonl + data/notifications.jsonl + data/sebi_public_issues.jsonl +
+# data/te_india_news.jsonl + data/te_world_news.jsonl.
 # The same run also refreshes the intraday overlays: the commodity-price snapshot
 # (data/commodities.json), the Trading-Economics FX overlay (USD/EUR/GBP-INR in
 # data/rates.json), the India macro Economic Calendar (data/calendar.json, merged onto the
@@ -74,7 +75,7 @@ jobs:
           pip install "scrapling[fetchers]"
           scrapling install
 
-      - name: Fetch RBI + SEBI and update history (+ commodities / FX / investing.com bonds)
+      - name: Fetch RBI + SEBI + TE news and update history (+ commodities / FX / investing.com bonds)
         env:
           # Optional: set these repo variables to also backfill older items from
           # RBI's listing page(s) for each feed.
@@ -86,6 +87,10 @@ jobs:
           MARKETWIRE_BONDS_DUMP: ${{ runner.temp }}/bonds_dump.html
           # Dump the fetched TE calendar HTML for markup diagnosis (uploaded below).
           MARKETWIRE_CALENDAR_DUMP: ${{ runner.temp }}/calendar_dump.html
+          # Same for the TE news stream — one dump per candidate URL tried
+          # (te_stream_dump.1.html, .2.html, …), so the winning shape (JSON / HTML /
+          # RSS) and any Cloudflare block are both visible.
+          MARKETWIRE_TE_STREAM_DUMP: ${{ runner.temp }}/te_stream_dump.html
           # Set this repo SECRET to a (residential) proxy URL to reliably get past investing.com's
           # datacenter-IP 403 — e.g. http://user:pass@host:port. Empty = direct (often blocked).
           MARKETWIRE_SCRAPE_PROXY: ${{ secrets.MARKETWIRE_SCRAPE_PROXY }}
@@ -122,15 +127,27 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
+      # The bodies each TE-stream candidate returned (the real stream, a Cloudflare
+      # block, or a 404 from a URL guess) — for tuning te_stream's parsers and pinning
+      # the feed to whichever candidate actually serves the stream.
+      - name: Upload TE stream fetch dumps (diagnostic)
+        if: ${{ always() && github.event_name == 'schedule' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: te-stream-dump
+          path: ${{ runner.temp }}/te_stream_dump.*
+          if-no-files-found: ignore
+          retention-days: 7
+
       - name: Commit history + commodities + fx + bonds if changed
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/history.jsonl data/notifications.jsonl data/sebi_public_issues.jsonl data/commodities.json data/rates.json data/calendar.json
+          git add data/history.jsonl data/notifications.jsonl data/sebi_public_issues.jsonl data/te_india_news.jsonl data/te_world_news.jsonl data/commodities.json data/rates.json data/calendar.json
           if git diff --cached --quiet; then
             echo "No data changes."
           else
-            git commit -m "data: update history + sebi + commodities + fx + bonds + calendar $(date -u +%FT%TZ)"
+            git commit -m "data: update history + sebi + te news + commodities + fx + bonds + calendar $(date -u +%FT%TZ)"
             # main has other writers (the rates workflows, branch merges) and this job's
             # checkout->push window spans the whole poll (minutes, more on the schedule
             # runs that render bonds), so a bare push can lose the race. Rebase and retry; -X theirs

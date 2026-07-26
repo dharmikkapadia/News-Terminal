@@ -29,6 +29,14 @@ SEBI_PUBLIC_ISSUES_PATH = os.environ.get(
     "MARKETWIRE_SEBI_PUBLIC_ISSUES_FILE",
     os.path.join(_DATA_DIR, "sebi_public_issues.jsonl"),
 )
+TE_INDIA_NEWS_PATH = os.environ.get(
+    "MARKETWIRE_TE_INDIA_NEWS_FILE",
+    os.path.join(_DATA_DIR, "te_india_news.jsonl"),
+)
+TE_WORLD_NEWS_PATH = os.environ.get(
+    "MARKETWIRE_TE_WORLD_NEWS_FILE",
+    os.path.join(_DATA_DIR, "te_world_news.jsonl"),
+)
 UA = common.UA
 _FIELDS = ("link", "title", "summary", "published", "ts")
 
@@ -76,13 +84,24 @@ def load_file(path=HISTORY_PATH):
         return []
 
 
+def _row(it):
+    """One stored line. An explicit `key` (Trading Economics items, whose links
+    repeat across headlines) is written only when the source set one, so the RBI /
+    SEBI files keep their existing shape byte-for-byte."""
+    row = {k: it.get(k) for k in _FIELDS}
+    key = it.get("key")
+    if isinstance(key, str) and key.strip():
+        row["key"] = key.strip()
+    return row
+
+
 def save_file(items, path=HISTORY_PATH):
     """Write deduped history oldest-first (append-friendly diffs). Returns count."""
     os.makedirs(os.path.dirname(path), exist_ok=True)
     items = list(reversed(dedupe(items)))  # oldest-first on disk
     with open(path, "w", encoding="utf-8") as f:
         for it in items:
-            f.write(json.dumps({k: it.get(k) for k in _FIELDS}, ensure_ascii=False) + "\n")
+            f.write(json.dumps(_row(it), ensure_ascii=False) + "\n")
     return len(items)
 
 
