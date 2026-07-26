@@ -151,7 +151,8 @@ def test_parse_stream_json_fixture():
     assert inr["title"] == "India Rupee Falls to 86.4 per USD"
     assert inr["link"] == "https://tradingeconomics.com/india/currency"
     assert inr["country"] == "India"
-    assert inr["ts"] == int(datetime(2026, 7, 26, 9, 15, tzinfo=IST).timestamp())
+    # No zone on the record's date -> TE's own zone, not IST.
+    assert inr["ts"] == int(datetime(2026, 7, 26, 9, 15, tzinfo=te_stream.STREAM_TZ).timestamp())
     ifo = items[1]                                # capitalised keys + a .NET date
     assert ifo["title"] == "Germany Ifo Business Climate Improves"
     assert ifo["ts"] == 1753500600
@@ -178,25 +179,40 @@ def test_parse_stream_rss_fixture():
 # timestamps / identity / filtering
 # --------------------------------------------------------------------------- #
 def test_parse_when_shapes():
+    """Absolute times carry TE's zone (STREAM_TZ, observed as UTC); relative ones are
+    zone-free; a bare DATE stays IST-midnight so it renders as a plain date."""
+    TE_TZ = te_stream.STREAM_TZ
     now = datetime(2026, 7, 26, 15, 0, tzinfo=IST)
     pw = te_stream.parse_when
     assert pw("14 minutes ago", now) == int((now - timedelta(minutes=14)).timestamp())
     assert pw("an hour ago", now) == int((now - timedelta(hours=1)).timestamp())
     assert pw("just now", now) == int(now.timestamp())
     assert pw("2026-07-24T18:30:00Z", now) == int(datetime(2026, 7, 24, 18, 30, tzinfo=timezone.utc).timestamp())
-    assert pw("2026-07-24 18:30", now) == int(datetime(2026, 7, 24, 18, 30, tzinfo=IST).timestamp())
+    assert pw("2026-07-24 18:30", now) == int(datetime(2026, 7, 24, 18, 30, tzinfo=TE_TZ).timestamp())
+    assert pw("2026-07-24", now) == int(datetime(2026, 7, 24, tzinfo=IST).timestamp())
     assert pw("Jul 24, 2026", now) == int(datetime(2026, 7, 24, tzinfo=IST).timestamp())
-    assert pw("24 July 2026 09:15", now) == int(datetime(2026, 7, 24, 9, 15, tzinfo=IST).timestamp())
+    assert pw("24 July 2026 09:15", now) == int(datetime(2026, 7, 24, 9, 15, tzinfo=TE_TZ).timestamp())
     assert pw("Jul/24", now) == int(datetime(2026, 7, 24, tzinfo=IST).timestamp())
-    assert pw("09:15", now) == int(now.replace(hour=9, minute=15, second=0, microsecond=0).timestamp())
+    assert pw("09:15", now) == int(datetime(2026, 7, 26, 9, 15, tzinfo=TE_TZ).timestamp())
     assert pw(1753500600) == 1753500600 and pw(1753500600000) == 1753500600
     assert pw("") is None and pw(None) is None and pw("sometime soon") is None
 
 
+def test_parse_when_absolute_times_are_read_in_tes_zone_not_ist():
+    """Regression for the first live poll: TE stamped a 'SENSEX Index Closes' story
+    10:30, which is 16:00 IST (just after the 15:30 close) — not 10:30 IST, five
+    hours BEFORE it. Absolute TE stamps must not be read as IST."""
+    now = datetime(2026, 7, 26, 11, 39, tzinfo=IST)
+    ts = te_stream.parse_when("2026-07-24 10:30", now)
+    assert datetime.fromtimestamp(ts, IST).strftime("%H:%M") == "16:00"
+
+
 def test_parse_when_bare_clock_time_rolls_back_over_midnight():
-    now = datetime(2026, 7, 26, 0, 5, tzinfo=IST)          # last night's item, read after midnight
-    assert te_stream.parse_when("23:50", now) == int(datetime(2026, 7, 25, 23, 50, tzinfo=IST).timestamp())
-    assert te_stream.parse_when("00:02", now) == int(datetime(2026, 7, 26, 0, 2, tzinfo=IST).timestamp())
+    TE_TZ = te_stream.STREAM_TZ
+    # 00:05 in TE's zone — last night's item, read just after TE's midnight.
+    now = datetime(2026, 7, 26, 0, 5, tzinfo=TE_TZ)
+    assert te_stream.parse_when("23:50", now) == int(datetime(2026, 7, 25, 23, 50, tzinfo=TE_TZ).timestamp())
+    assert te_stream.parse_when("00:02", now) == int(datetime(2026, 7, 26, 0, 2, tzinfo=TE_TZ).timestamp())
 
 
 def test_parse_when_bare_month_day_rolls_back_a_year():

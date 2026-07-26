@@ -40,12 +40,13 @@ on a later day merges into the first one (rare — TE headlines carry the number
 
 Timestamps
 ----------
-TE renders recent items relatively ("14 minutes ago"), which is timezone-free
-and exact, and older ones as dates, which are assumed IST like the rest of the
-wire. history.dedupe() keeps the FIRST-seen ts, so an item polled within 30
-minutes of publication keeps that accurate stamp forever. `published` is
-rewritten to an absolute IST string once a ts resolves — never a stale
-"2 hours ago" frozen into the history file.
+TE prints absolute stamps in **UTC** for a logged-out client (see STREAM_TZ —
+reading them as IST put every item 5h30m early), relative ones ("14 minutes
+ago") which are zone-free and exact, and bare dates which stay IST-midnight so
+they render as plain dates. history.dedupe() keeps the FIRST-seen ts, so an item
+polled within 30 minutes of publication keeps that accurate stamp forever.
+`published` is rewritten to an absolute IST string once a ts resolves — never a
+stale "2 hours ago" frozen into the history file.
 
 Validate from a host that can reach tradingeconomics.com (this sandbox and CI
 are blocked): set MARKETWIRE_TE_STREAM_DUMP to capture each candidate's raw
@@ -68,6 +69,18 @@ import requests
 import common
 
 IST = common.IST
+
+# The zone TE prints the stream's ABSOLUTE timestamps in. It serves **UTC** to a
+# logged-out client — confirmed against the first live CI poll: a "The SENSEX Index
+# Closes 0.43% Lower" story was stamped 10:30 (= 16:00 IST, half an hour after the
+# 15:30 IST close, not 5 hours before it), and an item stamped 06:08 was fetched at
+# 06:08 UTC. Reading those as IST put every TE item 5h30m early. Relative stamps
+# ("14 minutes ago") are zone-free and an ISO stamp's own offset always wins, so this
+# only applies to bare absolute times; a DATE with no clock stays IST-midnight, so it
+# renders as a plain date instead of gaining a false 05:30. TE localizes per-visitor,
+# so this is an observation, not a documented contract — override it with
+# MARKETWIRE_TE_STREAM_TZ_MIN (minutes east of UTC, e.g. 330 for IST) if it changes.
+STREAM_TZ = timezone(timedelta(minutes=int(os.environ.get("MARKETWIRE_TE_STREAM_TZ_MIN", "0") or 0)))
 
 # Candidate sources per feed, most-specific first — the first one that yields
 # items wins. Comma-separated so a deploy can re-point either feed (or collapse
@@ -140,9 +153,9 @@ _INDIA_RE = re.compile(r"\b(india|indian)\b", re.I)
 # --------------------------------------------------------------------------- #
 def _tz_offset(marker):
     """An ISO zone marker ('Z' / '+05:30') -> a fixed-offset tzinfo. No marker (or
-    an unreadable one) -> IST, the wire's assumed zone for undated sources."""
+    an unreadable one) -> STREAM_TZ, the zone TE prints its stamps in."""
     if not marker:
-        return IST
+        return STREAM_TZ
     if marker.upper() == "Z":
         return timezone.utc
     try:
@@ -150,7 +163,7 @@ def _tz_offset(marker):
         mins = int(digits[:2]) * 60 + int(digits[2:4])
         return timezone(timedelta(minutes=mins if marker[0] == "+" else -mins))
     except (ValueError, IndexError):
-        return IST
+        return STREAM_TZ
 
 
 def _hm(text, base):
@@ -208,17 +221,24 @@ def parse_when(text, now=None):
     if m:
         y, mo, d = int(m.group(1)), int(m.group(2)), int(m.group(3))
         hh, mm, ss = int(m.group(4) or 0), int(m.group(5) or 0), int(m.group(6) or 0)
+        # An explicit offset always wins; otherwise a stamp WITH a clock is TE's zone
+        # and a bare date is IST-midnight (a pure date, no invented time-of-day).
+        off = _tz_offset(m.group(7)) if m.group(7) else (STREAM_TZ if m.group(4) else IST)
         try:
-            return int(datetime(y, mo, d, hh, mm, ss, tzinfo=_tz_offset(m.group(7))).timestamp())
+            return int(datetime(y, mo, d, hh, mm, ss, tzinfo=off).timestamp())
         except ValueError:
             return None
 
+    # "yesterday"/"today"/a bare clock are relative to TE's OWN calendar day, so
+    # anchor them to now as TE sees it, not to the IST day.
+    te_now = now.astimezone(STREAM_TZ)
     if "yesterday" in low:
-        return int(_hm(s, (now - timedelta(days=1)).replace(hour=0, minute=0, second=0,
-                                                            microsecond=0)).timestamp())
+        return int(_hm(s, (te_now - timedelta(days=1)).replace(hour=0, minute=0, second=0,
+                                                               microsecond=0)).timestamp())
     if "today" in low:
-        return int(_hm(s, now.replace(hour=0, minute=0, second=0, microsecond=0)).timestamp())
+        return int(_hm(s, te_now.replace(hour=0, minute=0, second=0, microsecond=0)).timestamp())
 
+    dated_tz = STREAM_TZ if _HM_RE.search(s) else IST       # see the ISO note above
     for rx, order in ((_DMY_RE, "dmy"), (_MDY_RE, "mdy")):
         m = rx.search(s)
         if not m:
@@ -231,7 +251,7 @@ def parse_when(text, now=None):
         if not mon:
             continue
         try:
-            return int(_hm(s, datetime(year, mon, day, tzinfo=IST)).timestamp())
+            return int(_hm(s, datetime(year, mon, day, tzinfo=dated_tz)).timestamp())
         except ValueError:
             return None
 
@@ -240,16 +260,16 @@ def parse_when(text, now=None):
         mon = common.MONTHS.get(m.group(1)[:3].lower())
         if mon:
             try:
-                dt = datetime(now.year, mon, int(m.group(2)), tzinfo=IST)
+                dt = datetime(te_now.year, mon, int(m.group(2)), tzinfo=dated_tz)
                 if (dt - now).days > 7:                         # a Dec date read in early Jan
-                    dt = dt.replace(year=now.year - 1)
+                    dt = dt.replace(year=dt.year - 1)
                 return int(_hm(s, dt).timestamp())
             except ValueError:
                 return None
 
-    if _HM_RE.search(s):                                        # bare clock time = today
-        dt = _hm(s, now.replace(second=0, microsecond=0))
-        if dt > now + timedelta(minutes=5):     # a late-evening stamp read after midnight
+    if _HM_RE.search(s):                                        # bare clock time = TE's today
+        dt = _hm(s, te_now.replace(second=0, microsecond=0))
+        if dt > te_now + timedelta(minutes=5):  # a late-evening stamp read after midnight
             dt -= timedelta(days=1)
         return int(dt.timestamp())
     return None
