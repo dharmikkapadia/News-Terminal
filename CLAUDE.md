@@ -1,12 +1,14 @@
 # MarketWire — project notes for Claude
 
-A Streamlit reader for **RBI Press Releases**, **RBI Notifications**, and **SEBI
-Public Issues** (`streamlit_app.py`): fetches the two RBI RSS feeds plus SEBI's
-Public Issues (DRHP filings) listing server-side and shows them **together**
+A Streamlit reader for **RBI Press Releases**, **RBI Notifications**, **SEBI
+Public Issues** and **Trading Economics news** (`streamlit_app.py`): fetches the two RBI
+RSS feeds, SEBI's Public Issues (DRHP filings) listing and TE's news stream (split into
+an India feed and a World feed) server-side and shows them **together**
 in one wire with a keyword filter, a **sort order** toggle (newest/oldest first), an
 opt-in **date-range** filter, and a sidebar **Sources** multiselect (show all feeds
 or pick individually), each item tagged with its source
-(`RBI - Press Release` / `RBI - Notifications` / `SEBI - Public Issues`). The UI is laid
+(`RBI - Press Release` / `RBI - Notifications` / `SEBI - Public Issues` /
+`TE - India News` / `TE - World News`). The UI is laid
 out like a news website with a sidebar **Layout** toggle: **Stream** (default — a
 single-column feed à la Trading Economics: underlined headline, right-aligned source
 tags, clamped body with an inline `<details>` Show more/less toggle, relative
@@ -44,7 +46,8 @@ TE's own % change) and falls back to **Yahoo Finance's keyless chart endpoint** 
 drops a symbol; **Steel** is pinned to Yahoo (USD HRC, since TE steel is CNY rebar). Durable history accumulates per feed
 via `store.py` (SQLite/Postgres/Turso — one table per feed) **and** in-repo
 `data/history.jsonl` (press releases) + `data/notifications.jsonl` (notifications)
-+ `data/sebi_public_issues.jsonl` (SEBI), all maintained by a scheduled GitHub
++ `data/sebi_public_issues.jsonl` (SEBI) + `data/te_india_news.jsonl` +
+`data/te_world_news.jsonl` (TE news — uncapped, like the rest), all maintained by a scheduled GitHub
 Action running `poll.py` (every 30 min via an external dispatch cron + a 2-hourly
 `schedule` fallback, which is also the only runs that scrape bonds; the repo is
 PUBLIC so Actions minutes are free — see docs/OPERATIONS.md's "Actions minutes"
@@ -96,6 +99,34 @@ SEBI items on the link itself (unique + permanent, so this is safe).
   literal HTML sample built from a Claude-for-Chrome capture of the real markup;
   validate `sebi.py` itself from a host that can reach sebi.gov.in, like
   `rbi_archive.py`.
+- **TE news stream** (`te_stream.py` → `data/te_india_news.jsonl` +
+  `data/te_world_news.jsonl`, source tags `TE - India News` / `TE - World News`) feeds TWO
+  wire sources off `tradingeconomics.com/stream`, both on by default and on the **30-min
+  `poll.py` cron** (committed by `history.yml`), **uncapped** like the RBI/SEBI feeds. TE
+  publishes no documented feed for the stream and blocks CI/this sandbox, so each feed is
+  an ordered **candidate chain** (comma-separated, overridable via
+  `MARKETWIRE_TE_INDIA_STREAM_URL` / `MARKETWIRE_TE_WORLD_STREAM_URL`): the stream XHR
+  endpoint (`/ws/stream.ashx`), the rendered `/stream` page, an RSS mirror — India's chain
+  ends with the plain global stream filtered by `_is_india()` (TE country tag → the item's
+  `/india/…` country page → whole-word "India/Indian" in the HEADLINE only). Each candidate
+  is fetched once, **sniffed** (JSON / RSS / HTML) and routed to `parse_stream_json` /
+  `parse_stream_rss` / `parse_stream`; the **first that yields items wins**, so a wrong URL
+  guess costs one request. The HTML parser probes `_ITEM_SELECTORS` most-specific-first and
+  keeps only the **innermost** matches (a substring class probe matches wrappers too, which
+  would otherwise swallow the page as one item). **Identity:** TE reuses one indicator-page
+  link across many headlines, so items set an explicit **`key` = `te:<sha1(link|title)>`** —
+  `common.item_key()` honours an explicit `key`, `history.save_file()` writes it ONLY when
+  set (so RBI/SEBI lines stay byte-identical) and `store.load()` now returns the stored key,
+  so identity round-trips both backends. Deliberately NOT keyed on the timestamp: a stream
+  item's printed time ages from "2 minutes ago" to a date, which would re-key it into a
+  duplicate. Relative stamps are exact, absolute ones are read as IST; `published` is
+  rewritten absolute once a ts resolves (never freeze "2 hours ago" into the history file),
+  and both TE labels are in `_DATE_ONLY_SOURCES` so a midnight stamp can't mislabel one
+  `ARCHIVE`. Written WITHOUT live TE access — fixture-tested in `tests/test_te_stream.py`,
+  the first CI poll is the live test, and `MARKETWIRE_TE_STREAM_DUMP` (uploaded as the
+  `te-stream-dump` artifact on schedule runs, one file per candidate) captures each
+  candidate's raw body so the winning shape can be identified and pinned. Validate from a
+  host that can reach TE, like `rates.py`/`commodities.py`.
 - The palette is injected CSS (`theme_css`, fed the single Trading Economics palette
   from `THEMES`). Streamlit **portals overlays** (selectbox/multiselect dropdowns,
   help `?` tooltips, popovers, the **date-picker calendar**) outside `.stApp`, so
@@ -131,7 +162,7 @@ SEBI items on the link itself (unique + permanent, so this is safe).
   without live TE access: fixture-tested in `tests/test_calendar.py`, the first CI poll is
   the live test, and `MARKETWIRE_CALENDAR_DUMP` (uploaded as the `calendar-fetch-dump`
   artifact on schedule runs) captures the fetched HTML for parser tuning.
-- **Shared plumbing lives in `common.py`** (IST, both UA families, `num`,
+- **Shared plumbing lives in `common.py`** (IST, both UA families, `num`, `strip_html`,
   `item_key`/`link_id`, the GitHub-Actions `annotate`, the URL-or-path JSON loader,
   the TE `tr[data-symbol]` table scraper, the Yahoo chart fetcher, `bond_benchmark`)
   — modules keep their old names as thin aliases (`rates._num = common.num`), so fix

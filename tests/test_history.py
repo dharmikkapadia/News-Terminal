@@ -1,5 +1,7 @@
 """Characterization tests for history.py's dedupe/merge and JSONL round-trip."""
 
+import json
+
 import history
 
 
@@ -39,6 +41,24 @@ def test_save_load_round_trip(tmp_path):
     back = history.load_file(path)
     assert [it["ts"] for it in back] == [100, 200]      # oldest-first on disk
     assert history.dedupe(back)[0]["ts"] == 200
+
+
+def test_save_file_persists_an_explicit_key_only_when_set(tmp_path):
+    """TE items round-trip on their own key; RBI/SEBI lines keep their old shape
+    exactly (no `"key": null` churn across the committed history files)."""
+    path = str(tmp_path / "h.jsonl")
+    history.save_file([
+        {"key": "te:abc123", "link": "https://tradingeconomics.com/india/gdp",
+         "title": "India GDP", "summary": "s", "published": "p", "ts": 100},
+        {"link": "https://x/?prid=1", "title": "A", "summary": "sa", "published": "p1", "ts": 200},
+    ], path)
+    lines = [json.loads(ln) for ln in open(path, encoding="utf-8") if ln.strip()]
+    assert set(lines[1]) == {"link", "title", "summary", "published", "ts"}   # RBI line unchanged
+    assert lines[0]["key"] == "te:abc123"
+    # Two TE stories sharing a link (TE points many headlines at one page) stay distinct.
+    back = history.load_file(path)
+    same_link = dict(back[0], key="te:def456", title="India GDP revised", ts=300)
+    assert len(history.dedupe(back + [same_link])) == 3
 
 
 def test_load_file_missing_returns_empty(tmp_path):

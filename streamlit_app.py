@@ -1,11 +1,12 @@
-"""MarketWire — an RBI + SEBI regulatory-wire reader.
+"""MarketWire — an RBI + SEBI regulatory wire, with market news alongside.
 
-A Streamlit app that fetches RBI's Press Releases + Notifications RSS feeds and
-SEBI's Public Issues (DRHP) listing server-side (browsers can't read most RSS
-directly because of CORS, and SEBI's listing has no RSS at all), remembers items
-in a small SQLite store so the wire accumulates over time, and presents them as a
-news website: a newspaper masthead over a uniform grid of story cards, with
-subtle fade-in/hover motion and a summary preview that expands to the full text.
+A Streamlit app that fetches RBI's Press Releases + Notifications RSS feeds,
+SEBI's Public Issues (DRHP) listing and Trading Economics' news stream (India +
+World) server-side (browsers can't read most RSS directly because of CORS, and
+neither the SEBI listing nor the TE stream has an RSS feed at all), remembers
+items in a small SQLite store so the wire accumulates over time, and presents
+them as a news website: a newspaper masthead over a uniform grid of story cards,
+with subtle fade-in/hover motion and a summary preview that expands to the full text.
 
 Look & feel: a single Trading Economics palette (soft-grey page, white cards,
 navy headlines), tuned so all text stays legible.
@@ -41,12 +42,14 @@ import history      # durable history kept as JSONL in the repo (maintained by t
 import rates        # RBI Current Rates snapshot (data/rates.json) for the dashboard
 import sebi         # SEBI Public Issues listing scraper (no RSS exists for it)
 import store        # durable history backend (sqlite / Postgres / Turso)
+import te_stream    # Trading Economics news stream (India + World), scraped
 
 # The feeds the app reads — all shown together in one wire, each item tagged with
 # its source `label`. Each carries its own live URL, durable store category, and
 # committed history file. Override any URL via env (mirror/cache or local testing)
-# without code changes. `scrape=True` feeds (SEBI — no RSS available) are fetched
-# via fetch_sebi_listing() instead of the RSS-based fetch_feed().
+# without code changes. A feed with no RSS (SEBI's listing, the two Trading
+# Economics streams) names its scraper in `scrape`, and is fetched through that
+# entry in _FETCHERS instead of the RSS-based fetch_feed().
 FEEDS = {
     "press": dict(
         name="Press Releases",            # friendly name shown in the Sources filter
@@ -71,7 +74,29 @@ FEEDS = {
         history_url_env="MARKETWIRE_SEBI_PUBLIC_ISSUES_HISTORY_URL",
         history_path=history.SEBI_PUBLIC_ISSUES_PATH,
         label="SEBI - Public Issues",
-        scrape=True,
+        scrape="sebi",
+    ),
+    # Trading Economics' news stream, split into two selectable sources off the one
+    # stream. `url` is a COMMA-SEPARATED candidate chain (TE publishes no documented
+    # feed for it) — te_stream tries each in order and keeps the first that yields
+    # items, and applies the MARKETWIRE_TE_*_STREAM_URL overrides itself.
+    "te_india": dict(
+        name="TE India News",
+        url=te_stream.INDIA_URLS,
+        category="te_india_news",
+        history_url_env="MARKETWIRE_TE_INDIA_NEWS_URL",
+        history_path=history.TE_INDIA_NEWS_PATH,
+        label="TE - India News",
+        scrape="te_india",
+    ),
+    "te_world": dict(
+        name="TE World News",
+        url=te_stream.WORLD_URLS,
+        category="te_world_news",
+        history_url_env="MARKETWIRE_TE_WORLD_NEWS_URL",
+        history_path=history.TE_WORLD_NEWS_PATH,
+        label="TE - World News",
+        scrape="te_world",
     ),
 }
 FEED_NAMES = [cfg["name"] for cfg in FEEDS.values()]
@@ -81,11 +106,12 @@ REFRESH_SECONDS = int(os.environ.get("MARKETWIRE_REFRESH", "300"))
 CACHE_TTL = max(REFRESH_SECONDS - 30, 15)  # just under the interval so each tick re-fetches
 
 
-# Sources whose LIVE data is inherently date-only (the site never exposes a
-# time), unlike RBI's RSS feeds where a midnight timestamp specifically means
-# "backfilled from the listing, not the live feed". Without this, every fresh
-# SEBI item would be mislabeled ARCHIVE and vanish behind the "Show archive" toggle.
-_DATE_ONLY_SOURCES = {"SEBI - Public Issues"}
+# Sources that never get "backfilled from an RBI listing", so a midnight timestamp
+# carries no meaning for them — unlike RBI's RSS feeds, where midnight specifically
+# means "archive stub, not the live feed". SEBI's listing is date-only by nature;
+# TE's stream prints relative times that can still land on midnight for an older
+# item. Without this they'd be mislabeled ARCHIVE and vanish behind "Show archive".
+_DATE_ONLY_SOURCES = {"SEBI - Public Issues", "TE - India News", "TE - World News"}
 
 # Source label -> source-tag CSS class (theme_css defines a colour per class, so
 # each source reads as visually distinct). Unknown/future sources fall back to
@@ -94,6 +120,8 @@ _SRC_CLASS = {
     "RBI - Press Release": "press",
     "RBI - Notifications": "notif",
     "SEBI - Public Issues": "sebi",
+    "TE - India News": "te",
+    "TE - World News": "tew",
 }
 
 # SEBI's listing gives only a headline + an optional raw related-document link
@@ -125,9 +153,9 @@ def _masthead_html():
     today = datetime.now(IST).strftime("%A, %d %B %Y")
     return (
         "<div class='mw-masthead'>"
-        f"<div class='mw-kicker'><span>RBI · SEBI · Wire</span><span>{today} · IST</span></div>"
+        f"<div class='mw-kicker'><span>RBI · SEBI · TE · Wire</span><span>{today} · IST</span></div>"
         "<div class='mw-wordmark'>MarketWire</div>"
-        "<div class='mw-sub'>Press Releases, Notifications &amp; Filings</div>"
+        "<div class='mw-sub'>Press Releases, Notifications, Filings &amp; Market News</div>"
         "<div class='mw-rule'></div><div class='mw-rule-thin'></div>"
         "</div>"
     )
@@ -686,6 +714,10 @@ THEMES = {
     # signal blue/green/violet accents, crisp sans (no serif) — a markets-data look.
     "Trading Economics": dict(bg="#EEF2F6", panel="#FFFFFF", text="#1C2A38", heading="#14304F",
                               muted="#6A7889", accent="#0E72BC", accent2="#13A36B", accent3="#7C4DCC",
+                              # accent4/5 tag the two Trading Economics news sources
+                              # (burnt orange = India, slate = World) — distinct from
+                              # the regulators' blue/green/violet at a glance.
+                              accent4="#C2410C", accent5="#475569",
                               link="#0E72BC",
                               border="#DCE3EB", shadow="rgba(16,48,90,.12)", headfont=_SANS,
                               up="#13A36B", down="#D64550",
@@ -706,6 +738,29 @@ def fetch_sebi_listing(url):
     """Cached wrapper around sebi.fetch_listing (SEBI has no RSS to read for this
     listing, so it's scraped instead). Returns (items, error)."""
     return sebi.fetch_listing(url)
+
+
+@st.cache_data(ttl=CACHE_TTL, show_spinner=False)
+def fetch_te_india(urls):
+    """Cached wrapper around te_stream.fetch_india — the India slice of Trading
+    Economics' news stream. `urls` is the feed's candidate chain. Returns (items, error)."""
+    return te_stream.fetch_india(urls)
+
+
+@st.cache_data(ttl=CACHE_TTL, show_spinner=False)
+def fetch_te_world(urls):
+    """Cached wrapper around te_stream.fetch_world — TE's whole news stream.
+    Returns (items, error)."""
+    return te_stream.fetch_world(urls)
+
+
+# A FEEDS entry's `scrape` name -> the cached fetcher that reads it. Feeds without
+# one are plain RSS and go through fetch_feed.
+_FETCHERS = {
+    "sebi": fetch_sebi_listing,
+    "te_india": fetch_te_india,
+    "te_world": fetch_te_world,
+}
 
 
 @st.cache_data(ttl=600, show_spinner=False)
@@ -822,6 +877,8 @@ def theme_css(p):
         padding: 3px 8px; border-radius: 3px; color: {_src_lbl}; background: {p['accent']}; white-space: nowrap; }}
       .mw-src.notif {{ background: {p['accent2']}; }}
       .mw-src.sebi {{ background: {p['accent3']}; }}
+      .mw-src.te {{ background: {p['accent4']}; }}
+      .mw-src.tew {{ background: {p['accent5']}; }}
       .mw-time {{ font-size: 11px; color: {p['muted']}; letter-spacing: .02em; margin-left: auto; text-align: right; }}
       .mw-head {{ font-family: {p['headfont']}; font-weight: 700; font-size: 17px;
         line-height: 1.24; color: {p['heading']}; margin: 0 0 8px; }}
@@ -1155,6 +1212,8 @@ st.markdown(_masthead_html(), unsafe_allow_html=True)
 _spacer, refresh = st.columns([6, 1])
 if refresh.button("⟳ Refresh", use_container_width=True):
     fetch_feed.clear()
+    for _fetcher in _FETCHERS.values():          # the scraped feeds (SEBI, TE streams)
+        _fetcher.clear()
     load_history.clear()
     load_rates_cached.clear()
     load_commodities_cached.clear()
@@ -1198,7 +1257,7 @@ def wire():
         return
     items, new_count, errors = [], 0, []
     for cfg in active:
-        fetch = fetch_sebi_listing if cfg.get("scrape") else fetch_feed
+        fetch = _FETCHERS.get(cfg.get("scrape"), fetch_feed)
         rss_items, error = fetch(cfg["url"])
         if error:
             errors.append(error)

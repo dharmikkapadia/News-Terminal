@@ -5,8 +5,6 @@ same way. Returns (items, error); never raises.
 """
 
 import calendar
-import html
-import re
 from datetime import datetime
 
 import requests
@@ -18,19 +16,12 @@ RBI_FEED = "https://rbi.org.in/pressreleases_rss.xml"
 RBI_NOTIFICATIONS_FEED = "https://rbi.org.in/notifications_rss.xml"
 UA = common.UA
 IST = common.IST
-_TAG_RE = re.compile(r"<[^>]+>")
 # RBI's pubDate omits a timezone (e.g. "Thu, 25 Jun 2026 22:45:00"), which
 # feedparser can't parse — so it leaves published_parsed=None. Parse it ourselves
 # (assuming IST) so items get a real timestamp instead of falling back to midnight.
 _DT_FORMATS = ("%a, %d %b %Y %H:%M:%S", "%d %b %Y %H:%M:%S", "%a, %d %b %Y", "%d %b %Y")
 
-
-def strip_html(s):
-    """Turn an RSS HTML summary into plain, single-spaced text."""
-    if not s:
-        return ""
-    s = _TAG_RE.sub(" ", s)
-    return re.sub(r"\s+", " ", html.unescape(s)).strip()
+strip_html = common.strip_html      # shared with te_stream.py — lives in common.py now
 
 
 def _parse_dt(s):
