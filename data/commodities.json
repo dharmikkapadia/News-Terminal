@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-07-27T05:00:48+05:30",
+  "captured_at": "2026-07-27T05:30:45+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…)",
   "commodities": [
@@ -11,9 +11,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
       "source": "Trading Economics · CO1:COM",
-      "price": 92.143,
-      "prev_close": 85.906,
-      "change_pct": -6.34,
+      "price": 91.791,
+      "prev_close": 85.202,
+      "change_pct": -6.7,
       "currency": "USD",
       "as_of": "2026-07-26"
     },
@@ -25,9 +25,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Trading Economics · XAUUSD:CUR",
-      "price": 4084.34,
+      "price": 4095.25,
       "prev_close": 4052.0,
-      "change_pct": 0.8,
+      "change_pct": 1.07,
       "currency": "USD",
       "as_of": "2026-07-26"
     },
@@ -39,9 +39,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
       "source": "Trading Economics · XAGUSD:CUR",
-      "price": 59.317,
+      "price": 59.667,
       "prev_close": 57.98,
-      "change_pct": 2.31,
+      "change_pct": 2.91,
       "currency": "USD",
       "as_of": "2026-07-26"
     },
@@ -53,9 +53,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Trading Economics · HG1:COM",
-      "price": 6.3202,
+      "price": 6.3301,
       "prev_close": 6.3014,
-      "change_pct": 0.3,
+      "change_pct": 0.46,
       "currency": "USD",
       "as_of": "2026-07-26"
     },
@@ -95,11 +95,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/steel",
       "source": "Yahoo Finance · HRC=F",
-      "price": 1200.0,
+      "price": 1204.0,
       "prev_close": 1156.0,
-      "change_pct": 3.81,
+      "change_pct": 4.15,
       "currency": "USD",
-      "as_of": "2026-07-24"
+      "as_of": "2026-07-27"
     },
     {
       "key": "iron",
