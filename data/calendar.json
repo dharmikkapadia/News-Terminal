@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-07-28T16:00:39+05:30",
+  "captured_at": "2026-07-28T16:12:45+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -135,11 +135,11 @@
       "url": "https://tradingeconomics.com/india/industrial-production",
       "importance": null,
       "actual": "7.3%",
-      "previous": "5.1%",
+      "previous": "5%",
       "consensus": "5.7%",
       "forecast": "4.9%",
       "first_seen": "2026-07-21T22:01:55+05:30",
-      "updated_at": "2026-07-28T16:00:39+05:30"
+      "updated_at": "2026-07-28T16:12:45+05:30"
     },
     {
       "id": "402130",
@@ -148,11 +148,12 @@
       "event": "Manufacturing Production YoY",
       "url": "https://tradingeconomics.com/india/manufacturing-production",
       "importance": null,
-      "actual": "",
-      "previous": "5.5%",
+      "actual": "7.8%",
+      "previous": "5.2%",
       "consensus": "",
       "forecast": "5%",
-      "first_seen": "2026-07-21T22:01:55+05:30"
+      "first_seen": "2026-07-21T22:01:55+05:30",
+      "updated_at": "2026-07-28T16:12:45+05:30"
     },
     {
       "id": "417761",
