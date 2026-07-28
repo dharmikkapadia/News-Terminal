@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-07-28T20:36:15+05:30",
+  "captured_at": "2026-07-28T22:08:36+05:30",
   "source": "https://www.rbi.org.in/",
   "policy_rates": {
     "repo_rate": 5.25,
@@ -15,7 +15,7 @@
   "exchange_rates": {
     "as_of": "As at 1.00pm of July 28, 2026",
     "source": "FBIL",
-    "inr_per_usd": 95.675,
+    "inr_per_usd": 95.674,
     "inr_per_gbp": 127.304,
     "inr_per_eur": 109.0551,
     "inr_per_100_jpy": 58.52,
@@ -24,7 +24,7 @@
     "fx_te": {
       "inr_per_usd": {
         "label": "USD/INR",
-        "prev_close": 95.5816,
+        "prev_close": 95.5796,
         "change_pct": -0.1,
         "chart_url": "https://tradingeconomics.com/currencies?quote=inr",
         "as_of": "2026-07-28",
@@ -47,7 +47,7 @@
         "source": "Trading Economics · GBPINR:CUR"
       }
     },
-    "fx_te_captured_at": "2026-07-28T22:00:43+05:30"
+    "fx_te_captured_at": "2026-07-28T22:08:37+05:30"
   },
   "lending_deposit_rates": {
     "base_rate": [
@@ -70,7 +70,7 @@
         4.6,
         5.45
       ],
-      "as_on": "as on  July 27, 2026"
+      "as_on": "as on July 27, 2026"
     },
     "gsec_yields": [
       {
@@ -99,11 +99,11 @@
       "182_day": 5.6098,
       "364_day": 5.765
     },
-    "gsec_tbill_as_on": "as on  July 27, 2026",
+    "gsec_tbill_as_on": "as on July 27, 2026",
     "capital_market": {
       "sensex": 76835.78,
       "nifty_50": 23995.95,
-      "as_on": "as on  July 27, 2026"
+      "as_on": "as on July 27, 2026"
     },
     "bonds": {
       "source": "investing.com",
