@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-07-30T00:00:44+05:30",
+  "captured_at": "2026-07-30T00:30:44+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…)",
   "commodities": [
@@ -11,9 +11,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
       "source": "Trading Economics · CO1:COM",
-      "price": 90.672,
+      "price": 90.444,
       "prev_close": 84.09,
-      "change_pct": 7.83,
+      "change_pct": 7.56,
       "currency": "USD",
       "as_of": "2026-07-29"
     },
@@ -25,9 +25,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Trading Economics · XAUUSD:CUR",
-      "price": 4065.31,
+      "price": 4106.77,
       "prev_close": 4028.33,
-      "change_pct": 0.92,
+      "change_pct": 1.95,
       "currency": "USD",
       "as_of": "2026-07-29"
     },
@@ -39,9 +39,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
       "source": "Trading Economics · XAGUSD:CUR",
-      "price": 58.142,
+      "price": 59.012,
       "prev_close": 57.098,
-      "change_pct": 1.83,
+      "change_pct": 3.35,
       "currency": "USD",
       "as_of": "2026-07-29"
     },
@@ -53,9 +53,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Trading Economics · HG1:COM",
-      "price": 6.348,
+      "price": 6.3789,
       "prev_close": 6.327,
-      "change_pct": 0.33,
+      "change_pct": 0.82,
       "currency": "USD",
       "as_of": "2026-07-29"
     },
@@ -95,9 +95,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/steel",
       "source": "Yahoo Finance · HRC=F",
-      "price": 1203.0,
+      "price": 1204.0,
       "prev_close": 1156.0,
-      "change_pct": 4.07,
+      "change_pct": 4.15,
       "currency": "USD",
       "as_of": "2026-07-29"
     },
