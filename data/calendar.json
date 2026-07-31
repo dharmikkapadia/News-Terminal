@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-07-31T16:30:49+05:30",
+  "captured_at": "2026-07-31T17:00:50+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -176,12 +176,12 @@
       "event": "Foreign Exchange Reserves",
       "url": "https://tradingeconomics.com/india/foreign-exchange-reserves",
       "importance": null,
-      "actual": "",
+      "actual": "$682.35B",
       "previous": "$676.24B",
       "consensus": "",
       "forecast": "",
       "first_seen": "2026-07-21T22:01:55+05:30",
-      "updated_at": "2026-07-24T17:00:45+05:30"
+      "updated_at": "2026-07-31T17:00:50+05:30"
     },
     {
       "id": "396415",
@@ -303,10 +303,11 @@
       "url": "https://tradingeconomics.com/india/foreign-exchange-reserves",
       "importance": null,
       "actual": "",
-      "previous": "",
+      "previous": "$682.35B",
       "consensus": "",
       "forecast": "",
-      "first_seen": "2026-07-21T22:01:55+05:30"
+      "first_seen": "2026-07-21T22:01:55+05:30",
+      "updated_at": "2026-07-31T17:00:50+05:30"
     },
     {
       "id": "401022",
@@ -472,19 +473,6 @@
       "first_seen": "2026-07-22T16:00:44+05:30"
     },
     {
-      "id": "396572",
-      "date": "2026-08-19",
-      "time": "11:30 AM",
-      "event": "M3 Money Supply YoY",
-      "url": "https://tradingeconomics.com/india/money-supply-m3",
-      "importance": null,
-      "actual": "",
-      "previous": "",
-      "consensus": "",
-      "forecast": "",
-      "first_seen": "2026-07-24T17:00:45+05:30"
-    },
-    {
       "id": "400393",
       "date": "2026-08-20",
       "time": "11:30 AM",
@@ -574,6 +562,20 @@
       "consensus": "",
       "forecast": "",
       "first_seen": "2026-07-26T17:05:23+05:30"
+    },
+    {
+      "id": "396572",
+      "date": "2026-08-26",
+      "time": "11:30 AM",
+      "event": "M3 Money Supply YoY",
+      "url": "https://tradingeconomics.com/india/money-supply-m3",
+      "importance": null,
+      "actual": "",
+      "previous": "",
+      "consensus": "",
+      "forecast": "",
+      "first_seen": "2026-07-24T17:00:45+05:30",
+      "updated_at": "2026-07-31T17:00:50+05:30"
     }
   ]
 }
