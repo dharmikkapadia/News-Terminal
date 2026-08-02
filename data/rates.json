@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-08-01T21:28:29+05:30",
+  "captured_at": "2026-08-02T15:20:48+05:30",
   "source": "https://www.rbi.org.in/",
   "policy_rates": {
     "repo_rate": 5.25,
@@ -47,7 +47,7 @@
         "source": "Trading Economics · GBPINR:CUR"
       }
     },
-    "fx_te_captured_at": "2026-08-02T15:00:46+05:30"
+    "fx_te_captured_at": "2026-08-02T15:20:48+05:30"
   },
   "lending_deposit_rates": {
     "base_rate": [
