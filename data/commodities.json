@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-08-03T03:00:37+05:30",
+  "captured_at": "2026-08-03T03:30:44+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…)",
   "commodities": [
@@ -11,11 +11,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
       "source": "Trading Economics · CO1:COM",
-      "price": 87.93,
-      "prev_close": 86.88,
-      "change_pct": 1.21,
+      "price": 84.255,
+      "prev_close": 80.58,
+      "change_pct": -4.18,
       "currency": "USD",
-      "as_of": "2026-07-31"
+      "as_of": "2026-08-02"
     },
     {
       "key": "gold",
