@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-08-02T09:05:32+05:30",
+  "captured_at": "2026-08-02T09:31:35+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…)",
   "commodities": [
@@ -95,9 +95,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/steel",
       "source": "Yahoo Finance · HRC=F",
-      "price": 1191.0,
+      "price": 1190.0,
       "prev_close": 1193.0,
-      "change_pct": -0.17,
+      "change_pct": -0.25,
       "currency": "USD",
       "as_of": "2026-07-31"
     },
