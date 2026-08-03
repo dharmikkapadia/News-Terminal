@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-08-03T06:30:44+05:30",
+  "captured_at": "2026-08-03T07:00:45+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…)",
   "commodities": [
@@ -11,9 +11,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
       "source": "Trading Economics · CO1:COM",
-      "price": 83.88,
-      "prev_close": 79.83,
-      "change_pct": -4.61,
+      "price": 83.756,
+      "prev_close": 79.582,
+      "change_pct": -4.75,
       "currency": "USD",
       "as_of": "2026-08-03"
     },
@@ -25,9 +25,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Trading Economics · XAUUSD:CUR",
-      "price": 4055.3,
+      "price": 4053.41,
       "prev_close": 4042.97,
-      "change_pct": 0.3,
+      "change_pct": 0.26,
       "currency": "USD",
       "as_of": "2026-08-03"
     },
@@ -39,9 +39,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
       "source": "Trading Economics · XAGUSD:CUR",
-      "price": 57.961,
+      "price": 58.192,
       "prev_close": 57.62,
-      "change_pct": 0.59,
+      "change_pct": 0.99,
       "currency": "USD",
       "as_of": "2026-08-03"
     },
@@ -53,9 +53,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Trading Economics · HG1:COM",
-      "price": 6.4913,
+      "price": 6.4973,
       "prev_close": 6.436,
-      "change_pct": 0.86,
+      "change_pct": 0.95,
       "currency": "USD",
       "as_of": "2026-08-03"
     },
@@ -81,9 +81,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/zinc",
       "source": "Trading Economics · LMZSDS03:COM",
-      "price": 3665.9,
+      "price": 3653.35,
       "prev_close": 3645.5,
-      "change_pct": 0.56,
+      "change_pct": 0.22,
       "currency": "USD",
       "as_of": "2026-08-03"
     },
