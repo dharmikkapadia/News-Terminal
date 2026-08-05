@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-08-05T15:30:50+05:30",
+  "captured_at": "2026-08-05T16:00:54+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -605,6 +605,32 @@
       "consensus": "",
       "forecast": "",
       "first_seen": "2026-08-02T17:00:41+05:30"
+    },
+    {
+      "id": "402558",
+      "date": "2026-08-31",
+      "time": "10:30 AM",
+      "event": "GDP Growth Rate YoY",
+      "url": "https://tradingeconomics.com/india/gdp-growth-annual",
+      "importance": null,
+      "actual": "",
+      "previous": "7.8%",
+      "consensus": "",
+      "forecast": "7.2%",
+      "first_seen": "2026-08-05T16:00:54+05:30"
+    },
+    {
+      "id": "417762",
+      "date": "2026-08-31",
+      "time": "10:30 AM",
+      "event": "Government Budget Value",
+      "url": "https://tradingeconomics.com/india/government-budget-value",
+      "importance": null,
+      "actual": "",
+      "previous": "INR-3078B",
+      "consensus": "",
+      "forecast": "INR -7000.0B",
+      "first_seen": "2026-08-05T16:00:54+05:30"
     }
   ]
 }
