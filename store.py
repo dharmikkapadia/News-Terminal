@@ -122,7 +122,15 @@ def init_db():
 
 def upsert(items, category="press"):
     """Insert items we haven't stored; backfill a summary if we now have one.
-    Returns the number of genuinely new rows (so the UI can show "N new")."""
+    Returns the number of genuinely new rows (so the UI can show "N new").
+
+    The insert is a single atomic `INSERT ... ON CONFLICT DO UPDATE`, not a
+    SELECT-then-INSERT: Streamlit runs each session's fragment independently, so
+    two sessions polling the same feed around the same moment can both see a key
+    as new and both try to INSERT it — a plain SELECT-then-INSERT loses that race
+    and crashes with a UNIQUE constraint violation. ON CONFLICT makes the second
+    writer's statement a no-op (or a conditional summary backfill) instead of an
+    error, on all three backends (standard SQL upsert since SQLite 3.24)."""
     if not items:
         return 0
     table = _table(category)
@@ -136,15 +144,15 @@ def upsert(items, category="press"):
                 continue
             row = conn.execute(_q(f"SELECT summary FROM {table} WHERE key=?", style), (k,)).fetchone()
             if row is None:
-                conn.execute(
-                    _q(f"INSERT INTO {table}(key, link, title, summary, published, ts, fetched_ts) "
-                       "VALUES (?,?,?,?,?,?,?)", style),
-                    (k, it.get("link", ""), it.get("title", ""), it.get("summary", "") or "",
-                     it.get("published", "") or "", it.get("ts"), now),
-                )
                 new += 1
-            elif not row[0] and it.get("summary"):
-                conn.execute(_q(f"UPDATE {table} SET summary=? WHERE key=?", style), (it["summary"], k))
+            conn.execute(
+                _q(f"INSERT INTO {table}(key, link, title, summary, published, ts, fetched_ts) "
+                   "VALUES (?,?,?,?,?,?,?) "
+                   "ON CONFLICT(key) DO UPDATE SET summary=excluded.summary "
+                   "WHERE (summary IS NULL OR summary='') AND excluded.summary<>''", style),
+                (k, it.get("link", ""), it.get("title", ""), it.get("summary", "") or "",
+                 it.get("published", "") or "", it.get("ts"), now),
+            )
         conn.commit()
     finally:
         conn.close()
