@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-08-05T10:00:48+05:30",
+  "captured_at": "2026-08-05T10:30:49+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -191,12 +191,12 @@
       "event": "Cash Reserve Ratio",
       "url": "https://tradingeconomics.com/india/cash-reserve-ratio",
       "importance": null,
-      "actual": "",
+      "actual": "3%",
       "previous": "3%",
       "consensus": "3.0%",
       "forecast": "3.0%",
       "first_seen": "2026-07-21T22:01:55+05:30",
-      "updated_at": "2026-08-03T12:00:47+05:30"
+      "updated_at": "2026-08-05T10:30:49+05:30"
     },
     {
       "id": "419618",
@@ -205,12 +205,12 @@
       "event": "RBI Interest Rate Decision",
       "url": "https://tradingeconomics.com/india/interest-rate",
       "importance": null,
-      "actual": "",
+      "actual": "5.25%",
       "previous": "5.25%",
       "consensus": "5.25%",
       "forecast": "5.25%",
       "first_seen": "2026-07-21T22:01:55+05:30",
-      "updated_at": "2026-07-31T16:00:50+05:30"
+      "updated_at": "2026-08-05T10:30:49+05:30"
     },
     {
       "id": "396450",
@@ -219,12 +219,12 @@
       "event": "HSBC Composite PMI Final",
       "url": "https://tradingeconomics.com/india/composite-pmi",
       "importance": null,
-      "actual": "",
+      "actual": "54.30",
       "previous": "57.1",
       "consensus": "54.3",
       "forecast": "54.3",
       "first_seen": "2026-07-21T22:01:55+05:30",
-      "updated_at": "2026-07-24T11:00:36+05:30"
+      "updated_at": "2026-08-05T10:30:49+05:30"
     },
     {
       "id": "396449",
@@ -233,12 +233,12 @@
       "event": "HSBC Services PMI Final",
       "url": "https://tradingeconomics.com/india/services-pmi",
       "importance": null,
-      "actual": "",
+      "actual": "53.3",
       "previous": "57.4",
       "consensus": "54.5",
       "forecast": "53.1",
       "first_seen": "2026-07-21T22:01:55+05:30",
-      "updated_at": "2026-08-03T12:00:47+05:30"
+      "updated_at": "2026-08-05T10:30:49+05:30"
     },
     {
       "id": "396460",
