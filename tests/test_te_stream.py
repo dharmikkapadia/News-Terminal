@@ -299,7 +299,8 @@ def test_fetch_india_filters_the_global_stream(monkeypatch):
     assert err is None
     assert [i["title"] for i in items] == ["India Inflation Rate Eases to 2.1% in June"]
     world, err = te_stream.fetch_world(BASE)
-    assert err is None and len(world) == 3
+    assert err is None and len(world) == 2
+    assert "India Inflation Rate Eases to 2.1% in June" not in [i["title"] for i in world]
 
 
 def test_fetch_sniffs_json_by_body_when_content_type_lies(monkeypatch):

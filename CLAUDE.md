@@ -108,7 +108,10 @@ SEBI items on the link itself (unique + permanent, so this is safe).
   `MARKETWIRE_TE_INDIA_STREAM_URL` / `MARKETWIRE_TE_WORLD_STREAM_URL`): the stream XHR
   endpoint (`/ws/stream.ashx`), the rendered `/stream` page, an RSS mirror — India's chain
   ends with the plain global stream filtered by `_is_india()` (TE country tag → the item's
-  `/india/…` country page → whole-word "India/Indian" in the HEADLINE only). Each candidate
+  `/india/…` country page → whole-word "India/Indian" in the HEADLINE only). `fetch_world()`
+  runs the SAME `_is_india()` test the other way — it drops India-tagged items — because the
+  global stream includes every country's news, India included, and without that filter every
+  India headline was showing up twice (once per source tag). Each candidate
   is fetched once, **sniffed** (JSON / RSS / HTML) and routed to `parse_stream_json` /
   `parse_stream_rss` / `parse_stream`; the **first that yields items wins**, so a wrong URL
   guess costs one request. The HTML parser probes `_ITEM_SELECTORS` most-specific-first and

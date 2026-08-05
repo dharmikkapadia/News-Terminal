@@ -25,7 +25,10 @@ endpoint), RSS/Atom, or server-rendered HTML — then handed to the matching
 parser. A candidate that errors or parses to nothing just moves to the next, so
 a wrong guess costs a request, not the feed. India's LAST candidate is the plain
 global stream filtered to India-tagged items, which works whatever TE does with
-its country URLs.
+its country URLs. World's fetch filters the OTHER way — it drops India-tagged
+items (same _is_india test) — because the global stream includes every
+country's news, India included, and without that filter every India headline
+would show up twice: once under TE - India News, once under TE - World News.
 
 Nothing here ever raises: every entry point returns (items, error), and an
 empty result simply leaves the committed history untouched (poll.py merges).
@@ -566,8 +569,11 @@ def fetch_stream(urls=WORLD_URLS, timeout=25, keep=None):
 
 
 def fetch_world(urls=WORLD_URLS, timeout=25):
-    """TE's whole news stream — every country, every category."""
-    return fetch_stream(urls, timeout=timeout)
+    """TE's whole news stream — every country, every category — MINUS India-tagged
+    items (see _is_india): the global stream naturally includes India stories, and
+    those are already carried by TE - India News, so keeping them here duplicated
+    every India headline across both wire sources."""
+    return fetch_stream(urls, timeout=timeout, keep=lambda it: not _is_india(it))
 
 
 def fetch_india(urls=INDIA_URLS, timeout=25):
