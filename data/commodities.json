@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-08-05T08:46:27+05:30",
+  "captured_at": "2026-08-05T09:00:40+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…)",
   "commodities": [
@@ -11,8 +11,8 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
       "source": "Trading Economics · CO1:COM",
-      "price": 78.321,
-      "prev_close": 77.282,
+      "price": 78.324,
+      "prev_close": 77.288,
       "change_pct": -1.31,
       "currency": "USD",
       "as_of": "2026-08-05"
@@ -25,9 +25,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Trading Economics · XAUUSD:CUR",
-      "price": 4135.47,
+      "price": 4130.25,
       "prev_close": 4077.86,
-      "change_pct": 1.41,
+      "change_pct": 1.28,
       "currency": "USD",
       "as_of": "2026-08-05"
     },
@@ -39,9 +39,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
       "source": "Trading Economics · XAGUSD:CUR",
-      "price": 60.883,
+      "price": 60.782,
       "prev_close": 59.506,
-      "change_pct": 2.31,
+      "change_pct": 2.14,
       "currency": "USD",
       "as_of": "2026-08-05"
     },
@@ -53,9 +53,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Trading Economics · HG1:COM",
-      "price": 6.6242,
+      "price": 6.6218,
       "prev_close": 6.6185,
-      "change_pct": 0.09,
+      "change_pct": 0.05,
       "currency": "USD",
       "as_of": "2026-08-05"
     },
@@ -81,9 +81,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/zinc",
       "source": "Trading Economics · LMZSDS03:COM",
-      "price": 3683.5,
+      "price": 3684.5,
       "prev_close": 3666.9,
-      "change_pct": 0.45,
+      "change_pct": 0.48,
       "currency": "USD",
       "as_of": "2026-08-05"
     },
