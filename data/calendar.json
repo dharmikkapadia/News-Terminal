@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-08-06T10:30:46+05:30",
+  "captured_at": "2026-08-06T11:00:42+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -631,6 +631,19 @@
       "consensus": "",
       "forecast": "INR -7000.0B",
       "first_seen": "2026-08-05T16:00:54+05:30"
+    },
+    {
+      "id": "396663",
+      "date": "2026-09-01",
+      "time": "05:00 AM",
+      "event": "HSBC Manufacturing PMI Final",
+      "url": "https://tradingeconomics.com/india/manufacturing-pmi",
+      "importance": null,
+      "actual": "",
+      "previous": "53.5",
+      "consensus": "",
+      "forecast": "",
+      "first_seen": "2026-08-06T11:00:42+05:30"
     }
   ]
 }
