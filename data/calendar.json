@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-08-06T17:00:38+05:30",
+  "captured_at": "2026-08-06T17:30:55+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -644,6 +644,19 @@
       "consensus": "",
       "forecast": "",
       "first_seen": "2026-08-06T11:00:42+05:30"
+    },
+    {
+      "id": "401467",
+      "date": "2026-09-01",
+      "time": "12:00 PM",
+      "event": "Current Account",
+      "url": "https://tradingeconomics.com/india/current-account",
+      "importance": null,
+      "actual": "",
+      "previous": "$7.1B",
+      "consensus": "",
+      "forecast": "$ -7.4B",
+      "first_seen": "2026-08-06T17:30:55+05:30"
     }
   ]
 }
