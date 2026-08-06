@@ -78,10 +78,16 @@ def _render(url, wait_selector=None, timeout=RENDER_TIMEOUT_MS):
     def _one(fetcher_name, **extra):
         try:
             from scrapling import fetchers
-        except Exception as ex:                      # scrapling/browser not installed
+            fetcher = getattr(fetchers, fetcher_name)
+        except Exception as ex:
+            # Covers scrapling/browser not installed AND a failed lazy submodule import —
+            # e.g. scrapling.fetchers.chrome's module-level browserforge header generation,
+            # which can raise ValueError("No headers based on this input can be generated")
+            # on some environments (a live upstream scrapling/browserforge bug, unrelated to
+            # this site). Must be caught here, not left to propagate, or one bad fetcher
+            # resolution crashes the whole render instead of falling back to the next one.
             attempts.append(f"{fetcher_name}: import failed: {type(ex).__name__}: {ex}")
             return None
-        fetcher = getattr(fetchers, fetcher_name)
         for ws in ([wait_selector, None] if wait_selector else [None]):
             kw = dict(headless=True, network_idle=True, timeout=timeout, **extra)
             if ws:
@@ -264,9 +270,12 @@ def poll_rates_browser(path=None, home_url=HOME_URL, mpc_url=MPC_URL):
 
 
 def main():
-    status = poll_rates_browser()
+    try:
+        status = poll_rates_browser()
+    except Exception as ex:           # defensive: poll_rates_browser must never fail the run
+        status = f"rates(browser) refresh errored ({type(ex).__name__}: {ex}) — kept committed snapshot"
     print(status)
-    if status.startswith("kept committed snapshot"):
+    if status.startswith("kept committed snapshot") or "errored" in status:
         _annotate("warning", "rates(browser) refresh", status)
     return 0          # green-safe: a failed render keeps the snapshot, never fails the run
 
