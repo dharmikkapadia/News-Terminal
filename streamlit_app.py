@@ -1342,10 +1342,7 @@ def wire():
     )
 
     # --- render: Stream (single-column feed) or Grid (3-up card grid) ---------
-    RENDER_CAP = 120          # bound the DOM; narrow with filters to reach the rest
-    visible = shown[:RENDER_CAP]
-    if len(shown) > RENDER_CAP:
-        st.caption(f"Showing the first {RENDER_CAP} of {len(shown)} — narrow with the filters above to see the rest.")
+    visible = shown
 
     if st.session_state.get("layout", "Stream") == "Grid":
         CARD_COLS = 3
