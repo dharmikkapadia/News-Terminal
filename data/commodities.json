@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-08-11T03:00:39+05:30",
+  "captured_at": "2026-08-11T03:30:53+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…)",
   "commodities": [
@@ -11,9 +11,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
       "source": "Trading Economics · CO1:COM",
-      "price": 87.85,
+      "price": 87.592,
       "prev_close": 83.55,
-      "change_pct": 5.15,
+      "change_pct": 4.84,
       "currency": "USD",
       "as_of": "2026-08-10"
     },
@@ -25,9 +25,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Trading Economics · XAUUSD:CUR",
-      "price": 4391.34,
+      "price": 4391.71,
       "prev_close": 4343.43,
-      "change_pct": 1.1,
+      "change_pct": 1.11,
       "currency": "USD",
       "as_of": "2026-08-10"
     },
@@ -39,9 +39,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
       "source": "Trading Economics · XAGUSD:CUR",
-      "price": 65.714,
+      "price": 65.21,
       "prev_close": 63.542,
-      "change_pct": 3.42,
+      "change_pct": 2.63,
       "currency": "USD",
       "as_of": "2026-08-10"
     },
@@ -53,7 +53,7 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Trading Economics · HG1:COM",
-      "price": 6.612,
+      "price": 6.6118,
       "prev_close": 6.5705,
       "change_pct": 0.63,
       "currency": "USD",
@@ -123,9 +123,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/coffee",
       "source": "Trading Economics · KC1:COM",
-      "price": 315.2,
-      "prev_close": 314.5,
-      "change_pct": -0.22,
+      "price": 314.99,
+      "prev_close": 314.08,
+      "change_pct": -0.29,
       "currency": "USD",
       "as_of": "2026-08-10"
     }
