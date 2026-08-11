@@ -77,6 +77,13 @@ jobs:
           sudo apt-get update && sudo apt-get install -y xvfb
           pip install "scrapling[fetchers]"
           scrapling install
+          # `scrapling install` downloads PLAYWRIGHT's chromium build, but StealthyFetcher
+          # launches via PATCHRIGHT, which pins its own chromium revision — when the two
+          # drift (Aug 2026: patchright wanted chromium-1228, playwright installed a newer
+          # rev) every render died instantly with "Executable doesn't exist ... run
+          # patchright install", silently keeping the committed bonds/coffee snapshots.
+          # Install patchright's chromium explicitly so the stealth render can launch.
+          patchright install chromium
 
       - name: Fetch RBI + SEBI + TE news and update history (+ commodities / FX / investing.com bonds + coffee)
         env:
