@@ -4,8 +4,8 @@
 This REPLACES RBI as the source of the government-bond / bill yields shown in the Current
 Rates dashboard — both the "10Y G-Sec" signal tile and the yield rows of the Market Trends
 panel. investing.com blocks bots and renders the table client-side, so the page is fetched
-in a REAL browser via Scrapling (reusing rates_scrapling._render — Chromium/DynamicFetcher
-first, stealth Firefox/StealthyFetcher with Cloudflare solving as the anti-bot fallback) and
+in a REAL browser via Scrapling's StealthyFetcher — the shared `common.stealth_render`,
+tuned for investing.com and also used by commodities.py's London coffee quote — and
 parsed with BeautifulSoup.
 
 It overlays data/rates.json's `market_trends.bonds` block and rides the SAME 30-min
@@ -42,9 +42,6 @@ import rates              # reuse RATES_PATH / IST / save_rates (single source o
 BONDS_BOARD_URL = "https://www.investing.com/rates-bonds/india-government-bonds"
 BONDS_URL = os.environ.get("MARKETWIRE_INVESTING_BONDS_URL", BONDS_BOARD_URL)
 RENDER_TIMEOUT_MS = int(os.environ.get("MARKETWIRE_RENDER_TIMEOUT_MS", "90000"))
-# investing.com hard-blocks datacenter IPs (Cloudflare 403). A (residential) proxy is the
-# reliable way through from CI; set MARKETWIRE_SCRAPE_PROXY to a proxy URL to use it.
-SCRAPE_PROXY = os.environ.get("MARKETWIRE_SCRAPE_PROXY", "").strip() or None
 # Where to dump the rendered HTML for markup diagnosis (a CI run uploads it as an artifact).
 _DUMP_PATH = os.environ.get("MARKETWIRE_BONDS_DUMP", "").strip()
 
@@ -198,64 +195,13 @@ def _is_complete(curve):
     )
 
 
-def _env_flag(name, default=False):
-    """Read a boolean-ish env var; empty/unset → `default`."""
-    v = os.environ.get(name, "").strip().lower()
-    return default if not v else v in ("1", "true", "yes", "on")
-
-
-def _maybe_dump(html):
-    """Write the rendered HTML to MARKETWIRE_BONDS_DUMP if set (a CI run can upload it as an
-    artifact to diagnose the markup / confirm a block page). Best-effort; never raises."""
-    if not (_DUMP_PATH and html):
-        return
-    try:
-        with open(_DUMP_PATH, "w", encoding="utf-8") as f:
-            f.write(html)
-    except Exception:
-        pass
-
-
 def _render(url, timeout=RENDER_TIMEOUT_MS):
-    """Fetch investing.com in Scrapling's STEALTH browser and return (html, error).
-
-    investing.com hard-blocks bots from datacenter IPs (Cloudflare 403), so this is tuned to
-    look like a real user and NOT hang on investing.com's never-idle ad/tracker traffic:
-      • StealthyFetcher only — plain Chromium (DynamicFetcher) is pointless against Cloudflare;
-      • solve_cloudflare + arrive via a Google click + block ads so the DOM actually settles;
-      • network_idle=False — waiting for 'load'/network-idle just times out on investing.com
-        (that was the original failure: `Page.goto ... waiting until "load"` → 60s timeout);
-      • non-headless by default (set MARKETWIRE_BONDS_HEADLESS=true to override) — run under a
-        virtual display (xvfb) in CI; headless stealth Chrome is easier for Cloudflare to flag;
-      • MARKETWIRE_SCRAPE_PROXY routes through a (residential) proxy — the RELIABLE fix from CI,
-        since a GitHub-runner IP is usually 403'd however good the browser fingerprint is.
-    A 403/429 (or empty) response comes back as an error so the caller preserves the snapshot."""
-    try:
-        from scrapling.fetchers import StealthyFetcher
-    except Exception as ex:                       # scrapling/browser not installed
-        return None, f"scrapling unavailable: {type(ex).__name__}: {ex}"
-    kw = dict(
-        headless=_env_flag("MARKETWIRE_BONDS_HEADLESS", default=False),
-        solve_cloudflare=True,       # attempt the Cloudflare/Turnstile challenge
-        google_search=True,          # arrive via a Google results click (organic-looking)
-        network_idle=False,          # investing.com's trackers never idle → don't wait on it
-        load_dom=True,
-        block_ads=True,              # fewer ad/tracker requests → the page settles + parses
-        wait=4000,                   # let the client-rendered yields table paint post-challenge
-        timeout=timeout,
-    )
-    if SCRAPE_PROXY:
-        kw["proxy"] = SCRAPE_PROXY
-    try:
-        page = StealthyFetcher.fetch(url, **kw)
-    except Exception as ex:
-        return None, f"{type(ex).__name__}: {ex}"
-    status = getattr(page, "status", None)
-    html = getattr(page, "html_content", None) or ""
-    _maybe_dump(html)                             # dump even a block page for diagnosis
-    if html.strip() and status not in (403, 429):
-        return html, None
-    return None, f"blocked/empty (status={status}, html={len(html)}B)"
+    """Fetch investing.com in Scrapling's STEALTH browser and return (html, error) — the
+    shared `common.stealth_render` (see its docstring for the anti-bot tuning: Cloudflare
+    solving, Google-click arrival, network_idle=False, non-headless under xvfb in CI, and
+    MARKETWIRE_SCRAPE_PROXY routing), dumping the rendered HTML to MARKETWIRE_BONDS_DUMP
+    for the bonds-render-dump CI artifact."""
+    return common.stealth_render(url, timeout=timeout, dump_path=_DUMP_PATH)
 
 
 def fetch_bonds(url=BONDS_URL, timeout=RENDER_TIMEOUT_MS):

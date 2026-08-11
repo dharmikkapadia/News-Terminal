@@ -1,10 +1,12 @@
 """Characterization tests for the HTML parsers (SEBI listing, investing.com bonds,
-RBI archive dates) on literal fixture markup — no network."""
+the investing.com instrument quote, RBI archive dates) on literal fixture markup —
+no network."""
 
 import calendar
 from datetime import datetime, timedelta, timezone
 
 import bonds
+import commodities
 import rbi_archive
 import sebi
 
@@ -90,6 +92,42 @@ def test_parse_bonds_reads_by_header_and_sorts_by_maturity():
 def test_parse_bonds_empty_on_no_rows():
     curve, err = bonds.parse_bonds("<html><table><tr><th>Nope</th></tr></table></html>")
     assert curve == [] and err
+
+
+# investing.com single-instrument price header (the London coffee futures page) —
+# `data-test` attributes, sign carried in the % text, prev close in the key stats.
+COFFEE_HTML = """
+<html><body>
+  <div data-test="instrument-price-last">4,507.5</div>
+  <span data-test="instrument-price-change">-23.5</span>
+  <span data-test="instrument-price-change-percent">(-0.52%)</span>
+  <dl><dt>Prev. Close</dt><dd data-test="prevClose">4,531.0</dd></dl>
+</body></html>
+"""
+
+
+def test_parse_investing_quote_reads_price_header():
+    q, err = commodities.parse_investing_quote(COFFEE_HTML)
+    assert err is None
+    assert q["price"] == 4507.5
+    assert q["prev_close"] == 4531.0
+    assert q["change_pct"] == -0.52
+    assert q["currency"] == "USD"
+
+
+def test_parse_investing_quote_derives_prev_close():
+    html = ('<div data-test="instrument-price-last">4,080.0</div>'
+            '<span data-test="instrument-price-change-percent">+2.00%</span>')
+    q, err = commodities.parse_investing_quote(html)
+    assert err is None
+    assert q["price"] == 4080.0
+    assert q["change_pct"] == 2.0
+    assert q["prev_close"] == 4000.0                # derived: price / (1 + pct/100)
+
+
+def test_parse_investing_quote_errors_without_price():
+    q, err = commodities.parse_investing_quote("<html><body>Just a moment...</body></html>")
+    assert q is None and err
 
 
 def test_rbi_archive_date_formats():

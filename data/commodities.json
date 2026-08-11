@@ -1,7 +1,7 @@
 {
   "captured_at": "2026-08-11T16:30:54+05:30",
-  "source": "Trading Economics (primary) + Yahoo Finance (fallback)",
-  "chart_links": "Trading Economics (tradingeconomics.com/commodity/…)",
+  "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
+  "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
     {
       "key": "brent",
@@ -117,17 +117,17 @@
     },
     {
       "key": "coffee",
-      "name": "Coffee",
-      "unit": "USc/lb",
+      "name": "Coffee (Robusta)",
+      "unit": "USD/T",
       "category": "Softs",
       "cadence": "daily",
-      "chart_url": "https://tradingeconomics.com/commodity/coffee",
-      "source": "Trading Economics · KC1:COM",
-      "price": 323.46,
-      "prev_close": 313.9,
-      "change_pct": 3.05,
-      "currency": "USD",
-      "as_of": "2026-08-11"
+      "chart_url": "https://www.investing.com/commodities/london-coffee",
+      "source": null,
+      "price": null,
+      "prev_close": null,
+      "change_pct": null,
+      "currency": null,
+      "as_of": null
     },
     {
       "key": "freight",

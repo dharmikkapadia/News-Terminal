@@ -586,7 +586,7 @@ def _commodities_dashboard_html(snap):
     return (
         "<div class='mw-cmds-wrap'>"
         f"<div class='mw-rates-hd'><span class='t'>Commodities</span>"
-        f"<span class='s'>{html.escape(sub)} · % vs prev close · charts: Trading Economics</span></div>"
+        f"<span class='s'>{html.escape(sub)} · % vs prev close · charts: Trading Economics / investing.com</span></div>"
         f"<div class='mw-cmds'>{''.join(_cmd_card(c) for c in rows)}</div>"
         "</div>"
     )

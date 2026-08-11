@@ -239,26 +239,31 @@ numerics, green/red gain-loss tones.
 ### Commodities strip (free prices · % vs prev close · chart links)
 
 Below the rates panel, an opt-in **Commodities** strip (sidebar **Show commodities**) shows
-**Brent, Gold, Silver, Copper, Aluminium, Zinc, Steel (HRC), Iron Ore, Coffee and the
+**Brent, Gold, Silver, Copper, Aluminium, Zinc, Steel (HRC), Iron Ore, Coffee (London Robusta)
+and the
 Containerized Freight Index** (the weekly Shanghai SCFI composite, quoted in points) — each as a
 tile with the price, the **% change vs its previous close** (coloured with the palette's
 `up`/`down` gain/loss tones), and a **direct chart link** (the whole tile opens the commodity's
-[Trading Economics](https://tradingeconomics.com/commodities) page in a new tab).
+[Trading Economics](https://tradingeconomics.com/commodities) page in a new tab; the Coffee tile
+opens its [investing.com](https://www.investing.com/commodities/london-coffee) page).
 
 It reads a committed **`data/commodities.json`** (`commodities.py`), refreshed the same guarded
 way as the rates snapshot:
-- **Source — all free, no paid key: Trading Economics primary, Yahoo Finance fallback.** Prices and
+- **Source — all free, no paid key: Trading Economics primary, Yahoo Finance fallback; Coffee from
+  investing.com.** Prices and
   the **% change vs previous close** come from **Trading Economics' server-rendered commodities
   table** (`tradingeconomics.com/commodities`) — for a logged-out visitor the price, net change and
   percent change are baked into each row's markup (`tr[data-symbol]` → `td#p`/`td#nch`/`td#pch`),
-  no key or JavaScript needed. TE covers all 10 **including Zinc** (`LMZSDS03:COM`) and the
+  no key or JavaScript needed. TE covers every TE-sourced tile **including Zinc** (`LMZSDS03:COM`)
+  and the
   **Containerized Freight Index**, and gives a broker-grade % change, so we don't compute one. If TE
   is blocked / rate-limited / drops a symbol, we fall back to **Yahoo Finance's keyless chart
-  endpoint** (`…/v8/finance/chart/<symbol>`, daily closes → `(last − prev)/prev`) for the 8 it
+  endpoint** (`…/v8/finance/chart/<symbol>`, daily closes → `(last − prev)/prev`) for the 7 it
   covers. **Steel** is pinned to Yahoo (`HRC=F`, a USD HR-coil benchmark) on purpose — TE's steel
   (`JBP:COM`) is Chinese rebar in CNY/T. Yahoo is only queried for the symbols that actually need it
   (Steel + any TE gaps), so a healthy TE run hits Yahoo once. Chart links are Trading Economics'
-  public per-commodity pages. TE rows are matched by `data-symbol`, falling back to the row's
+  public per-commodity pages (Coffee: its investing.com page). TE rows are matched by `data-symbol`,
+  falling back to the row's
   `/commodity/<slug>` name link (`common.fetch_te_table`'s `want_slug`) — the freight index's
   symbol (`SHSPSCFI:IND`) was written without live TE access and is unverified, but its slug
   (`containerized-freight-index`) is its verified public URL, so the row resolves either way. It's
@@ -266,16 +271,33 @@ way as the rates snapshot:
   so a TE miss preserves its last committed value. (Note: TE's logged-out page
   serves last-settled values, so prices can lag the live intraday tick until TE's next server rebuild
   — fine for a 30-min poll; verified to be current, not stale.)
+- **Coffee — investing.com's London (Robusta) coffee futures page**
+  ([investing.com/commodities/london-coffee](https://www.investing.com/commodities/london-coffee),
+  quoted in **USD/tonne**), replacing Trading Economics' US Arabica (`KC1:COM`, USc/lb). It has
+  **no TE/Yahoo fallback** — their coffee is a different series AND unit. investing.com blocks bots
+  and renders client-side, so `commodities.fetch_investing()` fetches the page with the **shared
+  stealth-browser render** (`common.stealth_render` — the same investing.com-tuned Scrapling fetch,
+  xvfb + `MARKETWIRE_SCRAPE_PROXY` story as the bond scrape below), and therefore — like the bond
+  curve — the quote refreshes **only on `history.yml`'s 2-hourly `schedule` runs** (the only runs
+  that install the browser); every other poll preserves the last committed price (marked `stale`).
+  `parse_investing_quote()` reads the instrument page's price header by `data-test` attribute
+  (`instrument-price-last` / `instrument-price-change-percent` / `prevClose`, with the legacy
+  `#last_last` ids as fallback). Written without live investing.com access — schedule runs upload
+  the rendered HTML as the `coffee-render-dump` artifact (`MARKETWIRE_COFFEE_DUMP`) for parser
+  tuning, and `MARKETWIRE_INVESTING_COFFEE_URL` overrides the page URL.
 - **Automated (best-effort):** commodities ride the **same 30-min poller as history** — `poll.py`
   calls `commodities.poll_commodities()` each run and `.github/workflows/history.yml` commits
   `data/commodities.json` alongside the history files. (Prices move intraday, so they want frequent
   updates — unlike the once-a-day RBI rates, which stay on their own `rates.yml`.) The refresh
   rewrites the file **only when the liquid core (Brent/Gold/Silver/Copper) resolves in-bounds from
   either source** — a blocked/rate-limited scrape leaves the committed snapshot untouched, and any
-  symbol both sources miss (e.g. Zinc and Containerized Freight, which are TE-only) keeps its last
+  symbol its source(s) miss (e.g. Zinc and Containerized Freight, which are TE-only, or Coffee
+  between browser runs) keeps its last
   committed price. The seed
-  file ships with `null` prices; they fill on the next 30-min poll (or trigger `history.yml` via
-  **workflow_dispatch** to populate now). Like `rates.py`, the scrapers were written without live
+  file ships with `null` prices; they fill on the next 30-min poll — Coffee on the next 2-hourly
+  `schedule` run (or trigger `history.yml` via
+  **workflow_dispatch** to populate the rest now — dispatch runs skip the browser scrapes). Like
+  `rates.py`, the scrapers were written without live
   market access — validate them from a machine that can reach TE / Yahoo (TE sits behind Cloudflare;
   Yahoo 403s some datacenter IPs). Note: committing on each price tick means more frequent commits
   during market hours (each a brief Streamlit Cloud redeploy) — the trade-off for fresher prices.

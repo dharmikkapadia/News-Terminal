@@ -8,12 +8,13 @@ name: MarketWire history
 # The same run also refreshes the intraday overlays: the commodity-price snapshot
 # (data/commodities.json), the Trading-Economics FX overlay (USD/EUR/GBP-INR in
 # data/rates.json), the India macro Economic Calendar (data/calendar.json, merged onto the
-# committed snapshot so released actuals land promptly) AND the India government-bond yield
-# curve (market_trends.bonds, scraped from investing.com in a real browser via Scrapling) —
-# they move intraday, so FX/commodities/calendar ride every run (every 30 min via the external
-# dispatch cron) while the bond scrape runs only on the 2-hourly schedule runs (its browser
-# install is too heavy/flaky for every run — see below). The rest of the RBI Current Rates
-# snapshot stays on its own once-a-day rates.yml.
+# committed snapshot so released actuals land promptly) AND the investing.com scrapes — the
+# India government-bond yield curve (market_trends.bonds) and the London (Robusta) coffee
+# quote in the commodities snapshot, both rendered in a real browser via Scrapling — they
+# move intraday, so FX/commodities/calendar ride every run (every 30 min via the external
+# dispatch cron) while the investing.com scrapes run only on the 2-hourly schedule runs
+# (the browser install is too heavy/flaky for every run — see below). The rest of the RBI
+# Current Rates snapshot stays on its own once-a-day rates.yml.
 # The Streamlit app reads those committed files, so everything survives Streamlit Cloud restarts
 # with no external database.
 #
@@ -32,7 +33,8 @@ on:
     # 30-min cadence blew the 2,000-min/month free tier in ~20 days — July 2026; see
     # docs/OPERATIONS.md's Actions-minutes section before making the repo private again.)
     # These 2-hourly schedule runs are ALSO the only ones that do the heavy
-    # investing.com bond scrape (Scrapling stealth browser + xvfb) — see below.
+    # investing.com scrapes (bond curve + London coffee — Scrapling stealth
+    # browser + xvfb) — see below.
     - cron: "7 */2 * * *"
   workflow_dispatch: {}       # used by the external cron + manual runs (Actions tab)
 
@@ -59,32 +61,35 @@ jobs:
       - name: Install deps
         run: pip install feedparser requests beautifulsoup4
 
-      # Scrapling + a browser are needed ONLY for the investing.com government-bond scrape
-      # (bonds.poll_bonds, called from poll.py) — investing.com blocks bots, so the yield
-      # curve is fetched by rendering the page in a real STEALTH browser (non-headless
-      # under xvfb — much harder for Cloudflare to flag). The install + render add minutes
-      # and Cloudflare-flake exposure to a run, so they ride ONLY the 2-hourly `schedule`
-      # runs, keeping the 30-min dispatch runs light and fast. On dispatch runs
-      # bonds.poll_bonds() finds no scrapling, no-ops safely, and keeps the committed
-      # curve — the yield curve refreshes up to ~12x/day while history/FX/commodities
-      # refresh every run.
-      - name: Install Scrapling stealth browser + xvfb (bond scrape — schedule runs only)
+      # Scrapling + a browser are needed ONLY for the investing.com scrapes — the
+      # government-bond curve (bonds.poll_bonds) and the London coffee quote
+      # (commodities.fetch_investing), both called from poll.py — investing.com blocks
+      # bots, so those pages are fetched by rendering them in a real STEALTH browser
+      # (non-headless under xvfb — much harder for Cloudflare to flag). The install +
+      # renders add minutes and Cloudflare-flake exposure to a run, so they ride ONLY the
+      # 2-hourly `schedule` runs, keeping the 30-min dispatch runs light and fast. On
+      # dispatch runs the renders find no scrapling, fail fast and safely, and keep the
+      # committed curve/price — bonds + coffee refresh up to ~12x/day while
+      # history/FX/commodities refresh every run.
+      - name: Install Scrapling stealth browser + xvfb (investing.com scrapes — schedule runs only)
         if: github.event_name == 'schedule'
         run: |
           sudo apt-get update && sudo apt-get install -y xvfb
           pip install "scrapling[fetchers]"
           scrapling install
 
-      - name: Fetch RBI + SEBI + TE news and update history (+ commodities / FX / investing.com bonds)
+      - name: Fetch RBI + SEBI + TE news and update history (+ commodities / FX / investing.com bonds + coffee)
         env:
           # Optional: set these repo variables to also backfill older items from
           # RBI's listing page(s) for each feed.
           MARKETWIRE_ARCHIVE_URLS: ${{ vars.MARKETWIRE_ARCHIVE_URLS }}
           MARKETWIRE_NOTIFICATIONS_ARCHIVE_URLS: ${{ vars.MARKETWIRE_NOTIFICATIONS_ARCHIVE_URLS }}
-          # investing.com bond scrape (bonds.py): run the stealth browser non-headless under
-          # xvfb; dump the rendered HTML for diagnosis; route through a proxy if configured.
+          # investing.com scrapes (bonds.py + the coffee quote in commodities.py): run the
+          # stealth browser non-headless under xvfb; dump each rendered HTML for diagnosis;
+          # route through a proxy if configured.
           MARKETWIRE_BONDS_HEADLESS: "false"
           MARKETWIRE_BONDS_DUMP: ${{ runner.temp }}/bonds_dump.html
+          MARKETWIRE_COFFEE_DUMP: ${{ runner.temp }}/coffee_dump.html
           # Dump the fetched TE calendar HTML for markup diagnosis (uploaded below).
           MARKETWIRE_CALENDAR_DUMP: ${{ runner.temp }}/calendar_dump.html
           # Same for the TE news stream — one dump per candidate URL tried
@@ -112,6 +117,18 @@ jobs:
         with:
           name: bonds-render-dump
           path: ${{ runner.temp }}/bonds_dump.html
+          if-no-files-found: ignore
+          retention-days: 7
+
+      # Same for the rendered investing.com London-coffee page (commodities.fetch_investing) —
+      # its parser was written without live investing.com access, so the first schedule runs'
+      # dumps are how the real markup gets confirmed/tuned.
+      - name: Upload coffee render dump (diagnostic)
+        if: ${{ always() && github.event_name == 'schedule' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: coffee-render-dump
+          path: ${{ runner.temp }}/coffee_dump.html
           if-no-files-found: ignore
           retention-days: 7
 

@@ -33,24 +33,30 @@ change vs previous close** and a per-bond chart link) come from `market_trends.b
 `data/rates.json`, scraped by `bonds.py` (browser-rendered via Scrapling); the **Call Money
 Rate** row was removed, and **Sensex/Nifty** stay RBI. Below it sits an opt-in
 **Commodities** strip (`_commodities_dashboard_html`, sidebar **Show commodities** toggle): a
-tile per commodity (Brent, Gold, Silver, Copper, Aluminium, Zinc, Steel, Iron Ore, Coffee,
+tile per commodity (Brent, Gold, Silver, Copper, Aluminium, Zinc, Steel, Iron Ore, Coffee —
+London Robusta, from investing.com — and
 Containerized Freight — the weekly Shanghai SCFI composite, in points) with
 price, **% change vs the previous close** (coloured with the palette's `up`/`down` gain/loss
 tones), and a **direct chart link** (the tile opens the
-commodity's Trading Economics page). Below that sits an opt-in **Economic Calendar**
+commodity's Trading Economics page; the Coffee tile opens its investing.com page). Below that
+sits an opt-in **Economic Calendar**
 (`_calendar_dashboard_html`, sidebar **Show economic calendar** toggle): a strip of the next
 key India macro releases over an expandable full table (previous/consensus/actual with
 importance stars), read from `data/calendar.json` via `econ_calendar.py` (see the Gotchas
 entry). It reads `data/commodities.json` via `commodities.py`, which
-scrapes **Trading Economics' server-rendered commodities table** (primary — all 10 incl. Zinc, with
+scrapes **Trading Economics' server-rendered commodities table** (primary — every TE-sourced tile
+incl. Zinc, with
 TE's own % change) and falls back to **Yahoo Finance's keyless chart endpoint** if TE is blocked or
-drops a symbol; **Steel** is pinned to Yahoo (USD HRC, since TE steel is CNY rebar). Durable history accumulates per feed
+drops a symbol; **Steel** is pinned to Yahoo (USD HRC, since TE steel is CNY rebar), and **Coffee is
+investing.com's London (Robusta) page in USD/T** (browser-rendered like the bonds, so it refreshes
+only on the 2-hourly schedule runs — see the Commodities gotcha). Durable history accumulates per feed
 via `store.py` (SQLite/Postgres/Turso — one table per feed) **and** in-repo
 `data/history.jsonl` (press releases) + `data/notifications.jsonl` (notifications)
 + `data/sebi_public_issues.jsonl` (SEBI) + `data/te_india_news.jsonl` +
 `data/te_world_news.jsonl` (TE news — uncapped, like the rest), all maintained by a scheduled GitHub
 Action running `poll.py` (every 30 min via an external dispatch cron + a 2-hourly
-`schedule` fallback, which is also the only runs that scrape bonds; the repo is
+`schedule` fallback, which is also the only runs that scrape investing.com — bonds +
+the coffee quote; the repo is
 PUBLIC so Actions minutes are free — see docs/OPERATIONS.md's "Actions minutes"
 section before ever making it private again). NB: the README is a non-technical
 product page for end users — ALL technical/ops documentation lives in
@@ -168,7 +174,8 @@ SEBI items on the link itself (unique + permanent, so this is safe).
   artifact on schedule runs) captures the fetched HTML for parser tuning.
 - **Shared plumbing lives in `common.py`** (IST, both UA families, `num`, `strip_html`,
   `item_key`/`link_id`, the GitHub-Actions `annotate`, the URL-or-path JSON loader,
-  the TE `tr[data-symbol]` table scraper, the Yahoo chart fetcher, `bond_benchmark`)
+  the TE `tr[data-symbol]` table scraper, the Yahoo chart fetcher, the investing.com
+  `stealth_render` (bonds + coffee), `bond_benchmark`)
   — modules keep their old names as thin aliases (`rates._num = common.num`), so fix
   shared logic THERE, not by re-adding a per-module copy. `tests/` holds the
   characterization suite (`python -m pytest tests/` — needs requests+bs4+pytest; the
@@ -208,12 +215,26 @@ SEBI items on the link itself (unique + permanent, so this is safe).
   prices move intraday, unlike the once-a-day RBI rates. `poll.py`'s `main()` calls
   `commodities.poll_commodities()` each run and `history.yml` commits `data/commodities.json`
   alongside the history files. **Source = Trading Economics primary + Yahoo fallback** (both free,
-  keyless): `fetch_te()` scrapes TE's server-rendered `/commodities` table (`tr[data-symbol]` →
-  `td#p`/`td#nch`/`td#pch`/`td#date`) for all 10 incl. **Zinc**, taking TE's own signed % vs previous
+  keyless), **except Coffee — investing.com** (see below): `fetch_te()` scrapes TE's server-rendered
+  `/commodities` table (`tr[data-symbol]` →
+  `td#p`/`td#nch`/`td#pch`/`td#date`) for every TE-sourced tile incl. **Zinc**, taking TE's own signed
+  % vs previous
   close; if TE is blocked/misses a symbol, `fetch_yahoo()` fills it from the chart endpoint
   (`query1.finance.yahoo.com/v8/finance/chart/<sym>`, computing `(last − prev)/prev`). Per-commodity
   `source` in `SPECS`: most are `"te"` (TE→Yahoo); **Steel is `"yahoo"`** (USD HRC `HRC=F`, because
-  TE steel `JBP:COM` is Chinese rebar in CNY/T — no TE fallback for it); **Zinc** and **Containerized
+  TE steel `JBP:COM` is Chinese rebar in CNY/T — no TE fallback for it); **Coffee is `"investing"`**
+  — **investing.com's London (Robusta) coffee futures page** (`investing.com/commodities/london-coffee`,
+  USD/tonne — replaced TE's US Arabica `KC1:COM` in USc/lb; no TE/Yahoo fallback, different series AND
+  unit). Coffee is fetched by `fetch_investing()` via the shared stealth-browser render
+  (`common.stealth_render`, the same investing.com-tuned Scrapling fetch as `bonds.py` — same
+  Cloudflare/xvfb/proxy story, `MARKETWIRE_SCRAPE_PROXY` etc.), so like bonds it refreshes **only on
+  `history.yml`'s 2-hourly `schedule` runs** (the only runs with the browser; elsewhere the render
+  fails fast) and keeps its last committed price in between; `parse_investing_quote()` reads the
+  instrument page's price header by `data-test` attribute (`instrument-price-last` /
+  `instrument-price-change-percent` / `prevClose`, legacy `#last_last` ids as fallback) and was
+  written WITHOUT live investing.com access — `MARKETWIRE_COFFEE_DUMP` (uploaded as the
+  `coffee-render-dump` artifact on schedule runs) captures the rendered HTML for tuning, and
+  `MARKETWIRE_INVESTING_COFFEE_URL` overrides the page. **Zinc** and **Containerized
   Freight** are TE-only (no free Yahoo series) so they're preserved from the last snapshot if TE
   misses. Freight (key `freight`, `cadence: "weekly"` in `SPECS` — SCFI prints weekly, and the tile
   shows its as-of date) was added WITHOUT live TE access, so its `data-symbol` (`SHSPSCFI:IND`,
@@ -223,11 +244,14 @@ SEBI items on the link itself (unique + permanent, so this is safe).
   still resolves. Yahoo is only queried for the
   symbols that actually need it (Steel + any TE gaps), so a healthy TE run hits Yahoo once. It writes
   **only when the liquid core (Brent/Gold/Silver/Copper) resolves in-bounds from either source**
-  (`_is_complete`); any symbol both sources miss keeps its last committed price. Chart links are
-  Trading Economics per-commodity pages. The seed ships with `null` prices — they fill on the next
-  30-min poll (or trigger `history.yml` via workflow_dispatch). TE's logged-out page serves
+  (`_is_complete`); any symbol its source(s) miss keeps its last committed price. Chart links are
+  Trading Economics per-commodity pages (Coffee: its investing.com page — the same page scraped). The
+  seed ships with `null` prices — they fill on the next
+  30-min poll (Coffee: the next 2-hourly schedule run, or trigger `history.yml` via
+  workflow_dispatch — note dispatch runs skip the browser scrapes). TE's logged-out page serves
   last-settled values (may lag intraday) and sits behind Cloudflare, and Yahoo may 403 some datacenter
-  IPs (incl. this sandbox) — so validate the scrapers from a host that can reach TE / Yahoo, like
+  IPs (incl. this sandbox) — so validate the scrapers from a host that can reach TE / Yahoo /
+  investing.com, like
   `rates.py`/`rbi_archive.py`. NB: the 30-min cron commits whenever a price ticks (→ a Streamlit Cloud
   redeploy), the intended freshness trade-off.
 - **Government bonds** (`bonds.py` → `market_trends.bonds` inside `data/rates.json`) are the yield
@@ -238,7 +262,8 @@ SEBI items on the link itself (unique + permanent, so this is safe).
   tier back when the repo was private) — so the workflow installs it only on schedule runs, and
   on the 30-min dispatch runs `bonds.poll_bonds()` (still called by `poll.py`'s `main()` each
   run) finds no scrapling, no-ops, and keeps the committed curve. **investing.com blocks bots (Cloudflare 403 on datacenter IPs) and renders the table
-  client-side**, so `bonds._render()` fetches it with Scrapling's **StealthyFetcher** tuned for it:
+  client-side**, so `bonds._render()` (a thin wrapper over the shared `common.stealth_render`,
+  also used for the Coffee quote) fetches it with Scrapling's **StealthyFetcher** tuned for it:
   `solve_cloudflare=True`, arrive via a Google click, `block_ads`, **`network_idle=False`** (its
   ad/trackers never idle — waiting on `load` was the original 60s-timeout bug), and **non-headless**
   by default (`MARKETWIRE_BONDS_HEADLESS`, run under **xvfb** in CI). **`MARKETWIRE_SCRAPE_PROXY`**

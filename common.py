@@ -5,10 +5,13 @@ started to drift — three slightly different `_num`s): the IST timezone, the tw
 User-Agent families, number/date/identity parsing, the GitHub-Actions annotation
 printer, the URL-or-path JSON snapshot loader, the Trading-Economics
 `tr[data-symbol]` table scraper (shared by commodities + FX), the Yahoo Finance
-chart-endpoint fetcher, and the ~10Y bond-benchmark picker.
+chart-endpoint fetcher, the Scrapling stealth-browser render for bot-blocked
+investing.com pages (shared by the bond curve + the London coffee quote), and the
+~10Y bond-benchmark picker.
 
 Deliberately imports NO project modules (so it can never create an import cycle);
-bs4 is imported lazily inside the TE parser, matching the callers' old pattern.
+bs4 and scrapling are imported lazily inside their users, matching the callers'
+old pattern.
 Each consuming module keeps its public names as thin aliases (e.g.
 `rates._num = common.num`), so call sites and the test suite are unchanged.
 """
@@ -239,6 +242,72 @@ def yahoo_chart_quote(symbol, timeout=20, session=None):
         }, None
     except Exception as ex:
         return None, f"parse error: {type(ex).__name__}: {ex}"
+
+
+def env_flag(name, default=False):
+    """Read a boolean-ish env var; empty/unset → `default`."""
+    v = os.environ.get(name, "").strip().lower()
+    return default if not v else v in ("1", "true", "yes", "on")
+
+
+def stealth_render(url, timeout=None, dump_path=None, wait=4000):
+    """Fetch a bot-blocked investing.com page in Scrapling's STEALTH browser and
+    return (html, error). Shared by bonds.py (the yield-curve board) and
+    commodities.py (the London coffee quote); scrapling is imported lazily, so a
+    host without it just gets an error back (and the caller keeps its snapshot).
+
+    investing.com hard-blocks bots from datacenter IPs (Cloudflare 403), so this is
+    tuned to look like a real user and NOT hang on its never-idle ad/tracker traffic:
+      • StealthyFetcher only — plain Chromium (DynamicFetcher) is pointless against
+        Cloudflare;
+      • solve_cloudflare + arrive via a Google click + block ads so the DOM settles;
+      • network_idle=False — waiting for 'load'/network-idle just times out on
+        investing.com (the original failure: `Page.goto ... waiting until "load"` →
+        60s timeout);
+      • non-headless by default (set MARKETWIRE_BONDS_HEADLESS=true to override) —
+        run under a virtual display (xvfb) in CI; headless stealth Chrome is easier
+        for Cloudflare to flag;
+      • MARKETWIRE_SCRAPE_PROXY routes through a (residential) proxy — the RELIABLE
+        fix from CI, since a GitHub-runner IP is usually 403'd however good the
+        browser fingerprint is.
+    `timeout` (ms) defaults from MARKETWIRE_RENDER_TIMEOUT_MS; `dump_path` (if set)
+    receives whatever HTML came back — even a block page — so a CI artifact can carry
+    it for markup diagnosis. A 403/429 (or empty) response comes back as an error so
+    callers preserve their committed snapshots."""
+    if timeout is None:
+        timeout = int(os.environ.get("MARKETWIRE_RENDER_TIMEOUT_MS", "90000"))
+    try:
+        from scrapling.fetchers import StealthyFetcher
+    except Exception as ex:                       # scrapling/browser not installed
+        return None, f"scrapling unavailable: {type(ex).__name__}: {ex}"
+    kw = dict(
+        headless=env_flag("MARKETWIRE_BONDS_HEADLESS", default=False),
+        solve_cloudflare=True,       # attempt the Cloudflare/Turnstile challenge
+        google_search=True,          # arrive via a Google results click (organic-looking)
+        network_idle=False,          # investing.com's trackers never idle → don't wait on it
+        load_dom=True,
+        block_ads=True,              # fewer ad/tracker requests → the page settles + parses
+        wait=wait,                   # let the client-rendered content paint post-challenge
+        timeout=timeout,
+    )
+    proxy = os.environ.get("MARKETWIRE_SCRAPE_PROXY", "").strip()
+    if proxy:
+        kw["proxy"] = proxy
+    try:
+        page = StealthyFetcher.fetch(url, **kw)
+    except Exception as ex:
+        return None, f"{type(ex).__name__}: {ex}"
+    status = getattr(page, "status", None)
+    body = getattr(page, "html_content", None) or ""
+    if dump_path and body:                        # dump even a block page for diagnosis
+        try:
+            with open(dump_path, "w", encoding="utf-8") as f:
+                f.write(body)
+        except Exception:
+            pass
+    if body.strip() and status not in (403, 429):
+        return body, None
+    return None, f"blocked/empty (status={status}, html={len(body)}B)"
 
 
 def bond_benchmark(curve, target_years=10.0):
