@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-08-12T04:02:00+05:30",
+  "captured_at": "2026-08-12T04:22:06+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -11,9 +11,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
       "source": "Trading Economics · CO1:COM",
-      "price": 89.271,
+      "price": 89.242,
       "prev_close": 87.72,
-      "change_pct": 1.77,
+      "change_pct": 1.73,
       "currency": "USD",
       "as_of": "2026-08-11"
     },
@@ -25,9 +25,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Trading Economics · XAUUSD:CUR",
-      "price": 4376.45,
-      "prev_close": 4361.56,
-      "change_pct": -0.34,
+      "price": 4373.86,
+      "prev_close": 4356.38,
+      "change_pct": -0.4,
       "currency": "USD",
       "as_of": "2026-08-11"
     },
@@ -39,9 +39,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
       "source": "Trading Economics · XAGUSD:CUR",
-      "price": 64.866,
-      "prev_close": 64.027,
-      "change_pct": -1.28,
+      "price": 64.799,
+      "prev_close": 63.893,
+      "change_pct": -1.38,
       "currency": "USD",
       "as_of": "2026-08-11"
     },
@@ -53,9 +53,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Trading Economics · HG1:COM",
-      "price": 6.6173,
+      "price": 6.6184,
       "prev_close": 6.5945,
-      "change_pct": 0.35,
+      "change_pct": 0.36,
       "currency": "USD",
       "as_of": "2026-08-11"
     },
@@ -127,7 +127,8 @@
       "prev_close": 3780.0,
       "change_pct": -0.53,
       "currency": "USD",
-      "as_of": "2026-08-12"
+      "as_of": "2026-08-12",
+      "stale": true
     },
     {
       "key": "freight",
