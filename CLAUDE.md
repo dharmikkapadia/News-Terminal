@@ -33,7 +33,8 @@ change vs previous close** and a per-bond chart link) come from `market_trends.b
 `data/rates.json`, scraped by `bonds.py` (browser-rendered via Scrapling); the **Call Money
 Rate** row was removed, and **Sensex/Nifty** stay RBI. Below it sits an opt-in
 **Commodities** strip (`_commodities_dashboard_html`, sidebar **Show commodities** toggle): a
-tile per commodity (Brent, Gold, Silver, Copper, Aluminium, Zinc, Steel, Iron Ore, Coffee) with
+tile per commodity (Brent, Gold, Silver, Copper, Aluminium, Zinc, Steel, Iron Ore, Coffee,
+Containerized Freight — the weekly Shanghai SCFI composite, in points) with
 price, **% change vs the previous close** (coloured with the palette's `up`/`down` gain/loss
 tones), and a **direct chart link** (the tile opens the
 commodity's Trading Economics page). Below that sits an opt-in **Economic Calendar**
@@ -41,7 +42,7 @@ commodity's Trading Economics page). Below that sits an opt-in **Economic Calend
 key India macro releases over an expandable full table (previous/consensus/actual with
 importance stars), read from `data/calendar.json` via `econ_calendar.py` (see the Gotchas
 entry). It reads `data/commodities.json` via `commodities.py`, which
-scrapes **Trading Economics' server-rendered commodities table** (primary — all 9 incl. Zinc, with
+scrapes **Trading Economics' server-rendered commodities table** (primary — all 10 incl. Zinc, with
 TE's own % change) and falls back to **Yahoo Finance's keyless chart endpoint** if TE is blocked or
 drops a symbol; **Steel** is pinned to Yahoo (USD HRC, since TE steel is CNY rebar). Durable history accumulates per feed
 via `store.py` (SQLite/Postgres/Turso — one table per feed) **and** in-repo
@@ -208,12 +209,18 @@ SEBI items on the link itself (unique + permanent, so this is safe).
   `commodities.poll_commodities()` each run and `history.yml` commits `data/commodities.json`
   alongside the history files. **Source = Trading Economics primary + Yahoo fallback** (both free,
   keyless): `fetch_te()` scrapes TE's server-rendered `/commodities` table (`tr[data-symbol]` →
-  `td#p`/`td#nch`/`td#pch`/`td#date`) for all 9 incl. **Zinc**, taking TE's own signed % vs previous
+  `td#p`/`td#nch`/`td#pch`/`td#date`) for all 10 incl. **Zinc**, taking TE's own signed % vs previous
   close; if TE is blocked/misses a symbol, `fetch_yahoo()` fills it from the chart endpoint
   (`query1.finance.yahoo.com/v8/finance/chart/<sym>`, computing `(last − prev)/prev`). Per-commodity
   `source` in `SPECS`: most are `"te"` (TE→Yahoo); **Steel is `"yahoo"`** (USD HRC `HRC=F`, because
-  TE steel `JBP:COM` is Chinese rebar in CNY/T — no TE fallback for it); **Zinc** is TE-only (no free
-  Yahoo future) so it's preserved from the last snapshot if TE misses. Yahoo is only queried for the
+  TE steel `JBP:COM` is Chinese rebar in CNY/T — no TE fallback for it); **Zinc** and **Containerized
+  Freight** are TE-only (no free Yahoo series) so they're preserved from the last snapshot if TE
+  misses. Freight (key `freight`, `cadence: "weekly"` in `SPECS` — SCFI prints weekly, and the tile
+  shows its as-of date) was added WITHOUT live TE access, so its `data-symbol` (`SHSPSCFI:IND`,
+  Bloomberg's SCFI ticker per TE's usual convention) is unverified — which is why `fetch_te_table`
+  (common.py) now also matches a row by its `/commodity/<slug>` name link (`want_slug`) when the
+  `data-symbol` isn't recognized; the slugs are our verified chart links, so a wrong symbol guess
+  still resolves. Yahoo is only queried for the
   symbols that actually need it (Steel + any TE gaps), so a healthy TE run hits Yahoo once. It writes
   **only when the liquid core (Brent/Gold/Silver/Copper) resolves in-bounds from either source**
   (`_is_complete`); any symbol both sources miss keeps its last committed price. Chart links are

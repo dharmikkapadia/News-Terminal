@@ -2,8 +2,8 @@
 """commodities.py — free commodity-price snapshot for the dashboard (load + best-effort scrape).
 
 The Streamlit app shows a Commodities strip (Brent, Gold, Silver, Copper, Aluminium,
-Zinc, Steel, Iron Ore, Coffee) with each commodity's **% change vs the previous close**
-and a **direct chart link**, all read from a single committed JSON file —
+Zinc, Steel, Iron Ore, Coffee, Containerized Freight) with each commodity's **% change
+vs the previous close** and a **direct chart link**, all read from a single committed JSON file —
 `data/commodities.json` — in the same in-repo, no-database spirit as rates.py / history.
 
 Where the data comes from (all FREE, no paid key) — TRADING ECONOMICS primary, YAHOO fallback:
@@ -12,14 +12,17 @@ Where the data comes from (all FREE, no paid key) — TRADING ECONOMICS primary,
     **% change vs previous close** are rendered straight into the row markup
     (`tr[data-symbol]` → `td#p` price, `td#nch` net change, `td#pch` percent, `td#date` quote
     date) — no key, no JavaScript, no WebSocket (the live socket is login-gated and irrelevant
-    to a 30-min poll). It covers all 9 INCLUDING Zinc, and gives a broker-grade % change so we
-    don't have to compute one. Verified to serve current (last-settled) values, not stale data.
+    to a 30-min poll). It covers all 10 INCLUDING Zinc and the Containerized Freight Index, and
+    gives a broker-grade % change so we don't have to compute one. Verified to serve current
+    (last-settled) values, not stale data.
   • FALLBACK — **Yahoo Finance's keyless chart endpoint**
     (`query1.finance.yahoo.com/v8/finance/chart/<sym>`). If TE is blocked / rate-limited / drops
     a symbol, we fall back to Yahoo for the 8 it covers, reading daily closes and reporting
     `(last − prev)/prev`. **Steel** is pinned to Yahoo on purpose: TE's steel (`JBP:COM`) is
     Chinese rebar in CNY/T, whereas Yahoo `HRC=F` is a USD HR-coil benchmark consistent with the
-    rest of the strip. Zinc has no free Yahoo future, so it's TE-only (preserved if TE misses).
+    rest of the strip. Zinc has no free Yahoo future and the Containerized Freight Index (the
+    weekly Shanghai SCFI composite) has no Yahoo series at all, so both are TE-only (preserved
+    if TE misses).
   • CHART LINK — Trading Economics' public per-commodity page (one clean URL each, all 9).
 
 Refresh model (mirrors rates.py): the committed JSON is the source of truth; `poll_commodities()`
@@ -53,10 +56,14 @@ IST = common.IST
 # The commodity universe. Each: stable key, display name, unit, category, the Trading Economics
 # row symbol (`te`), the Yahoo fallback symbol (`yf`, None ⇒ no free future), the TE chart slug,
 # and which source leads (`source`):
-#   "te"     → Trading Economics first, Yahoo fallback (the default for 8 of 9).
+#   "te"     → Trading Economics first, Yahoo fallback (the default).
 #   "yahoo"  → Yahoo only — used for Steel, since TE steel (JBP:COM) is Chinese rebar in CNY/T
 #              while Yahoo HRC=F is a USD HR-coil benchmark; no TE fallback (wrong series/currency).
-# Zinc is TE-only (no free Yahoo future): preserved from the last snapshot if TE misses.
+# Zinc and Containerized Freight are TE-only (no free Yahoo series): preserved from the last
+# snapshot if TE misses. Freight is the weekly Shanghai (SCFI) composite, quoted in points —
+# `cadence` marks it weekly (default daily), and its `te` symbol is a best guess written without
+# live TE access (Bloomberg's SHSPSCFI, TE's usual convention): if wrong, the row still resolves
+# via `fetch_te`'s slug fallback on the row's /commodity/containerized-freight-index link.
 SPECS = [
     dict(key="brent",     name="Brent Crude", unit="USD/bbl", category="Energy",
          te="CO1:COM",      yf="BZ=F",  slug="brent-crude-oil", source="te"),
@@ -76,6 +83,9 @@ SPECS = [
          te="SCO:COM",      yf="TIO=F", slug="iron-ore",        source="te"),
     dict(key="coffee",    name="Coffee",      unit="USc/lb",  category="Softs",
          te="KC1:COM",      yf="KC=F",  slug="coffee",          source="te"),
+    dict(key="freight",   name="Containerized Freight", unit="Points", category="Freight",
+         te="SHSPSCFI:IND", yf=None,    slug="containerized-freight-index", source="te",
+         cadence="weekly"),
 ]
 _SPECS_BY_KEY = {s["key"]: s for s in SPECS}
 
@@ -83,7 +93,7 @@ _SPECS_BY_KEY = {s["key"]: s for s in SPECS}
 _BOUNDS = {
     "brent": (5, 1000), "gold": (200, 50000), "silver": (1, 2000), "copper": (0.1, 100),
     "aluminium": (200, 20000), "zinc": (200, 20000), "steel": (50, 20000),
-    "iron": (10, 5000), "coffee": (10, 2000),
+    "iron": (10, 5000), "coffee": (10, 2000), "freight": (100, 50000),
 }
 # The liquid core that must resolve (from EITHER source) in-bounds for a scrape to be trusted
 # enough to overwrite the committed file (the rest are preserved if missing — see poll_commodities).
@@ -127,10 +137,13 @@ def _in_bounds(key, v):
 def fetch_te(url=TE_URL, timeout=25):
     """Scrape TE's commodities table into {our_key: {price, prev_close, change_pct, currency,
     as_of}}. Returns (quotes, error). Best effort: a Cloudflare block / markup change yields an
-    error (or an empty parse) and the caller falls back to Yahoo / preserves prior values."""
+    error (or an empty parse) and the caller falls back to Yahoo / preserves prior values.
+    Rows are matched by `data-symbol`, falling back to the row's /commodity/<slug> name link
+    (the slugs are verified public URLs — our chart links — unlike some symbol guesses)."""
     want = {s["te"]: s["key"] for s in SPECS if s.get("te")}
+    slugs = {s["slug"]: s["key"] for s in SPECS if s.get("te")}
     return common.fetch_te_table(url, want, timeout=timeout, headers=_HTML_HEADERS,
-                                 currency="USD")
+                                 currency="USD", want_slug=slugs)
 
 
 # --------------------------------------------------------------------------- #
@@ -191,7 +204,8 @@ def _entry(spec, quote=None, source=None, prior=None):
     (with its `source` label) if present, else preserved from the `prior` committed record."""
     e = {
         "key": spec["key"], "name": spec["name"], "unit": spec["unit"],
-        "category": spec["category"], "cadence": "daily", "chart_url": chart_url(spec),
+        "category": spec["category"], "cadence": spec.get("cadence", "daily"),
+        "chart_url": chart_url(spec),
         "source": source or (prior or {}).get("source"),
         "price": None, "prev_close": None, "change_pct": None, "currency": None, "as_of": None,
     }

@@ -239,7 +239,8 @@ numerics, green/red gain-loss tones.
 ### Commodities strip (free prices · % vs prev close · chart links)
 
 Below the rates panel, an opt-in **Commodities** strip (sidebar **Show commodities**) shows
-**Brent, Gold, Silver, Copper, Aluminium, Zinc, Steel (HRC), Iron Ore and Coffee** — each as a
+**Brent, Gold, Silver, Copper, Aluminium, Zinc, Steel (HRC), Iron Ore, Coffee and the
+Containerized Freight Index** (the weekly Shanghai SCFI composite, quoted in points) — each as a
 tile with the price, the **% change vs its previous close** (coloured with the palette's
 `up`/`down` gain/loss tones), and a **direct chart link** (the whole tile opens the commodity's
 [Trading Economics](https://tradingeconomics.com/commodities) page in a new tab).
@@ -250,13 +251,19 @@ way as the rates snapshot:
   the **% change vs previous close** come from **Trading Economics' server-rendered commodities
   table** (`tradingeconomics.com/commodities`) — for a logged-out visitor the price, net change and
   percent change are baked into each row's markup (`tr[data-symbol]` → `td#p`/`td#nch`/`td#pch`),
-  no key or JavaScript needed. TE covers all 9 **including Zinc** (`LMZSDS03:COM`) and gives a
-  broker-grade % change, so we don't compute one. If TE is blocked / rate-limited / drops a symbol,
-  we fall back to **Yahoo Finance's keyless chart endpoint** (`…/v8/finance/chart/<symbol>`, daily
-  closes → `(last − prev)/prev`) for the 8 it covers. **Steel** is pinned to Yahoo (`HRC=F`, a USD
-  HR-coil benchmark) on purpose — TE's steel (`JBP:COM`) is Chinese rebar in CNY/T. Yahoo is only
-  queried for the symbols that actually need it (Steel + any TE gaps), so a healthy TE run hits Yahoo
-  once. Chart links are Trading Economics' public per-commodity pages. (Note: TE's logged-out page
+  no key or JavaScript needed. TE covers all 10 **including Zinc** (`LMZSDS03:COM`) and the
+  **Containerized Freight Index**, and gives a broker-grade % change, so we don't compute one. If TE
+  is blocked / rate-limited / drops a symbol, we fall back to **Yahoo Finance's keyless chart
+  endpoint** (`…/v8/finance/chart/<symbol>`, daily closes → `(last − prev)/prev`) for the 8 it
+  covers. **Steel** is pinned to Yahoo (`HRC=F`, a USD HR-coil benchmark) on purpose — TE's steel
+  (`JBP:COM`) is Chinese rebar in CNY/T. Yahoo is only queried for the symbols that actually need it
+  (Steel + any TE gaps), so a healthy TE run hits Yahoo once. Chart links are Trading Economics'
+  public per-commodity pages. TE rows are matched by `data-symbol`, falling back to the row's
+  `/commodity/<slug>` name link (`common.fetch_te_table`'s `want_slug`) — the freight index's
+  symbol (`SHSPSCFI:IND`) was written without live TE access and is unverified, but its slug
+  (`containerized-freight-index`) is its verified public URL, so the row resolves either way. It's
+  marked `cadence: "weekly"` (SCFI prints weekly) and, like Zinc, is TE-only: no free Yahoo series,
+  so a TE miss preserves its last committed value. (Note: TE's logged-out page
   serves last-settled values, so prices can lag the live intraday tick until TE's next server rebuild
   — fine for a 30-min poll; verified to be current, not stale.)
 - **Automated (best-effort):** commodities ride the **same 30-min poller as history** — `poll.py`
@@ -265,7 +272,8 @@ way as the rates snapshot:
   updates — unlike the once-a-day RBI rates, which stay on their own `rates.yml`.) The refresh
   rewrites the file **only when the liquid core (Brent/Gold/Silver/Copper) resolves in-bounds from
   either source** — a blocked/rate-limited scrape leaves the committed snapshot untouched, and any
-  symbol both sources miss (e.g. Zinc, which is TE-only) keeps its last committed price. The seed
+  symbol both sources miss (e.g. Zinc and Containerized Freight, which are TE-only) keeps its last
+  committed price. The seed
   file ships with `null` prices; they fill on the next 30-min poll (or trigger `history.yml` via
   **workflow_dispatch** to populate now). Like `rates.py`, the scrapers were written without live
   market access — validate them from a machine that can reach TE / Yahoo (TE sits behind Cloudflare;

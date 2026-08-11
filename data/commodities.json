@@ -128,6 +128,20 @@
       "change_pct": -0.63,
       "currency": "USD",
       "as_of": "2026-08-10"
+    },
+    {
+      "key": "freight",
+      "name": "Containerized Freight",
+      "unit": "Points",
+      "category": "Freight",
+      "cadence": "weekly",
+      "chart_url": "https://tradingeconomics.com/commodity/containerized-freight-index",
+      "source": "Trading Economics",
+      "price": 3276.14,
+      "prev_close": 3276.14,
+      "change_pct": 0.0,
+      "currency": "USD",
+      "as_of": "2026-08-10"
     }
   ]
 }

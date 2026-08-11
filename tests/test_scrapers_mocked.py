@@ -28,8 +28,9 @@ class _Resp:
         return self._payload
 
 
-def _te_row(symbol, p, nch, pch, date_cell):
-    return (f'<tr data-symbol="{symbol}"><td>x</td><td id="p">{p}</td>'
+def _te_row(symbol, p, nch, pch, date_cell, href=None):
+    name = f'<a href="{href}">n</a>' if href else "x"
+    return (f'<tr data-symbol="{symbol}"><td>{name}</td><td id="p">{p}</td>'
             f'<td id="nch">{nch}</td><td id="pch">{pch}</td>'
             f'<td id="date">{date_cell}</td></tr>')
 
@@ -40,11 +41,15 @@ def test_fetch_te_commodities(monkeypatch):
             + _te_row("CO1:COM", "78.50", "-0.55", "-0.70%", f"{today:%b}/{today.day}")
             + _te_row("XAUUSD:CUR", "4,087.01", "12.01", "0.29%", "12:09")
             + _te_row("UNRELATED:COM", "1.00", "0", "0%", "Jan/01")
+            # unrecognized data-symbol, matched via the row's /commodity/<slug> name link
+            + _te_row("SOMETHING:IND", "3,276.14", "0", "0%", "Jan/01",
+                      href="/commodity/containerized-freight-index")
             + "</table></html>")
     monkeypatch.setattr(requests, "get", lambda *a, **kw: _Resp(html=html))
     quotes, err = commodities.fetch_te()
     assert err is None
-    assert set(quotes) == {"brent", "gold"}                  # unrelated symbol ignored
+    assert set(quotes) == {"brent", "gold", "freight"}       # unrelated symbol ignored
+    assert quotes["freight"]["price"] == 3276.14             # slug-fallback match
     brent = quotes["brent"]
     assert brent["price"] == 78.5
     assert brent["prev_close"] == 79.05                       # price - net change

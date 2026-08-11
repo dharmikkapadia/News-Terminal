@@ -144,7 +144,7 @@ def _te_celltext(tr, cid):
 
 
 def fetch_te_table(url, want, timeout=25, headers=None, currency=None,
-                   time_means_today=False, what="target"):
+                   time_means_today=False, what="target", want_slug=None):
     """Scrape a Trading-Economics server-rendered quotes table (commodities or the
     INR currencies board) into {our_key: {price, prev_close, change_pct[, currency],
     as_of}}. `want` maps TE row `data-symbol` -> our key. Returns (quotes, error).
@@ -152,7 +152,13 @@ def fetch_te_table(url, want, timeout=25, headers=None, currency=None,
     Each `tr[data-symbol]` row carries `td#p` price, `td#nch` net change, `td#pch`
     TE's own signed % vs previous close, and `td#date`. Best effort: a Cloudflare
     block / markup change yields an error (or an empty parse) and the caller falls
-    back to Yahoo / preserves prior values."""
+    back to Yahoo / preserves prior values.
+
+    `want_slug` (optional) maps a TE page slug (the last path segment of the row's
+    name link, e.g. 'containerized-freight-index') -> our key, tried only when the
+    row's `data-symbol` isn't in `want`. Row links are stable public URLs (they're
+    our chart links), so this rescues symbols whose `data-symbol` guess is wrong —
+    some were written without live TE access."""
     try:
         resp = requests.get(url, headers=headers or HTML_HEADERS, timeout=timeout)
         resp.raise_for_status()
@@ -167,6 +173,11 @@ def fetch_te_table(url, want, timeout=25, headers=None, currency=None,
     out = {}
     for tr in soup.select("tr[data-symbol]"):
         key = want.get(tr.get("data-symbol"))
+        if key is None and want_slug:
+            a = tr.find("a", href=True)
+            if a:
+                slug = a["href"].split("?", 1)[0].rstrip("/").rsplit("/", 1)[-1]
+                key = want_slug.get(slug)
         if not key or key in out:
             continue
         price = num(_te_celltext(tr, "p"))

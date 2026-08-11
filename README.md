@@ -34,8 +34,9 @@ the day's key numbers right above it.
   (MPC) meeting.
 
 - **Commodities at a glance.** An optional strip tracks Brent crude, gold, silver,
-  copper, aluminium, zinc, steel, iron ore and coffee — each with its price, the
-  day's percentage move (green/red), and a one-click link to a full chart.
+  copper, aluminium, zinc, steel, iron ore, coffee and the containerized freight
+  index (weekly Shanghai-route container shipping rates) — each with its price,
+  the latest percentage move (green/red), and a one-click link to a full chart.
 
 - **The macro calendar, built in.** An optional economic calendar shows India's
   upcoming data releases — CPI, GDP, PMI, trade, RBI decisions and more — with
