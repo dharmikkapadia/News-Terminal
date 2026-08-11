@@ -48,15 +48,15 @@ scrapes **Trading Economics' server-rendered commodities table** (primary — ev
 incl. Zinc, with
 TE's own % change) and falls back to **Yahoo Finance's keyless chart endpoint** if TE is blocked or
 drops a symbol; **Steel** is pinned to Yahoo (USD HRC, since TE steel is CNY rebar), and **Coffee is
-investing.com's London (Robusta) page in USD/T** (browser-rendered like the bonds, so it refreshes
-only on the 2-hourly schedule runs — see the Commodities gotcha). Durable history accumulates per feed
+investing.com's London (Robusta) page in USD/T** (browser-rendered like the bonds, on the same
+30-min poll — see the Commodities gotcha). Durable history accumulates per feed
 via `store.py` (SQLite/Postgres/Turso — one table per feed) **and** in-repo
 `data/history.jsonl` (press releases) + `data/notifications.jsonl` (notifications)
 + `data/sebi_public_issues.jsonl` (SEBI) + `data/te_india_news.jsonl` +
 `data/te_world_news.jsonl` (TE news — uncapped, like the rest), all maintained by a scheduled GitHub
 Action running `poll.py` (every 30 min via an external dispatch cron + a 2-hourly
-`schedule` fallback, which is also the only runs that scrape investing.com — bonds +
-the coffee quote; the repo is
+`schedule` fallback; every run also scrapes investing.com — bonds +
+the coffee quote — in the stealth browser; the repo is
 PUBLIC so Actions minutes are free — see docs/OPERATIONS.md's "Actions minutes"
 section before ever making it private again). NB: the README is a non-technical
 product page for end users — ALL technical/ops documentation lives in
@@ -227,13 +227,13 @@ SEBI items on the link itself (unique + permanent, so this is safe).
   USD/tonne — replaced TE's US Arabica `KC1:COM` in USc/lb; no TE/Yahoo fallback, different series AND
   unit). Coffee is fetched by `fetch_investing()` via the shared stealth-browser render
   (`common.stealth_render`, the same investing.com-tuned Scrapling fetch as `bonds.py` — same
-  Cloudflare/xvfb/proxy story, `MARKETWIRE_SCRAPE_PROXY` etc.), so like bonds it refreshes **only on
-  `history.yml`'s 2-hourly `schedule` runs** (the only runs with the browser; elsewhere the render
-  fails fast) and keeps its last committed price in between; `parse_investing_quote()` reads the
+  Cloudflare/xvfb/proxy story, `MARKETWIRE_SCRAPE_PROXY` etc.), so like bonds it refreshes **every
+  `history.yml` run** (the browser installs on all runs since Aug 2026; a failed render — or a host
+  without scrapling, like this sandbox — just keeps the last committed price); `parse_investing_quote()` reads the
   instrument page's price header by `data-test` attribute (`instrument-price-last` /
   `instrument-price-change-percent` / `prevClose`, legacy `#last_last` ids as fallback) and was
   written WITHOUT live investing.com access — `MARKETWIRE_COFFEE_DUMP` (uploaded as the
-  `coffee-render-dump` artifact on schedule runs) captures the rendered HTML for tuning, and
+  `coffee-render-dump` artifact each run) captures the rendered HTML for tuning, and
   `MARKETWIRE_INVESTING_COFFEE_URL` overrides the page. **Zinc** and **Containerized
   Freight** are TE-only (no free Yahoo series) so they're preserved from the last snapshot if TE
   misses. Freight (key `freight`, `cadence: "weekly"` in `SPECS` — SCFI prints weekly, and the tile
@@ -247,8 +247,7 @@ SEBI items on the link itself (unique + permanent, so this is safe).
   (`_is_complete`); any symbol its source(s) miss keeps its last committed price. Chart links are
   Trading Economics per-commodity pages (Coffee: its investing.com page — the same page scraped). The
   seed ships with `null` prices — they fill on the next
-  30-min poll (Coffee: the next 2-hourly schedule run, or trigger `history.yml` via
-  workflow_dispatch — note dispatch runs skip the browser scrapes). TE's logged-out page serves
+  30-min poll (or trigger `history.yml` via workflow_dispatch to populate now). TE's logged-out page serves
   last-settled values (may lag intraday) and sits behind Cloudflare, and Yahoo may 403 some datacenter
   IPs (incl. this sandbox) — so validate the scrapers from a host that can reach TE / Yahoo /
   investing.com, like
@@ -256,12 +255,12 @@ SEBI items on the link itself (unique + permanent, so this is safe).
   redeploy), the intended freshness trade-off.
 - **Government bonds** (`bonds.py` → `market_trends.bonds` inside `data/rates.json`) are the yield
   curve for the ~10y G-Sec tile + the Market Trends yield rows, **sourced from investing.com, not
-  RBI**. It refreshes ONLY on `history.yml`'s **2-hourly `schedule` runs** (committed by
-  `history.yml`), NOT the daily `rates.yml` and NOT every poll: the Scrapling-browser + xvfb
-  install + render add minutes and Cloudflare-flake exposure per run (and blew the Actions free
-  tier back when the repo was private) — so the workflow installs it only on schedule runs, and
-  on the 30-min dispatch runs `bonds.poll_bonds()` (still called by `poll.py`'s `main()` each
-  run) finds no scrapling, no-ops, and keeps the committed curve. **investing.com blocks bots (Cloudflare 403 on datacenter IPs) and renders the table
+  RBI**. It refreshes on **every `history.yml` run** (the 30-min cron; committed by
+  `history.yml`), NOT the daily `rates.yml`: since Aug 2026 the workflow installs the
+  Scrapling browser + xvfb on all runs (~1-2 min each, free on a public repo — the install was
+  gated to the 2-hourly `schedule` runs after the July 2026 private-repo Actions-minutes
+  blowout; restore that split before ever privating). On any host without scrapling (like this
+  sandbox) `bonds.poll_bonds()` finds none, no-ops, and keeps the committed curve. **investing.com blocks bots (Cloudflare 403 on datacenter IPs) and renders the table
   client-side**, so `bonds._render()` (a thin wrapper over the shared `common.stealth_render`,
   also used for the Coffee quote) fetches it with Scrapling's **StealthyFetcher** tuned for it:
   `solve_cloudflare=True`, arrive via a Google click, `block_ads`, **`network_idle=False`** (its
@@ -282,10 +281,11 @@ SEBI items on the link itself (unique + permanent, so this is safe).
   (tenor rows with a coloured `up`/`down` % vs prev close via `_fx_rrow`; the 10Y tile via
   `_bond_benchmark`) and **falls back to the RBI `gsec_yields`/`tbill_yields` rows until the first
   investing.com scrape lands** — the **Call Money Rate row is gone** and **Sensex/Nifty stay RBI**.
-  `history.yml` installs `scrapling[fetchers]` + `scrapling install` + **xvfb** and runs
-  `xvfb-run -a python poll.py` **only on its 2-hourly `schedule` runs** (the split dates from the
-  July 2026 private-repo Actions-minutes blowout, kept because it also makes the frequent dispatch
-  runs light and fast; those use plain `python poll.py` with light deps).
+  `history.yml` installs `scrapling[fetchers]` + `scrapling install` + **`patchright install
+  chromium`** (scrapling installs playwright's browser but StealthyFetcher launches via
+  patchright, which pins its own chromium — without the extra install every render died with
+  "Executable doesn't exist", Aug 2026) + **xvfb**, and runs `xvfb-run -a python poll.py` on
+  **every run**.
   This sandbox **can't reach investing.com**
   (egress proxy 403s the CONNECT, same as RBI) and
   has no Scrapling browser, so `poll_bonds()` no-ops safely here — **validate it in CI / on a real

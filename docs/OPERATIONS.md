@@ -54,20 +54,21 @@ whole minute**, so run *count* matters more than run length — at a 30-min cade
 (~48 runs/day × ~2 billable min once the Scrapling browser install rode every run)
 the workflow burned ~3,000 min/month, 150% of the private free tier's 2,000, and
 exhausted the July 2026 cycle in ~20 days. If privating, drop the external cron to
-hourly (≈1,200 min/month with the structure below). Two cost/robustness measures
-from that episode are kept regardless:
+hourly (≈1,200 min/month with the structure below) **and gate the Scrapling-browser
+install back onto the 2-hourly `schedule` runs** (an `if: github.event_name ==
+'schedule'` on the install step — how it ran until Aug 2026, when the investing.com
+scrapes were moved onto every run so bonds + coffee refresh at the full 30-min
+cadence; the scrapes no-op safely on runs without the browser and keep their
+committed values). One robustness measure from that episode is kept regardless:
 
-- the heavy Scrapling-browser + xvfb install for the investing.com **bond scrape runs
-  only on the 2-hourly `schedule` runs** (bonds no-op safely on dispatch runs and keep
-  the committed curve), so the frequent dispatch runs stay light and fast;
 - both workflows carry a `timeout-minutes` cap so one hung scrape dies fast.
 
 #### Reliable 30-min cadence (external cron)
 
 GitHub's own scheduler is **best-effort and unreliable** — a `*/30` cron here actually
 fired only ~every 90 min (GitHub drops most frequent scheduled runs). So the workflow's
-built-in `schedule` is a best-effort **2-hour fallback** (also the only runs that do
-the bond scrape); the primary cadence comes from an **external cron** that calls the
+built-in `schedule` is a best-effort **2-hour fallback**; the primary cadence comes
+from an **external cron** that calls the
 `workflow_dispatch` API every 30 min:
 
 1. Create a **fine-grained PAT** (GitHub → Settings → Developer settings → Fine-grained
@@ -277,12 +278,12 @@ way as the rates snapshot:
   **no TE/Yahoo fallback** — their coffee is a different series AND unit. investing.com blocks bots
   and renders client-side, so `commodities.fetch_investing()` fetches the page with the **shared
   stealth-browser render** (`common.stealth_render` — the same investing.com-tuned Scrapling fetch,
-  xvfb + `MARKETWIRE_SCRAPE_PROXY` story as the bond scrape below), and therefore — like the bond
-  curve — the quote refreshes **only on `history.yml`'s 2-hourly `schedule` runs** (the only runs
-  that install the browser); every other poll preserves the last committed price (marked `stale`).
+  xvfb + `MARKETWIRE_SCRAPE_PROXY` story as the bond scrape), and — like the bond
+  curve — the quote refreshes on **every `history.yml` run** (the browser installs on all runs
+  since Aug 2026); a blocked/failed render preserves the last committed price (marked `stale`).
   `parse_investing_quote()` reads the instrument page's price header by `data-test` attribute
   (`instrument-price-last` / `instrument-price-change-percent` / `prevClose`, with the legacy
-  `#last_last` ids as fallback). Written without live investing.com access — schedule runs upload
+  `#last_last` ids as fallback). Written without live investing.com access — each run uploads
   the rendered HTML as the `coffee-render-dump` artifact (`MARKETWIRE_COFFEE_DUMP`) for parser
   tuning, and `MARKETWIRE_INVESTING_COFFEE_URL` overrides the page URL.
 - **Automated (best-effort):** commodities ride the **same 30-min poller as history** — `poll.py`
@@ -292,11 +293,10 @@ way as the rates snapshot:
   rewrites the file **only when the liquid core (Brent/Gold/Silver/Copper) resolves in-bounds from
   either source** — a blocked/rate-limited scrape leaves the committed snapshot untouched, and any
   symbol its source(s) miss (e.g. Zinc and Containerized Freight, which are TE-only, or Coffee
-  between browser runs) keeps its last
+  on a blocked render) keeps its last
   committed price. The seed
-  file ships with `null` prices; they fill on the next 30-min poll — Coffee on the next 2-hourly
-  `schedule` run (or trigger `history.yml` via
-  **workflow_dispatch** to populate the rest now — dispatch runs skip the browser scrapes). Like
+  file ships with `null` prices; they fill on the next 30-min poll (or trigger `history.yml` via
+  **workflow_dispatch** to populate now). Like
   `rates.py`, the scrapers were written without live
   market access — validate them from a machine that can reach TE / Yahoo (TE sits behind Cloudflare;
   Yahoo 403s some datacenter IPs). Note: committing on each price tick means more frequent commits

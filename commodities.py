@@ -28,9 +28,10 @@ INVESTING.COM for Coffee:
     (`investing.com/commodities/london-coffee`, quoted in USD/tonne), replacing TE's US
     Arabica (`KC1:COM`, USc/lb). investing.com blocks bots and renders client-side, so the
     quote is fetched with the shared stealth-browser render (`common.stealth_render`, same as
-    bonds.py) — only history.yml's 2-hourly `schedule` runs install that browser, so Coffee
-    refreshes on those runs and keeps its last committed price in between (like Zinc/Freight
-    on a TE miss). No TE/Yahoo fallback: their coffee is a different series AND unit.
+    bonds.py) — history.yml installs that browser on every run, so Coffee rides the same
+    30-min cadence as the rest; any failed render (Cloudflare block, or a host without
+    scrapling, like this sandbox) keeps its last committed price (like Zinc/Freight on a TE
+    miss). No TE/Yahoo fallback: their coffee is a different series AND unit.
   • CHART LINK — Trading Economics' public per-commodity page (one clean URL each); Coffee
     links to its investing.com page instead (the same page scraped).
 
@@ -73,8 +74,8 @@ IST = common.IST
 #              while Yahoo HRC=F is a USD HR-coil benchmark; no TE fallback (wrong series/currency).
 #   "investing" → investing.com only — used for Coffee (London Robusta futures, USD/T, from the
 #              `investing` page URL, which doubles as the chart link). Browser-rendered via
-#              common.stealth_render, so it refreshes only on runs with the Scrapling browser
-#              (history.yml's 2-hourly `schedule` runs) and is preserved in between; no TE/Yahoo
+#              common.stealth_render (history.yml installs the browser every run); preserved
+#              from the last snapshot on any failed render; no TE/Yahoo
 #              fallback (their coffee is US Arabica in USc/lb — a different series AND unit).
 # Zinc and Containerized Freight are TE-only (no free Yahoo series): preserved from the last
 # snapshot if TE misses. Freight is the weekly Shanghai (SCFI) composite, quoted in points —
@@ -233,9 +234,9 @@ def parse_investing_quote(html_text):
 
 def fetch_investing(url=None, timeout=None):
     """Render an investing.com commodity page (it blocks bots — the shared stealth browser,
-    see common.stealth_render) and parse its price header. Returns (quote, error). Only runs
-    with the Scrapling browser installed can fetch (history.yml's 2-hourly `schedule` runs);
-    anywhere else the render fails fast and the caller preserves the committed price. Never
+    see common.stealth_render) and parse its price header. Returns (quote, error). Needs the
+    Scrapling browser (history.yml installs it on every run); on a host without it the render
+    fails fast and the caller preserves the committed price. Never
     raises for the expected failure modes (render blocked, scrapling missing, markup change)."""
     url = url or INVESTING_COFFEE_URL
     dump = os.environ.get("MARKETWIRE_COFFEE_DUMP", "").strip() or None
@@ -323,9 +324,10 @@ def poll_commodities(path=COMMODITIES_PATH):
                 need_yf.append(spec)
     yf_quotes, yf_err = fetch_yahoo(need_yf)
 
-    # investing.com-sourced specs (Coffee) need the stealth browser — only history.yml's
-    # 2-hourly `schedule` runs install it, so elsewhere the render fails fast and the last
-    # committed price is preserved (stale-marked), same as a TE miss on Zinc/Freight.
+    # investing.com-sourced specs (Coffee) need the stealth browser (history.yml installs
+    # it on every run); on a blocked render or a host without scrapling the fetch fails
+    # fast and the last committed price is preserved (stale-marked), same as a TE miss
+    # on Zinc/Freight.
     inv_quotes, inv_err = {}, {}
     for spec in SPECS:
         if spec["source"] != "investing":
