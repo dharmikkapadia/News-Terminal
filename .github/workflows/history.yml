@@ -10,11 +10,11 @@ name: MarketWire history
 # data/rates.json), the India macro Economic Calendar (data/calendar.json, merged onto the
 # committed snapshot so released actuals land promptly) AND the investing.com scrapes — the
 # India government-bond yield curve (market_trends.bonds) and the London (Robusta) coffee
-# quote in the commodities snapshot, both rendered in a real browser via Scrapling — they
-# move intraday, so FX/commodities/calendar ride every run (every 30 min via the external
-# dispatch cron) while the investing.com scrapes run only on the 2-hourly schedule runs
-# (the browser install is too heavy/flaky for every run — see below). The rest of the RBI
-# Current Rates snapshot stays on its own once-a-day rates.yml.
+# quote in the commodities snapshot, both rendered in a real browser via Scrapling. They all
+# move intraday, so EVERY run refreshes everything (every 30 min via the external dispatch
+# cron): the stealth browser installs on every run (the repo is public, so the ~1-2 min it
+# adds is free — see the Actions-minutes note in docs/OPERATIONS.md before privating). The
+# rest of the RBI Current Rates snapshot stays on its own once-a-day rates.yml.
 # The Streamlit app reads those committed files, so everything survives Streamlit Cloud restarts
 # with no external database.
 #
@@ -32,9 +32,6 @@ on:
     # freshness/redeploy trade-off, not a billing one. (While the repo was private, the
     # 30-min cadence blew the 2,000-min/month free tier in ~20 days — July 2026; see
     # docs/OPERATIONS.md's Actions-minutes section before making the repo private again.)
-    # These 2-hourly schedule runs are ALSO the only ones that do the heavy
-    # investing.com scrapes (bond curve + London coffee — Scrapling stealth
-    # browser + xvfb) — see below.
     - cron: "7 */2 * * *"
   workflow_dispatch: {}       # used by the external cron + manual runs (Actions tab)
 
@@ -61,18 +58,18 @@ jobs:
       - name: Install deps
         run: pip install feedparser requests beautifulsoup4
 
-      # Scrapling + a browser are needed ONLY for the investing.com scrapes — the
+      # Scrapling + a browser are needed for the investing.com scrapes — the
       # government-bond curve (bonds.poll_bonds) and the London coffee quote
       # (commodities.fetch_investing), both called from poll.py — investing.com blocks
       # bots, so those pages are fetched by rendering them in a real STEALTH browser
-      # (non-headless under xvfb — much harder for Cloudflare to flag). The install +
-      # renders add minutes and Cloudflare-flake exposure to a run, so they ride ONLY the
-      # 2-hourly `schedule` runs, keeping the 30-min dispatch runs light and fast. On
-      # dispatch runs the renders find no scrapling, fail fast and safely, and keep the
-      # committed curve/price — bonds + coffee refresh up to ~12x/day while
-      # history/FX/commodities refresh every run.
-      - name: Install Scrapling stealth browser + xvfb (investing.com scrapes — schedule runs only)
-        if: github.event_name == 'schedule'
+      # (non-headless under xvfb — much harder for Cloudflare to flag). Installed on
+      # EVERY run (schedule + 30-min dispatch) so bonds + coffee refresh at the same
+      # 30-min cadence as everything else; it adds ~1-2 min per run, free on a public
+      # repo. (Until Aug 2026 this rode only the 2-hourly schedule runs — restore that
+      # `if: github.event_name == 'schedule'` split if the repo ever goes private, or
+      # if investing.com starts flagging the extra render volume.) A failed render
+      # still just keeps the committed curve/price — the scrapers never hard-fail.
+      - name: Install Scrapling stealth browser + xvfb (investing.com scrapes)
         run: |
           sudo apt-get update && sudo apt-get install -y xvfb
           pip install "scrapling[fetchers]"
@@ -106,20 +103,14 @@ jobs:
           # Set this repo SECRET to a (residential) proxy URL to reliably get past investing.com's
           # datacenter-IP 403 — e.g. http://user:pass@host:port. Empty = direct (often blocked).
           MARKETWIRE_SCRAPE_PROXY: ${{ secrets.MARKETWIRE_SCRAPE_PROXY }}
-        # xvfb only exists on schedule runs (installed with the browser above);
-        # dispatch runs poll without it — bonds no-op, everything else refreshes.
-        run: |
-          if [ "$GITHUB_EVENT_NAME" = "schedule" ]; then
-            xvfb-run -a python poll.py
-          else
-            python poll.py
-          fi
+        # xvfb-run: the stealth browser runs non-headless (harder for Cloudflare to
+        # flag), so every poll gets a virtual display.
+        run: xvfb-run -a python poll.py
 
       # Upload the rendered investing.com HTML (whatever the fetch got — the real table or a
       # Cloudflare block page) so the markup can be inspected when the bond curve doesn't update.
-      # Only schedule runs render bonds, so only they can have a dump.
       - name: Upload bonds render dump (diagnostic)
-        if: ${{ always() && github.event_name == 'schedule' }}
+        if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
           name: bonds-render-dump
@@ -128,10 +119,10 @@ jobs:
           retention-days: 7
 
       # Same for the rendered investing.com London-coffee page (commodities.fetch_investing) —
-      # its parser was written without live investing.com access, so the first schedule runs'
+      # its parser was written without live investing.com access, so the first runs'
       # dumps are how the real markup gets confirmed/tuned.
       - name: Upload coffee render dump (diagnostic)
-        if: ${{ always() && github.event_name == 'schedule' }}
+        if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
           name: coffee-render-dump
@@ -173,8 +164,8 @@ jobs:
           else
             git commit -m "data: update history + sebi + te news + commodities + fx + bonds + calendar $(date -u +%FT%TZ)"
             # main has other writers (the rates workflows, branch merges) and this job's
-            # checkout->push window spans the whole poll (minutes, more on the schedule
-            # runs that render bonds), so a bare push can lose the race. Rebase and retry; -X theirs
+            # checkout->push window spans the whole poll (minutes — every run renders
+            # investing.com), so a bare push can lose the race. Rebase and retry; -X theirs
             # keeps THIS run's freshly-polled data files on any conflict (rebase swaps sides:
             # "theirs" = the commit being replayed, i.e. ours — the freshest scrape).
             for i in 1 2 3 4 5; do
