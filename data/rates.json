@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-08-11T21:28:29+05:30",
+  "captured_at": "2026-08-11T22:40:43+05:30",
   "source": "https://www.rbi.org.in/",
   "policy_rates": {
     "repo_rate": 5.25,
@@ -70,7 +70,7 @@
         4.6,
         5.15
       ],
-      "as_on": "as on August 10, 2026"
+      "as_on": "as on  August 10, 2026"
     },
     "gsec_yields": [
       {
@@ -99,11 +99,11 @@
       "182_day": 5.5501,
       "364_day": 5.6998
     },
-    "gsec_tbill_as_on": "as on August 10, 2026",
+    "gsec_tbill_as_on": "as on  August 10, 2026",
     "capital_market": {
       "sensex": 78542.44,
       "nifty_50": 24583.8,
-      "as_on": "as on August 10, 2026"
+      "as_on": "as on  August 10, 2026"
     },
     "bonds": {
       "source": "investing.com",
