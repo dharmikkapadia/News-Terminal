@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-08-12T16:01:46+05:30",
+  "captured_at": "2026-08-12T16:32:13+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -136,12 +136,12 @@
       "event": "Inflation Rate MoM",
       "url": "https://tradingeconomics.com/india/inflation-rate-mom",
       "importance": null,
-      "actual": "",
+      "actual": "0.88%",
       "previous": "1.03%",
       "consensus": "",
       "forecast": "0.5%",
       "first_seen": "2026-07-21T22:01:55+05:30",
-      "updated_at": "2026-07-22T15:30:47+05:30"
+      "updated_at": "2026-08-12T16:32:13+05:30"
     },
     {
       "id": "401894",
