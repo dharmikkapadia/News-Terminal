@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-08-12T15:31:58+05:30",
+  "captured_at": "2026-08-12T16:01:46+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -150,12 +150,12 @@
       "event": "Inflation Rate YoY",
       "url": "https://tradingeconomics.com/india/inflation-cpi",
       "importance": null,
-      "actual": "",
+      "actual": "4.45%",
       "previous": "4.38%",
       "consensus": "4.5%",
       "forecast": "4.5%",
       "first_seen": "2026-07-21T22:01:55+05:30",
-      "updated_at": "2026-08-10T14:00:46+05:30"
+      "updated_at": "2026-08-12T16:01:46+05:30"
     },
     {
       "id": "401904",
