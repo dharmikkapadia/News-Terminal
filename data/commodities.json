@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-08-14T03:01:46+05:30",
+  "captured_at": "2026-08-14T03:31:41+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -11,8 +11,8 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
       "source": "Trading Economics · CO1:COM",
-      "price": 86.914,
-      "prev_close": 84.848,
+      "price": 86.913,
+      "prev_close": 84.846,
       "change_pct": -2.32,
       "currency": "USD",
       "as_of": "2026-08-13"
@@ -25,9 +25,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Trading Economics · XAUUSD:CUR",
-      "price": 4349.55,
-      "prev_close": 4290.5,
-      "change_pct": -1.34,
+      "price": 4343.63,
+      "prev_close": 4278.66,
+      "change_pct": -1.47,
       "currency": "USD",
       "as_of": "2026-08-13"
     },
@@ -39,9 +39,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
       "source": "Trading Economics · XAGUSD:CUR",
-      "price": 64.464,
-      "prev_close": 63.607,
-      "change_pct": -1.31,
+      "price": 64.39,
+      "prev_close": 63.459,
+      "change_pct": -1.43,
       "currency": "USD",
       "as_of": "2026-08-13"
     },
@@ -53,9 +53,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Trading Economics · HG1:COM",
-      "price": 6.5,
-      "prev_close": 6.403,
-      "change_pct": -1.47,
+      "price": 6.5748,
+      "prev_close": 6.5526,
+      "change_pct": -0.34,
       "currency": "USD",
       "as_of": "2026-08-13"
     },
@@ -127,7 +127,8 @@
       "prev_close": 3643.0,
       "change_pct": -2.96,
       "currency": "USD",
-      "as_of": "2026-08-14"
+      "as_of": "2026-08-14",
+      "stale": true
     },
     {
       "key": "freight",
