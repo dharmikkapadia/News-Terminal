@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-08-14T16:33:53+05:30",
+  "captured_at": "2026-08-14T17:02:26+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -276,12 +276,12 @@
       "event": "Bank Loan Growth YoY",
       "url": "https://tradingeconomics.com/india/loan-growth",
       "importance": null,
-      "actual": "",
+      "actual": "19.3%",
       "previous": "17.7%",
       "consensus": "",
       "forecast": "",
       "first_seen": "2026-07-21T22:01:55+05:30",
-      "updated_at": "2026-08-07T17:30:44+05:30"
+      "updated_at": "2026-08-14T17:02:26+05:30"
     },
     {
       "id": "396493",
@@ -290,12 +290,12 @@
       "event": "Deposit Growth YoY",
       "url": "https://tradingeconomics.com/india/deposit-growth",
       "importance": null,
-      "actual": "",
+      "actual": "15.4%",
       "previous": "12.7%",
       "consensus": "",
       "forecast": "",
       "first_seen": "2026-07-21T22:01:55+05:30",
-      "updated_at": "2026-08-07T17:30:44+05:30"
+      "updated_at": "2026-08-14T17:02:26+05:30"
     },
     {
       "id": "396544",
@@ -304,12 +304,12 @@
       "event": "Foreign Exchange Reserves",
       "url": "https://tradingeconomics.com/india/foreign-exchange-reserves",
       "importance": null,
-      "actual": "",
+      "actual": "$707B",
       "previous": "$692.87B",
       "consensus": "",
       "forecast": "",
       "first_seen": "2026-07-21T22:01:55+05:30",
-      "updated_at": "2026-08-07T17:00:47+05:30"
+      "updated_at": "2026-08-14T17:02:26+05:30"
     },
     {
       "id": "401121",
@@ -388,10 +388,11 @@
       "url": "https://tradingeconomics.com/india/loan-growth",
       "importance": null,
       "actual": "",
-      "previous": "",
+      "previous": "19.3%",
       "consensus": "",
       "forecast": "",
-      "first_seen": "2026-07-26T17:05:23+05:30"
+      "first_seen": "2026-07-26T17:05:23+05:30",
+      "updated_at": "2026-08-14T17:02:26+05:30"
     },
     {
       "id": "396596",
@@ -401,10 +402,11 @@
       "url": "https://tradingeconomics.com/india/deposit-growth",
       "importance": null,
       "actual": "",
-      "previous": "",
+      "previous": "15.4%",
       "consensus": "",
       "forecast": "",
-      "first_seen": "2026-07-26T17:05:23+05:30"
+      "first_seen": "2026-07-26T17:05:23+05:30",
+      "updated_at": "2026-08-14T17:02:26+05:30"
     },
     {
       "id": "396594",
@@ -414,10 +416,11 @@
       "url": "https://tradingeconomics.com/india/foreign-exchange-reserves",
       "importance": null,
       "actual": "",
-      "previous": "",
+      "previous": "$707B",
       "consensus": "",
       "forecast": "",
-      "first_seen": "2026-07-26T17:05:23+05:30"
+      "first_seen": "2026-07-26T17:05:23+05:30",
+      "updated_at": "2026-08-14T17:02:26+05:30"
     },
     {
       "id": "396572",
