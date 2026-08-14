@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-08-15T03:31:53+05:30",
+  "captured_at": "2026-08-15T04:01:25+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -53,9 +53,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Trading Economics · HG1:COM",
-      "price": 6.5954,
-      "prev_close": 6.5925,
-      "change_pct": 0.04,
+      "price": 6.589,
+      "prev_close": 6.5855,
+      "change_pct": -0.05,
       "currency": "USD",
       "as_of": "2026-08-14"
     },
@@ -127,8 +127,7 @@
       "prev_close": 3643.0,
       "change_pct": -1.45,
       "currency": "USD",
-      "as_of": "2026-08-15",
-      "stale": true
+      "as_of": "2026-08-15"
     },
     {
       "key": "freight",
