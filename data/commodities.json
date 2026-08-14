@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-08-15T03:01:56+05:30",
+  "captured_at": "2026-08-15T03:31:53+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -11,9 +11,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
       "source": "Trading Economics · CO1:COM",
-      "price": 88.546,
+      "price": 88.59,
       "prev_close": 87.07,
-      "change_pct": 1.7,
+      "change_pct": 1.75,
       "currency": "USD",
       "as_of": "2026-08-14"
     },
@@ -39,9 +39,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
       "source": "Trading Economics · XAGUSD:CUR",
-      "price": 64.673,
+      "price": 64.682,
       "prev_close": 64.422,
-      "change_pct": 0.39,
+      "change_pct": 0.4,
       "currency": "USD",
       "as_of": "2026-08-14"
     },
@@ -53,7 +53,7 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Trading Economics · HG1:COM",
-      "price": 6.5952,
+      "price": 6.5954,
       "prev_close": 6.5925,
       "change_pct": 0.04,
       "currency": "USD",
@@ -127,7 +127,8 @@
       "prev_close": 3643.0,
       "change_pct": -1.45,
       "currency": "USD",
-      "as_of": "2026-08-15"
+      "as_of": "2026-08-15",
+      "stale": true
     },
     {
       "key": "freight",
@@ -137,9 +138,9 @@
       "cadence": "weekly",
       "chart_url": "https://tradingeconomics.com/commodity/containerized-freight-index",
       "source": "Trading Economics · SHSPSCFI:IND",
-      "price": 3276.14,
+      "price": 3355.24,
       "prev_close": 3276.14,
-      "change_pct": 0.0,
+      "change_pct": 2.41,
       "currency": "USD",
       "as_of": "2026-08-14"
     }
