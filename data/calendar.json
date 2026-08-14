@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-08-14T11:32:11+05:30",
+  "captured_at": "2026-08-14T12:02:02+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -234,12 +234,12 @@
       "event": "WPI Fuel YoY",
       "url": "https://tradingeconomics.com/india/wpi-fuel-yoy",
       "importance": null,
-      "actual": "",
+      "actual": "20.05%",
       "previous": "27.41%",
       "consensus": "",
       "forecast": "20.0%",
       "first_seen": "2026-07-21T22:01:55+05:30",
-      "updated_at": "2026-07-22T16:00:44+05:30"
+      "updated_at": "2026-08-14T12:02:02+05:30"
     },
     {
       "id": "400981",
@@ -248,12 +248,12 @@
       "event": "WPI Inflation YoY",
       "url": "https://tradingeconomics.com/india/wholesale-prices-yoy",
       "importance": null,
-      "actual": "",
+      "actual": "9.78%",
       "previous": "9.87%",
       "consensus": "9.95%",
       "forecast": "10.2%",
       "first_seen": "2026-07-21T22:01:55+05:30",
-      "updated_at": "2026-08-10T15:30:46+05:30"
+      "updated_at": "2026-08-14T12:02:02+05:30"
     },
     {
       "id": "402549",
