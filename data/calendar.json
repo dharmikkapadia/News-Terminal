@@ -1,36 +1,8 @@
 {
-  "captured_at": "2026-08-14T23:32:05+05:30",
+  "captured_at": "2026-08-15T00:02:15+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
-    {
-      "id": "417761",
-      "date": "2026-07-31",
-      "time": "10:30 AM",
-      "event": "Government Budget Value",
-      "url": "https://tradingeconomics.com/india/government-budget-value",
-      "importance": null,
-      "actual": "INR -3078B",
-      "previous": "INR-1624B",
-      "consensus": "",
-      "forecast": "INR -5400B",
-      "first_seen": "2026-07-21T22:01:55+05:30",
-      "updated_at": "2026-07-31T16:17:44+05:30"
-    },
-    {
-      "id": "396403",
-      "date": "2026-07-31",
-      "time": "11:30 AM",
-      "event": "Foreign Exchange Reserves",
-      "url": "https://tradingeconomics.com/india/foreign-exchange-reserves",
-      "importance": null,
-      "actual": "$682.35B",
-      "previous": "$676.24B",
-      "consensus": "",
-      "forecast": "",
-      "first_seen": "2026-07-21T22:01:55+05:30",
-      "updated_at": "2026-07-31T17:00:50+05:30"
-    },
     {
       "id": "396415",
       "date": "2026-08-03",
