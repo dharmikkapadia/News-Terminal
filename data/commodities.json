@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-08-14T05:31:54+05:30",
+  "captured_at": "2026-08-14T06:02:07+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -11,11 +11,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
       "source": "Trading Economics · CO1:COM",
-      "price": 87.093,
-      "prev_close": 85.206,
-      "change_pct": -2.12,
+      "price": 86.995,
+      "prev_close": 86.92,
+      "change_pct": -0.09,
       "currency": "USD",
-      "as_of": "2026-08-13"
+      "as_of": "2026-08-14"
     },
     {
       "key": "gold",
@@ -25,9 +25,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Trading Economics · XAUUSD:CUR",
-      "price": 4355.65,
-      "prev_close": 4302.7,
-      "change_pct": -1.2,
+      "price": 4340.37,
+      "prev_close": 4331.19,
+      "change_pct": -0.21,
       "currency": "USD",
       "as_of": "2026-08-14"
     },
@@ -39,9 +39,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
       "source": "Trading Economics · XAGUSD:CUR",
-      "price": 64.557,
-      "prev_close": 63.793,
-      "change_pct": -1.17,
+      "price": 64.335,
+      "prev_close": 64.116,
+      "change_pct": -0.34,
       "currency": "USD",
       "as_of": "2026-08-14"
     },
@@ -53,8 +53,8 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Trading Economics · HG1:COM",
-      "price": 6.5742,
-      "prev_close": 6.5514,
+      "price": 6.5692,
+      "prev_close": 6.5459,
       "change_pct": -0.35,
       "currency": "USD",
       "as_of": "2026-08-14"
@@ -81,11 +81,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/zinc",
       "source": "Trading Economics · LMZSDS03:COM",
-      "price": 3737.45,
-      "prev_close": 3737.25,
-      "change_pct": 0.01,
+      "price": 3738.7,
+      "prev_close": 3737.45,
+      "change_pct": 0.03,
       "currency": "USD",
-      "as_of": "2026-08-13"
+      "as_of": "2026-08-14"
     },
     {
       "key": "steel",
