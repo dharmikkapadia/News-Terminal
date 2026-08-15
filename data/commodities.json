@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-08-15T09:31:57+05:30",
+  "captured_at": "2026-08-15T10:01:48+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -99,7 +99,7 @@
       "prev_close": 1196.0,
       "change_pct": 0.0,
       "currency": "USD",
-      "as_of": "2026-08-13"
+      "as_of": "2026-08-14"
     },
     {
       "key": "iron",
