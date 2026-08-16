@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-08-17T03:31:47+05:30",
+  "captured_at": "2026-08-17T03:58:48+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -11,9 +11,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
       "source": "Trading Economics · CO1:COM",
-      "price": 88.52,
-      "prev_close": 87.07,
-      "change_pct": 1.67,
+      "price": 88.717,
+      "prev_close": 88.52,
+      "change_pct": 0.22,
       "currency": "USD",
       "as_of": "2026-08-16"
     },
@@ -25,11 +25,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Trading Economics · XAUUSD:CUR",
-      "price": 4375.5,
-      "prev_close": 4349.55,
-      "change_pct": 0.6,
+      "price": 4373.53,
+      "prev_close": 4371.56,
+      "change_pct": -0.05,
       "currency": "USD",
-      "as_of": "2026-08-14"
+      "as_of": "2026-08-16"
     },
     {
       "key": "silver",
@@ -39,11 +39,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
       "source": "Trading Economics · XAGUSD:CUR",
-      "price": 64.661,
-      "prev_close": 64.422,
-      "change_pct": 0.37,
+      "price": 64.889,
+      "prev_close": 64.661,
+      "change_pct": 0.35,
       "currency": "USD",
-      "as_of": "2026-08-14"
+      "as_of": "2026-08-16"
     },
     {
       "key": "copper",
@@ -53,11 +53,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Trading Economics · HG1:COM",
-      "price": 6.5995,
-      "prev_close": 6.5925,
-      "change_pct": 0.11,
+      "price": 6.6174,
+      "prev_close": 6.5995,
+      "change_pct": 0.27,
       "currency": "USD",
-      "as_of": "2026-08-14"
+      "as_of": "2026-08-16"
     },
     {
       "key": "aluminium",
@@ -127,7 +127,8 @@
       "prev_close": 3590.0,
       "change_pct": -1.45,
       "currency": "USD",
-      "as_of": "2026-08-17"
+      "as_of": "2026-08-17",
+      "stale": true
     },
     {
       "key": "freight",
