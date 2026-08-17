@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-08-17T08:37:14+05:30",
+  "captured_at": "2026-08-17T09:01:36+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -11,9 +11,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
       "source": "Trading Economics · CO1:COM",
-      "price": 88.753,
+      "price": 88.851,
       "prev_close": 88.52,
-      "change_pct": 0.26,
+      "change_pct": 0.37,
       "currency": "USD",
       "as_of": "2026-08-17"
     },
@@ -25,7 +25,7 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Trading Economics · XAUUSD:CUR",
-      "price": 4392.31,
+      "price": 4392.16,
       "prev_close": 4375.5,
       "change_pct": 0.38,
       "currency": "USD",
@@ -39,9 +39,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
       "source": "Trading Economics · XAGUSD:CUR",
-      "price": 65.69,
+      "price": 65.58,
       "prev_close": 64.661,
-      "change_pct": 1.59,
+      "change_pct": 1.42,
       "currency": "USD",
       "as_of": "2026-08-17"
     },
@@ -53,9 +53,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Trading Economics · HG1:COM",
-      "price": 6.7249,
+      "price": 6.7145,
       "prev_close": 6.5995,
-      "change_pct": 1.9,
+      "change_pct": 1.74,
       "currency": "USD",
       "as_of": "2026-08-17"
     },
@@ -81,9 +81,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/zinc",
       "source": "Trading Economics · LMZSDS03:COM",
-      "price": 3780.8,
+      "price": 3779.35,
       "prev_close": 3758.25,
-      "change_pct": 0.6,
+      "change_pct": 0.56,
       "currency": "USD",
       "as_of": "2026-08-17"
     },
