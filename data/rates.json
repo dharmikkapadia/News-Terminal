@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-08-16T22:10:07+05:30",
+  "captured_at": "2026-08-17T14:05:34+05:30",
   "source": "https://www.rbi.org.in/",
   "policy_rates": {
     "repo_rate": 5.25,
@@ -13,14 +13,14 @@
     "slr": 18.0
   },
   "exchange_rates": {
-    "as_of": "As at 1.00pm of August 14, 2026",
+    "as_of": "As at 1.00pm of August 17, 2026",
     "source": "FBIL",
-    "inr_per_usd": 95.657,
+    "inr_per_usd": 95.656,
     "inr_per_gbp": 129.619,
     "inr_per_eur": 110.8147,
-    "inr_per_100_jpy": 59.93,
-    "inr_per_aed": 25.9821,
-    "inr_per_10000_idr": 53.5294,
+    "inr_per_100_jpy": 60.09,
+    "inr_per_aed": 26.0298,
+    "inr_per_10000_idr": 53.6967,
     "fx_te": {
       "inr_per_usd": {
         "label": "USD/INR",
@@ -47,7 +47,7 @@
         "source": "Trading Economics · GBPINR:CUR"
       }
     },
-    "fx_te_captured_at": "2026-08-17T14:01:47+05:30"
+    "fx_te_captured_at": "2026-08-17T14:05:36+05:30"
   },
   "lending_deposit_rates": {
     "base_rate": [
@@ -70,28 +70,28 @@
         4.6,
         5.3
       ],
-      "as_on": "as on  August 13, 2026"
+      "as_on": "as on August 16, 2026"
     },
     "gsec_yields": [
       {
         "security": "6.03% GS 2029",
-        "yield": 6.0995
+        "yield": 6.0043
       },
       {
         "security": "6.36% GS 2031",
-        "yield": 6.3539
+        "yield": 6.3594
       },
       {
         "security": "6.94% GS 2036",
-        "yield": 6.7577
+        "yield": 6.7584
       },
       {
         "security": "6.68% GS 2040",
-        "yield": 6.9526
+        "yield": 6.9493
       },
       {
         "security": "7.24% GS 2055",
-        "yield": 7.3572
+        "yield": 7.3509
       }
     ],
     "tbill_yields": {
@@ -99,11 +99,11 @@
       "182_day": 5.539,
       "364_day": 5.7094
     },
-    "gsec_tbill_as_on": "as on  August 13, 2026",
+    "gsec_tbill_as_on": "as on August 14, 2026",
     "capital_market": {
-      "sensex": 78079.96,
-      "nifty_50": 24395.85,
-      "as_on": "as on  August 13, 2026"
+      "sensex": 78009.25,
+      "nifty_50": 24366.0,
+      "as_on": "as on August 14, 2026"
     },
     "bonds": {
       "source": "investing.com",
