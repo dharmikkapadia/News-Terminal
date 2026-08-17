@@ -15,7 +15,7 @@
   "exchange_rates": {
     "as_of": "As at 1.00pm of August 17, 2026",
     "source": "FBIL",
-    "inr_per_usd": 95.671,
+    "inr_per_usd": 95.673,
     "inr_per_gbp": 129.619,
     "inr_per_eur": 110.8147,
     "inr_per_100_jpy": 60.09,
@@ -47,7 +47,7 @@
         "source": "Trading Economics · GBPINR:CUR"
       }
     },
-    "fx_te_captured_at": "2026-08-17T14:23:26+05:30"
+    "fx_te_captured_at": "2026-08-17T14:31:54+05:30"
   },
   "lending_deposit_rates": {
     "base_rate": [
@@ -108,7 +108,7 @@
     "bonds": {
       "source": "investing.com",
       "board_url": "https://www.investing.com/rates-bonds/india-government-bonds",
-      "as_of": "2026-08-17T14:23:43+05:30",
+      "as_of": "2026-08-17T14:32:06+05:30",
       "benchmark_tenor": "10Y",
       "curve": [
         {
@@ -141,18 +141,18 @@
         {
           "tenor": "2Y",
           "label": "India 2Y",
-          "yield": 5.98,
+          "yield": 5.96,
           "prev_close": 5.942,
-          "change_pct": 0.64,
+          "change_pct": 0.3,
           "years": 2.0,
           "chart_url": "https://www.investing.com/rates-bonds/india-2-year-bond-yield"
         },
         {
           "tenor": "3Y",
           "label": "India 3Y",
-          "yield": 6.233,
+          "yield": 6.227,
           "prev_close": 6.168,
-          "change_pct": 1.05,
+          "change_pct": 0.96,
           "years": 3.0,
           "chart_url": "https://www.investing.com/rates-bonds/india-3-year-bond-yield"
         },
