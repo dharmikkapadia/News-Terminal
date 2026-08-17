@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-08-17T15:31:58+05:30",
+  "captured_at": "2026-08-17T16:02:05+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -290,12 +290,12 @@
       "event": "Unemployment Rate",
       "url": "https://tradingeconomics.com/india/unemployment-rate",
       "importance": null,
-      "actual": "",
+      "actual": "5.1%",
       "previous": "5.5%",
       "consensus": "5.4%",
       "forecast": "5.4%",
       "first_seen": "2026-07-22T16:00:44+05:30",
-      "updated_at": "2026-08-13T18:02:18+05:30"
+      "updated_at": "2026-08-17T16:02:05+05:30"
     },
     {
       "id": "400393",
@@ -589,6 +589,32 @@
       "consensus": "",
       "forecast": "",
       "first_seen": "2026-08-16T17:01:54+05:30"
+    },
+    {
+      "id": "403566",
+      "date": "2026-09-12",
+      "time": "10:30 AM",
+      "event": "Inflation Rate MoM",
+      "url": "https://tradingeconomics.com/india/inflation-rate-mom",
+      "importance": null,
+      "actual": "",
+      "previous": "0.88%",
+      "consensus": "",
+      "forecast": "",
+      "first_seen": "2026-08-17T16:02:05+05:30"
+    },
+    {
+      "id": "401139",
+      "date": "2026-09-12",
+      "time": "10:30 AM",
+      "event": "Inflation Rate YoY",
+      "url": "https://tradingeconomics.com/india/inflation-cpi",
+      "importance": null,
+      "actual": "",
+      "previous": "4.45%",
+      "consensus": "",
+      "forecast": "",
+      "first_seen": "2026-08-17T16:02:05+05:30"
     }
   ]
 }
