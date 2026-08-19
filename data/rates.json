@@ -15,17 +15,17 @@
   "exchange_rates": {
     "as_of": "As at 1.00pm of August 19, 2026",
     "source": "FBIL",
-    "inr_per_usd": 95.608,
-    "inr_per_gbp": 130.075,
-    "inr_per_eur": 111.4823,
+    "inr_per_usd": 95.596,
+    "inr_per_gbp": 130.004,
+    "inr_per_eur": 111.5451,
     "inr_per_100_jpy": 60.15,
     "inr_per_aed": 26.0696,
     "inr_per_10000_idr": 53.6937,
     "fx_te": {
       "inr_per_usd": {
         "label": "USD/INR",
-        "prev_close": 95.4402,
-        "change_pct": -0.18,
+        "prev_close": 95.4162,
+        "change_pct": -0.19,
         "chart_url": "https://tradingeconomics.com/currencies?quote=inr",
         "as_of": "2026-08-19",
         "source": "Trading Economics · USDINR:CUR"
@@ -33,21 +33,21 @@
       "inr_per_eur": {
         "label": "EUR/INR",
         "prev_close": 110.8681,
-        "change_pct": 0.55,
+        "change_pct": 0.61,
         "chart_url": "https://tradingeconomics.com/currencies?quote=inr",
         "as_of": "2026-08-19",
         "source": "Trading Economics · EURINR:CUR"
       },
       "inr_per_gbp": {
         "label": "GBP/INR",
-        "prev_close": 129.613,
-        "change_pct": 0.36,
+        "prev_close": 129.614,
+        "change_pct": 0.3,
         "chart_url": "https://tradingeconomics.com/currencies?quote=inr",
         "as_of": "2026-08-19",
         "source": "Trading Economics · GBPINR:CUR"
       }
     },
-    "fx_te_captured_at": "2026-08-19T23:31:41+05:30"
+    "fx_te_captured_at": "2026-08-20T00:03:51+05:30"
   },
   "lending_deposit_rates": {
     "base_rate": [
@@ -108,7 +108,7 @@
     "bonds": {
       "source": "investing.com",
       "board_url": "https://www.investing.com/rates-bonds/india-government-bonds",
-      "as_of": "2026-08-19T23:31:57+05:30",
+      "as_of": "2026-08-20T00:04:08+05:30",
       "benchmark_tenor": "10Y",
       "curve": [
         {
