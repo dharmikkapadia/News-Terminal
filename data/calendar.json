@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-08-20T16:31:52+05:30",
+  "captured_at": "2026-08-20T17:01:38+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -234,11 +234,12 @@
       "event": "Infrastructure Output YoY",
       "url": "https://tradingeconomics.com/india/construction-output",
       "importance": null,
-      "actual": "",
+      "actual": "5.4%",
       "previous": "5%",
       "consensus": "",
       "forecast": "2.2%",
-      "first_seen": "2026-07-25T17:30:44+05:30"
+      "first_seen": "2026-07-25T17:30:44+05:30",
+      "updated_at": "2026-08-20T17:01:38+05:30"
     },
     {
       "id": "399303",
