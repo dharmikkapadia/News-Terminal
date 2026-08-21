@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-08-22T03:31:46+05:30",
+  "captured_at": "2026-08-22T04:01:45+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -25,9 +25,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Trading Economics · XAUUSD:CUR",
-      "price": 4604.49,
+      "price": 4607.35,
       "prev_close": 4515.78,
-      "change_pct": 1.96,
+      "change_pct": 2.03,
       "currency": "USD",
       "as_of": "2026-08-21"
     },
@@ -53,9 +53,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Trading Economics · HG1:COM",
-      "price": 6.5753,
+      "price": 6.5755,
       "prev_close": 6.46,
-      "change_pct": 1.78,
+      "change_pct": 1.79,
       "currency": "USD",
       "as_of": "2026-08-21"
     },
