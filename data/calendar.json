@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-08-21T10:16:57+05:30",
+  "captured_at": "2026-08-21T10:32:01+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -248,12 +248,12 @@
       "event": "HSBC Composite PMI Flash",
       "url": "https://tradingeconomics.com/india/composite-pmi",
       "importance": null,
-      "actual": "",
+      "actual": "54.6",
       "previous": "54.3",
       "consensus": "54.4",
       "forecast": "55.5",
       "first_seen": "2026-07-26T11:00:41+05:30",
-      "updated_at": "2026-08-18T21:02:08+05:30"
+      "updated_at": "2026-08-21T10:32:01+05:30"
     },
     {
       "id": "399278",
@@ -262,12 +262,12 @@
       "event": "HSBC Manufacturing PMI Flash",
       "url": "https://tradingeconomics.com/india/manufacturing-pmi",
       "importance": null,
-      "actual": "",
+      "actual": "52.9",
       "previous": "53.5",
       "consensus": "54",
       "forecast": "54.3",
       "first_seen": "2026-07-26T11:00:41+05:30",
-      "updated_at": "2026-08-18T21:02:08+05:30"
+      "updated_at": "2026-08-21T10:32:01+05:30"
     },
     {
       "id": "399291",
@@ -276,12 +276,12 @@
       "event": "HSBC Services PMI Flash",
       "url": "https://tradingeconomics.com/india/services-pmi",
       "importance": null,
-      "actual": "",
+      "actual": "54.5",
       "previous": "53.3",
       "consensus": "53.8",
       "forecast": "54",
       "first_seen": "2026-07-26T11:00:41+05:30",
-      "updated_at": "2026-08-18T21:02:08+05:30"
+      "updated_at": "2026-08-21T10:32:01+05:30"
     },
     {
       "id": "396595",
