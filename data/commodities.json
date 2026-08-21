@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-08-21T22:12:41+05:30",
+  "captured_at": "2026-08-21T22:31:45+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -11,7 +11,7 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
       "source": "Trading Economics · CO1:COM",
-      "price": 94.21,
+      "price": 94.208,
       "prev_close": 93.78,
       "change_pct": 0.46,
       "currency": "USD",
@@ -25,9 +25,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Trading Economics · XAUUSD:CUR",
-      "price": 4618.95,
+      "price": 4629.0,
       "prev_close": 4515.78,
-      "change_pct": 2.28,
+      "change_pct": 2.51,
       "currency": "USD",
       "as_of": "2026-08-21"
     },
@@ -39,9 +39,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
       "source": "Trading Economics · XAGUSD:CUR",
-      "price": 69.729,
+      "price": 69.888,
       "prev_close": 68.075,
-      "change_pct": 2.43,
+      "change_pct": 2.66,
       "currency": "USD",
       "as_of": "2026-08-21"
     },
@@ -53,9 +53,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Trading Economics · HG1:COM",
-      "price": 6.5703,
+      "price": 6.5797,
       "prev_close": 6.46,
-      "change_pct": 1.71,
+      "change_pct": 1.85,
       "currency": "USD",
       "as_of": "2026-08-21"
     },
@@ -67,9 +67,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/aluminum",
       "source": "Trading Economics · LMAHDS03:COM",
-      "price": 3248.2,
+      "price": 3250.5,
       "prev_close": 3187.5,
-      "change_pct": 1.9,
+      "change_pct": 1.98,
       "currency": "USD",
       "as_of": "2026-08-21"
     },
