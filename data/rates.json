@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-08-23T22:10:22+05:30",
+  "captured_at": "2026-08-24T14:09:53+05:30",
   "source": "https://www.rbi.org.in/",
   "policy_rates": {
     "repo_rate": 5.25,
@@ -13,19 +13,19 @@
     "slr": 18.0
   },
   "exchange_rates": {
-    "as_of": "As at 1.00pm of August 21, 2026",
+    "as_of": "As at 1.00pm of August 24, 2026",
     "source": "FBIL",
-    "inr_per_usd": 95.77,
+    "inr_per_usd": 95.779,
     "inr_per_gbp": 130.616,
     "inr_per_eur": 111.8171,
-    "inr_per_100_jpy": 60.24,
-    "inr_per_aed": 26.0687,
-    "inr_per_10000_idr": 54.0841,
+    "inr_per_100_jpy": 60.22,
+    "inr_per_aed": 26.0626,
+    "inr_per_10000_idr": 54.057,
     "fx_te": {
       "inr_per_usd": {
         "label": "USD/INR",
         "prev_close": 95.6654,
-        "change_pct": 0.11,
+        "change_pct": 0.12,
         "chart_url": "https://tradingeconomics.com/currencies?quote=inr",
         "as_of": "2026-08-24",
         "source": "Trading Economics · USDINR:CUR"
@@ -47,7 +47,7 @@
         "source": "Trading Economics · GBPINR:CUR"
       }
     },
-    "fx_te_captured_at": "2026-08-24T14:01:45+05:30"
+    "fx_te_captured_at": "2026-08-24T14:09:53+05:30"
   },
   "lending_deposit_rates": {
     "base_rate": [
@@ -70,28 +70,28 @@
         4.6,
         5.2
       ],
-      "as_on": "as on  August 20, 2026"
+      "as_on": "as on August 23, 2026"
     },
     "gsec_yields": [
       {
         "security": "6.03% GS 2029",
-        "yield": 6.2888
+        "yield": 6.27
       },
       {
         "security": "6.36% GS 2031",
-        "yield": 6.5174
+        "yield": 6.4966
       },
       {
         "security": "6.94% GS 2036",
-        "yield": 6.8668
+        "yield": 6.8713
       },
       {
         "security": "6.68% GS 2040",
-        "yield": 7.042
+        "yield": 7.0379
       },
       {
         "security": "7.24% GS 2055",
-        "yield": 7.4634
+        "yield": 7.469
       }
     ],
     "tbill_yields": {
@@ -99,11 +99,11 @@
       "182_day": 5.5678,
       "364_day": 5.7373
     },
-    "gsec_tbill_as_on": "as on  August 20, 2026",
+    "gsec_tbill_as_on": "as on August 21, 2026",
     "capital_market": {
-      "sensex": 77537.72,
-      "nifty_50": 24231.85,
-      "as_on": "as on  August 20, 2026"
+      "sensex": 77540.83,
+      "nifty_50": 24252.0,
+      "as_on": "as on August 21, 2026"
     },
     "bonds": {
       "source": "investing.com",
