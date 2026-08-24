@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-08-24T09:01:42+05:30",
+  "captured_at": "2026-08-24T09:31:44+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -11,9 +11,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
       "source": "Trading Economics · CO1:COM",
-      "price": 93.092,
-      "prev_close": 91.794,
-      "change_pct": -1.37,
+      "price": 92.985,
+      "prev_close": 91.58,
+      "change_pct": -1.49,
       "currency": "USD",
       "as_of": "2026-08-24"
     },
@@ -25,9 +25,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Trading Economics · XAUUSD:CUR",
-      "price": 4643.76,
+      "price": 4641.93,
       "prev_close": 4607.35,
-      "change_pct": 0.79,
+      "change_pct": 0.75,
       "currency": "USD",
       "as_of": "2026-08-24"
     },
@@ -39,9 +39,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
       "source": "Trading Economics · XAGUSD:CUR",
-      "price": 68.988,
+      "price": 68.969,
       "prev_close": 68.947,
-      "change_pct": 0.06,
+      "change_pct": 0.03,
       "currency": "USD",
       "as_of": "2026-08-24"
     },
@@ -53,9 +53,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Trading Economics · HG1:COM",
-      "price": 6.5457,
-      "prev_close": 6.5119,
-      "change_pct": -0.51,
+      "price": 6.5422,
+      "prev_close": 6.5049,
+      "change_pct": -0.57,
       "currency": "USD",
       "as_of": "2026-08-24"
     },
@@ -81,9 +81,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/zinc",
       "source": "Trading Economics · LMZSDS03:COM",
-      "price": 3810.75,
-      "prev_close": 3798.35,
-      "change_pct": -0.32,
+      "price": 3809.8,
+      "prev_close": 3796.45,
+      "change_pct": -0.35,
       "currency": "USD",
       "as_of": "2026-08-24"
     },
@@ -95,11 +95,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/steel",
       "source": "Yahoo Finance · HRC=F",
-      "price": 1212.0,
+      "price": 1194.0,
       "prev_close": 1194.0,
-      "change_pct": 1.51,
+      "change_pct": 0.0,
       "currency": "USD",
-      "as_of": "2026-08-24"
+      "as_of": "2026-08-21"
     },
     {
       "key": "iron",
