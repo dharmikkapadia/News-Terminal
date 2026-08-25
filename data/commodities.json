@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-08-26T00:19:52+05:30",
+  "captured_at": "2026-08-26T00:31:42+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -11,9 +11,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
       "source": "Trading Economics · CO1:COM",
-      "price": 88.546,
-      "prev_close": 84.922,
-      "change_pct": -3.93,
+      "price": 88.469,
+      "prev_close": 84.768,
+      "change_pct": -4.02,
       "currency": "USD",
       "as_of": "2026-08-25"
     },
@@ -25,9 +25,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Trading Economics · XAUUSD:CUR",
-      "price": 4651.47,
-      "prev_close": 4650.94,
-      "change_pct": -0.01,
+      "price": 4654.59,
+      "prev_close": 4652.0,
+      "change_pct": 0.06,
       "currency": "USD",
       "as_of": "2026-08-25"
     },
@@ -39,9 +39,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
       "source": "Trading Economics · XAGUSD:CUR",
-      "price": 68.857,
-      "prev_close": 68.775,
-      "change_pct": -0.12,
+      "price": 68.906,
+      "prev_close": 68.873,
+      "change_pct": -0.05,
       "currency": "USD",
       "as_of": "2026-08-25"
     },
@@ -53,9 +53,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Trading Economics · HG1:COM",
-      "price": 6.6984,
+      "price": 6.7007,
       "prev_close": 6.599,
-      "change_pct": 1.51,
+      "change_pct": 1.54,
       "currency": "USD",
       "as_of": "2026-08-25"
     },
@@ -127,7 +127,8 @@
       "prev_close": 3801.0,
       "change_pct": -2.97,
       "currency": "USD",
-      "as_of": "2026-08-26"
+      "as_of": "2026-08-26",
+      "stale": true
     },
     {
       "key": "freight",
