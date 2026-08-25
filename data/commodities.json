@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-08-26T02:06:52+05:30",
+  "captured_at": "2026-08-26T02:32:08+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -11,9 +11,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
       "source": "Trading Economics · CO1:COM",
-      "price": 86.625,
-      "prev_close": 81.08,
-      "change_pct": -6.02,
+      "price": 86.977,
+      "prev_close": 81.784,
+      "change_pct": -5.63,
       "currency": "USD",
       "as_of": "2026-08-25"
     },
@@ -25,9 +25,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Trading Economics · XAUUSD:CUR",
-      "price": 4662.39,
+      "price": 4658.79,
       "prev_close": 4652.0,
-      "change_pct": 0.22,
+      "change_pct": 0.15,
       "currency": "USD",
       "as_of": "2026-08-25"
     },
@@ -39,9 +39,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
       "source": "Trading Economics · XAGUSD:CUR",
-      "price": 68.835,
-      "prev_close": 68.731,
-      "change_pct": -0.15,
+      "price": 68.624,
+      "prev_close": 68.309,
+      "change_pct": -0.46,
       "currency": "USD",
       "as_of": "2026-08-25"
     },
@@ -53,7 +53,7 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Trading Economics · HG1:COM",
-      "price": 6.7064,
+      "price": 6.7063,
       "prev_close": 6.599,
       "change_pct": 1.63,
       "currency": "USD",
@@ -124,7 +124,7 @@
       "chart_url": "https://www.investing.com/commodities/london-coffee",
       "source": "investing.com · london-coffee",
       "price": 3688.0,
-      "prev_close": 3801.0,
+      "prev_close": 3688.0,
       "change_pct": -2.97,
       "currency": "USD",
       "as_of": "2026-08-26"
