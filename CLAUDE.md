@@ -2,7 +2,7 @@
 
 A Streamlit reader for **RBI Press Releases**, **RBI Notifications**, **SEBI
 Public Issues** and **Trading Economics news** (`streamlit_app.py`): fetches the two RBI
-RSS feeds, SEBI's Public Issues (DRHP filings) listing and TE's news stream (split into
+RSS feeds, SEBI's Public Issues filings listing and TE's news stream (split into
 an India feed and a World feed) server-side and shows them **together**
 in one wire with a keyword filter, a **sort order** toggle (newest/oldest first), an
 opt-in **date-range** filter, and a sidebar **Sources** multiselect (show all feeds
@@ -87,9 +87,11 @@ SEBI items on the link itself (unique + permanent, so this is safe).
   `SEBI - Public Issues`) has **no RSS**: SEBI's site-wide `sebirss.xml` (linked
   from `/rss.html`) only carries Enforcement/Legal items, nothing from the Filings
   module. `sebi.fetch_listing()` scrapes the listing page
-  (`HomeAction.do?doListing=yes&sid=3&ssid=15&smid=10` — `sid`=Filings, `ssid`=15
-  Public Issues, `smid`=10 Draft Offer Documents/DRHPs; other Filings subsections
-  use different `ssid`/`smid` pairs, same row markup) — page 1 only (~25 newest
+  (`HomeAction.do?doListing=yes&sid=3&ssid=15&smid=11` — `sid`=Filings, `ssid`=15
+  Public Issues, `smid`=11 the sub-tab this app reads (it read `smid`=10, Draft
+  Offer Documents/DRHPs, until Aug 2026); other Filings subsections
+  use different `ssid`/`smid` pairs, same row markup; override the whole URL with
+  `MARKETWIRE_SEBI_PUBLIC_ISSUES_URL`) — page 1 only (~25 newest
   rows), no pagination/backfill yet. Its row markup nests a SECOND `<a>` (a related
   PDF link, usually an abridged prospectus) inside the detail-page `<a>`'s own
   content, unescaped — `sebi._row_item()` walks only the outer `<a>`'s direct-child

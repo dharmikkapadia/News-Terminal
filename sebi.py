@@ -11,8 +11,9 @@ as rbi_archive.py: never raises, returns (items, error) in the shared
 
 The URL's sid/ssid/smid select the section: sid=3 is the fixed "Filings"
 module; ssid picks the subsection (15 = Public Issues); smid picks the
-sub-tab within it (10 = "Draft Offer Documents filed with SEBI", i.e. DRHPs —
-LISTING_URL below). Point this at a different Filings listing by swapping
+sub-tab within it (11 — the Public Issues sub-tab this app reads, LISTING_URL
+below; 10 is the "Draft Offer Documents filed with SEBI"/DRHP tab it read
+until Aug 2026). Point this at a different Filings listing by swapping
 ssid/smid (e.g. ssid=16/smid=13 = Draft Letters of Offer under Rights Issues);
 the row markup is the same across subsections.
 
@@ -48,9 +49,9 @@ try:
 except Exception:
     _HAVE_BS4 = False
 
-# sid=3 (Filings) / ssid=15 (Public Issues) / smid=10 (Draft Offer Documents
-# filed with SEBI, i.e. DRHPs) — see the module docstring for the sid/ssid/smid scheme.
-LISTING_URL = "https://www.sebi.gov.in/sebiweb/home/HomeAction.do?doListing=yes&sid=3&ssid=15&smid=10"
+# sid=3 (Filings) / ssid=15 (Public Issues) / smid=11 — see the module docstring
+# for the sid/ssid/smid scheme. Override at runtime with MARKETWIRE_SEBI_PUBLIC_ISSUES_URL.
+LISTING_URL = "https://www.sebi.gov.in/sebiweb/home/HomeAction.do?doListing=yes&sid=3&ssid=15&smid=11"
 UA = common.UA
 IST = common.IST
 _DATE_RE = re.compile(r"[A-Z][a-z]{2}\s+\d{1,2},\s+\d{4}")

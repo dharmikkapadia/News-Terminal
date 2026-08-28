@@ -1,7 +1,7 @@
 """MarketWire — an RBI + SEBI regulatory wire, with market news alongside.
 
 A Streamlit app that fetches RBI's Press Releases + Notifications RSS feeds,
-SEBI's Public Issues (DRHP) listing and Trading Economics' news stream (India +
+SEBI's Public Issues listing and Trading Economics' news stream (India +
 World) server-side (browsers can't read most RSS directly because of CORS, and
 neither the SEBI listing nor the TE stream has an RSS feed at all), remembers
 items in a small SQLite store so the wire accumulates over time, and presents
