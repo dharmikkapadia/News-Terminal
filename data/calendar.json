@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-08-28T16:02:19+05:30",
+  "captured_at": "2026-08-28T16:32:15+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -207,11 +207,11 @@
       "url": "https://tradingeconomics.com/india/industrial-production",
       "importance": null,
       "actual": "6.7%",
-      "previous": "7.3%",
+      "previous": "8.8%",
       "consensus": "6%",
       "forecast": "5.7%",
       "first_seen": "2026-08-02T16:00:42+05:30",
-      "updated_at": "2026-08-28T16:02:19+05:30"
+      "updated_at": "2026-08-28T16:32:15+05:30"
     },
     {
       "id": "401532",
@@ -221,11 +221,11 @@
       "url": "https://tradingeconomics.com/india/manufacturing-production",
       "importance": null,
       "actual": "7.3%",
-      "previous": "7.8%",
+      "previous": "9.5%",
       "consensus": "",
       "forecast": "5.5%",
       "first_seen": "2026-08-02T16:00:42+05:30",
-      "updated_at": "2026-08-28T16:02:19+05:30"
+      "updated_at": "2026-08-28T16:32:15+05:30"
     },
     {
       "id": "396595",
@@ -440,8 +440,9 @@
       "actual": "",
       "previous": "0.88%",
       "consensus": "",
-      "forecast": "",
-      "first_seen": "2026-08-17T16:02:05+05:30"
+      "forecast": "0.5%",
+      "first_seen": "2026-08-17T16:02:05+05:30",
+      "updated_at": "2026-08-28T16:32:15+05:30"
     },
     {
       "id": "401139",
@@ -453,8 +454,9 @@
       "actual": "",
       "previous": "4.45%",
       "consensus": "",
-      "forecast": "",
-      "first_seen": "2026-08-17T16:02:05+05:30"
+      "forecast": "4.7%",
+      "first_seen": "2026-08-17T16:02:05+05:30",
+      "updated_at": "2026-08-28T16:32:15+05:30"
     },
     {
       "id": "400349",
@@ -466,8 +468,9 @@
       "actual": "",
       "previous": "6.65%",
       "consensus": "",
-      "forecast": "",
-      "first_seen": "2026-08-19T12:03:43+05:30"
+      "forecast": "6.7%",
+      "first_seen": "2026-08-19T12:03:43+05:30",
+      "updated_at": "2026-08-28T16:32:15+05:30"
     },
     {
       "id": "400591",
@@ -479,8 +482,9 @@
       "actual": "",
       "previous": "20.05%",
       "consensus": "",
-      "forecast": "",
-      "first_seen": "2026-08-19T12:03:43+05:30"
+      "forecast": "15.0%",
+      "first_seen": "2026-08-19T12:03:43+05:30",
+      "updated_at": "2026-08-28T16:32:15+05:30"
     },
     {
       "id": "400425",
@@ -492,8 +496,9 @@
       "actual": "",
       "previous": "9.78%",
       "consensus": "",
-      "forecast": "",
-      "first_seen": "2026-08-19T12:03:43+05:30"
+      "forecast": "10.0%",
+      "first_seen": "2026-08-19T12:03:43+05:30",
+      "updated_at": "2026-08-28T16:32:15+05:30"
     },
     {
       "id": "402190",
@@ -505,8 +510,9 @@
       "actual": "",
       "previous": "8.29%",
       "consensus": "",
-      "forecast": "",
-      "first_seen": "2026-08-19T12:03:43+05:30"
+      "forecast": "8.5%",
+      "first_seen": "2026-08-19T12:03:43+05:30",
+      "updated_at": "2026-08-28T16:32:15+05:30"
     },
     {
       "id": "400792",
