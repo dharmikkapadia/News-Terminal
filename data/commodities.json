@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-08-28T05:32:09+05:30",
+  "captured_at": "2026-08-28T06:02:04+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -11,9 +11,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
       "source": "Trading Economics · CO1:COM",
-      "price": 88.514,
-      "prev_close": 86.94,
-      "change_pct": 1.81,
+      "price": 88.421,
+      "prev_close": 88.322,
+      "change_pct": -0.11,
       "currency": "USD",
       "as_of": "2026-08-28"
     },
@@ -25,9 +25,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Trading Economics · XAUUSD:CUR",
-      "price": 4593.39,
-      "prev_close": 4593.04,
-      "change_pct": -0.01,
+      "price": 4591.25,
+      "prev_close": 4581.98,
+      "change_pct": -0.2,
       "currency": "USD",
       "as_of": "2026-08-28"
     },
@@ -39,11 +39,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
       "source": "Trading Economics · XAGUSD:CUR",
-      "price": 69.174,
-      "prev_close": 68.095,
-      "change_pct": 1.58,
+      "price": 69.176,
+      "prev_close": 69.096,
+      "change_pct": -0.12,
       "currency": "USD",
-      "as_of": "2026-08-27"
+      "as_of": "2026-08-28"
     },
     {
       "key": "copper",
@@ -53,9 +53,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Trading Economics · HG1:COM",
-      "price": 6.584,
-      "prev_close": 6.5685,
-      "change_pct": -0.23,
+      "price": 6.578,
+      "prev_close": 6.5665,
+      "change_pct": -0.17,
       "currency": "USD",
       "as_of": "2026-08-28"
     },
@@ -81,11 +81,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/zinc",
       "source": "Trading Economics · LMZSDS03:COM",
-      "price": 3875.55,
-      "prev_close": 3866.55,
-      "change_pct": -0.23,
+      "price": 3886.75,
+      "prev_close": 3875.55,
+      "change_pct": 0.29,
       "currency": "USD",
-      "as_of": "2026-08-27"
+      "as_of": "2026-08-28"
     },
     {
       "key": "steel",
