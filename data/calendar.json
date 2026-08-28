@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-08-28T17:02:38+05:30",
+  "captured_at": "2026-08-28T17:32:06+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -234,12 +234,12 @@
       "event": "Bank Loan Growth YoY",
       "url": "https://tradingeconomics.com/india/loan-growth",
       "importance": null,
-      "actual": "",
+      "actual": "18.3%",
       "previous": "19.3%",
       "consensus": "",
       "forecast": "",
       "first_seen": "2026-07-26T17:05:23+05:30",
-      "updated_at": "2026-08-21T17:02:47+05:30"
+      "updated_at": "2026-08-28T17:32:06+05:30"
     },
     {
       "id": "396596",
@@ -248,12 +248,12 @@
       "event": "Deposit Growth YoY",
       "url": "https://tradingeconomics.com/india/deposit-growth",
       "importance": null,
-      "actual": "",
+      "actual": "14.7%",
       "previous": "15.4%",
       "consensus": "",
       "forecast": "",
       "first_seen": "2026-07-26T17:05:23+05:30",
-      "updated_at": "2026-08-21T17:02:47+05:30"
+      "updated_at": "2026-08-28T17:32:06+05:30"
     },
     {
       "id": "396637",
@@ -276,12 +276,12 @@
       "event": "M3 Money Supply YoY",
       "url": "https://tradingeconomics.com/india/money-supply-m3",
       "importance": null,
-      "actual": "",
+      "actual": "14.2%",
       "previous": "14.7%",
       "consensus": "",
       "forecast": "",
       "first_seen": "2026-07-24T17:00:45+05:30",
-      "updated_at": "2026-08-26T18:03:12+05:30"
+      "updated_at": "2026-08-28T17:32:06+05:30"
     },
     {
       "id": "402558",
@@ -588,10 +588,11 @@
       "url": "https://tradingeconomics.com/india/money-supply-m3",
       "importance": null,
       "actual": "",
-      "previous": "",
+      "previous": "14.2%",
       "consensus": "",
       "forecast": "",
-      "first_seen": "2026-08-21T17:02:47+05:30"
+      "first_seen": "2026-08-21T17:02:47+05:30",
+      "updated_at": "2026-08-28T17:32:06+05:30"
     },
     {
       "id": "396827",
@@ -601,10 +602,11 @@
       "url": "https://tradingeconomics.com/india/loan-growth",
       "importance": null,
       "actual": "",
-      "previous": "",
+      "previous": "18.3%",
       "consensus": "",
       "forecast": "",
-      "first_seen": "2026-08-23T17:01:50+05:30"
+      "first_seen": "2026-08-23T17:01:50+05:30",
+      "updated_at": "2026-08-28T17:32:06+05:30"
     },
     {
       "id": "396828",
@@ -614,10 +616,11 @@
       "url": "https://tradingeconomics.com/india/deposit-growth",
       "importance": null,
       "actual": "",
-      "previous": "",
+      "previous": "14.7%",
       "consensus": "",
       "forecast": "",
-      "first_seen": "2026-08-23T17:01:50+05:30"
+      "first_seen": "2026-08-23T17:01:50+05:30",
+      "updated_at": "2026-08-28T17:32:06+05:30"
     },
     {
       "id": "396826",
