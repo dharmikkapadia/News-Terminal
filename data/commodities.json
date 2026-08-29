@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-08-29T10:31:32+05:30",
+  "captured_at": "2026-08-29T11:01:32+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -82,8 +82,8 @@
       "chart_url": "https://tradingeconomics.com/commodity/zinc",
       "source": "Trading Economics · LMZSDS03:COM",
       "price": 3857.8,
-      "prev_close": 3840.05,
-      "change_pct": -0.46,
+      "prev_close": 3857.8,
+      "change_pct": 0.0,
       "currency": "USD",
       "as_of": "2026-08-28"
     },
@@ -127,8 +127,7 @@
       "prev_close": 3561.0,
       "change_pct": -0.65,
       "currency": "USD",
-      "as_of": "2026-08-29",
-      "stale": true
+      "as_of": "2026-08-29"
     },
     {
       "key": "freight",
