@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-08-31T15:32:18+05:30",
+  "captured_at": "2026-08-31T16:01:50+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -178,12 +178,12 @@
       "event": "GDP Growth Rate YoY",
       "url": "https://tradingeconomics.com/india/gdp-growth-annual",
       "importance": null,
-      "actual": "",
+      "actual": "7.8%",
       "previous": "7.8%",
       "consensus": "7.1%",
       "forecast": "7.2%",
       "first_seen": "2026-08-05T16:00:54+05:30",
-      "updated_at": "2026-08-25T21:32:11+05:30"
+      "updated_at": "2026-08-31T16:01:50+05:30"
     },
     {
       "id": "417762",
