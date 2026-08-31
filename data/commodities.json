@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-08-31T16:31:35+05:30",
+  "captured_at": "2026-08-31T17:01:59+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -11,9 +11,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
       "source": "Trading Economics · CO1:COM",
-      "price": 90.88,
+      "price": 91.12,
       "prev_close": 88.1,
-      "change_pct": 3.16,
+      "change_pct": 3.43,
       "currency": "USD",
       "as_of": "2026-08-31"
     },
@@ -25,9 +25,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Trading Economics · XAUUSD:CUR",
-      "price": 4454.24,
+      "price": 4463.11,
       "prev_close": 4453.0,
-      "change_pct": 0.03,
+      "change_pct": 0.23,
       "currency": "USD",
       "as_of": "2026-08-31"
     },
@@ -39,9 +39,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
       "source": "Trading Economics · XAGUSD:CUR",
-      "price": 67.228,
+      "price": 67.428,
       "prev_close": 66.152,
-      "change_pct": 1.63,
+      "change_pct": 1.93,
       "currency": "USD",
       "as_of": "2026-08-31"
     },
@@ -53,9 +53,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Trading Economics · HG1:COM",
-      "price": 6.5891,
+      "price": 6.6025,
       "prev_close": 6.562,
-      "change_pct": 0.41,
+      "change_pct": 0.62,
       "currency": "USD",
       "as_of": "2026-08-31"
     },
@@ -95,11 +95,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/steel",
       "source": "Yahoo Finance · HRC=F",
-      "price": 1205.0,
-      "prev_close": 1203.0,
-      "change_pct": 0.17,
+      "price": 1211.0,
+      "prev_close": 1205.0,
+      "change_pct": 0.5,
       "currency": "USD",
-      "as_of": "2026-08-28"
+      "as_of": "2026-08-31"
     },
     {
       "key": "iron",
