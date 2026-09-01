@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-09-01T23:31:58+05:30",
+  "captured_at": "2026-09-02T00:02:02+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -11,9 +11,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
       "source": "Trading Economics · CO1:COM",
-      "price": 94.272,
+      "price": 94.718,
       "prev_close": 90.49,
-      "change_pct": 4.18,
+      "change_pct": 4.67,
       "currency": "USD",
       "as_of": "2026-09-01"
     },
@@ -25,9 +25,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Trading Economics · XAUUSD:CUR",
-      "price": 4343.75,
-      "prev_close": 4246.36,
-      "change_pct": -2.19,
+      "price": 4336.26,
+      "prev_close": 4231.38,
+      "change_pct": -2.36,
       "currency": "USD",
       "as_of": "2026-09-01"
     },
@@ -39,9 +39,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
       "source": "Trading Economics · XAGUSD:CUR",
-      "price": 64.622,
-      "prev_close": 62.724,
-      "change_pct": -2.85,
+      "price": 64.451,
+      "prev_close": 62.382,
+      "change_pct": -3.11,
       "currency": "USD",
       "as_of": "2026-09-01"
     },
@@ -53,9 +53,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Trading Economics · HG1:COM",
-      "price": 6.4789,
-      "prev_close": 6.3643,
-      "change_pct": -1.74,
+      "price": 6.4497,
+      "prev_close": 6.3059,
+      "change_pct": -2.18,
       "currency": "USD",
       "as_of": "2026-09-01"
     },
@@ -127,7 +127,7 @@
       "prev_close": 3538.0,
       "change_pct": -2.2,
       "currency": "USD",
-      "as_of": "2026-09-01"
+      "as_of": "2026-09-02"
     },
     {
       "key": "freight",
