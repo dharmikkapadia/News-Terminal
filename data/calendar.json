@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-09-01T10:33:58+05:30",
+  "captured_at": "2026-09-01T11:04:07+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -544,10 +544,11 @@
       "url": "https://tradingeconomics.com/india/manufacturing-pmi",
       "importance": null,
       "actual": "",
-      "previous": "",
+      "previous": "52.8",
       "consensus": "",
       "forecast": "53.2",
-      "first_seen": "2026-08-28T10:31:34+05:30"
+      "first_seen": "2026-08-28T10:31:34+05:30",
+      "updated_at": "2026-09-01T11:04:07+05:30"
     },
     {
       "id": "399292",
