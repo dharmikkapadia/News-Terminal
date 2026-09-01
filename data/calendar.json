@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-09-01T17:32:00+05:30",
+  "captured_at": "2026-09-01T18:02:39+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -206,11 +206,12 @@
       "event": "Current Account",
       "url": "https://tradingeconomics.com/india/current-account",
       "importance": null,
-      "actual": "",
-      "previous": "$7.1B",
+      "actual": "$-4.2B",
+      "previous": "$6.5B",
       "consensus": "",
       "forecast": "$ -7.4B",
-      "first_seen": "2026-08-06T17:30:55+05:30"
+      "first_seen": "2026-08-06T17:30:55+05:30",
+      "updated_at": "2026-09-01T18:02:39+05:30"
     },
     {
       "id": "396688",
