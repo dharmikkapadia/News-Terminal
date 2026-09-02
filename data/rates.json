@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-09-02T22:22:32+05:30",
+  "captured_at": "2026-09-02T23:54:36+05:30",
   "source": "https://www.rbi.org.in/",
   "policy_rates": {
     "repo_rate": 5.25,
@@ -15,39 +15,39 @@
   "exchange_rates": {
     "as_of": "As at 1.00pm of September 02, 2026",
     "source": "FBIL",
-    "inr_per_usd": 94.454,
-    "inr_per_gbp": 127.537,
-    "inr_per_eur": 109.477,
+    "inr_per_usd": 94.458,
+    "inr_per_gbp": 127.4,
+    "inr_per_eur": 109.4371,
     "inr_per_100_jpy": 59.51,
     "inr_per_aed": 25.857,
     "inr_per_10000_idr": 53.4479,
     "fx_te": {
       "inr_per_usd": {
         "label": "USD/INR",
-        "prev_close": 93.936,
-        "change_pct": -0.55,
+        "prev_close": 93.944,
+        "change_pct": -0.54,
         "chart_url": "https://tradingeconomics.com/currencies?quote=inr",
         "as_of": "2026-09-02",
         "source": "Trading Economics · USDINR:CUR"
       },
       "inr_per_eur": {
         "label": "EUR/INR",
-        "prev_close": 108.8549,
-        "change_pct": -0.57,
+        "prev_close": 108.7751,
+        "change_pct": -0.6,
         "chart_url": "https://tradingeconomics.com/currencies?quote=inr",
         "as_of": "2026-09-02",
         "source": "Trading Economics · EURINR:CUR"
       },
       "inr_per_gbp": {
         "label": "GBP/INR",
-        "prev_close": 126.709,
-        "change_pct": -0.65,
+        "prev_close": 126.435,
+        "change_pct": -0.75,
         "chart_url": "https://tradingeconomics.com/currencies?quote=inr",
         "as_of": "2026-09-02",
         "source": "Trading Economics · GBPINR:CUR"
       }
     },
-    "fx_te_captured_at": "2026-09-02T23:32:19+05:30"
+    "fx_te_captured_at": "2026-09-02T23:54:37+05:30"
   },
   "lending_deposit_rates": {
     "base_rate": [
@@ -70,7 +70,7 @@
         4.0,
         5.25
       ],
-      "as_on": "as on  September 01, 2026"
+      "as_on": "as on September 01, 2026"
     },
     "gsec_yields": [
       {
@@ -99,11 +99,11 @@
       "182_day": 5.6588,
       "364_day": 5.909
     },
-    "gsec_tbill_as_on": "as on  September 01, 2026",
+    "gsec_tbill_as_on": "as on September 01, 2026",
     "capital_market": {
       "sensex": 76944.28,
       "nifty_50": 24055.8,
-      "as_on": "as on  September 01, 2026"
+      "as_on": "as on September 01, 2026"
     },
     "bonds": {
       "source": "investing.com",
