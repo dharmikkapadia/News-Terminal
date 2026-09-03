@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-09-03T14:33:54+05:30",
+  "captured_at": "2026-09-03T15:02:27+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -308,34 +308,6 @@
       "first_seen": "2026-08-16T17:01:54+05:30"
     },
     {
-      "id": "403566",
-      "date": "2026-09-12",
-      "time": "10:30 AM",
-      "event": "Inflation Rate MoM",
-      "url": "https://tradingeconomics.com/india/inflation-rate-mom",
-      "importance": null,
-      "actual": "",
-      "previous": "0.88%",
-      "consensus": "",
-      "forecast": "0.5%",
-      "first_seen": "2026-08-17T16:02:05+05:30",
-      "updated_at": "2026-08-28T16:32:15+05:30"
-    },
-    {
-      "id": "401139",
-      "date": "2026-09-12",
-      "time": "10:30 AM",
-      "event": "Inflation Rate YoY",
-      "url": "https://tradingeconomics.com/india/inflation-cpi",
-      "importance": null,
-      "actual": "",
-      "previous": "4.45%",
-      "consensus": "",
-      "forecast": "4.7%",
-      "first_seen": "2026-08-17T16:02:05+05:30",
-      "updated_at": "2026-08-28T16:32:15+05:30"
-    },
-    {
       "id": "400349",
       "date": "2026-09-14",
       "time": "06:30 AM",
@@ -390,6 +362,34 @@
       "forecast": "8.5%",
       "first_seen": "2026-08-19T12:03:43+05:30",
       "updated_at": "2026-08-28T16:32:15+05:30"
+    },
+    {
+      "id": "403566",
+      "date": "2026-09-14",
+      "time": "10:30 AM",
+      "event": "Inflation Rate MoM",
+      "url": "https://tradingeconomics.com/india/inflation-rate-mom",
+      "importance": null,
+      "actual": "",
+      "previous": "0.88%",
+      "consensus": "",
+      "forecast": "0.5%",
+      "first_seen": "2026-08-17T16:02:05+05:30",
+      "updated_at": "2026-09-03T15:02:27+05:30"
+    },
+    {
+      "id": "401139",
+      "date": "2026-09-14",
+      "time": "10:30 AM",
+      "event": "Inflation Rate YoY",
+      "url": "https://tradingeconomics.com/india/inflation-cpi",
+      "importance": null,
+      "actual": "",
+      "previous": "4.45%",
+      "consensus": "",
+      "forecast": "4.7%",
+      "first_seen": "2026-08-17T16:02:05+05:30",
+      "updated_at": "2026-09-03T15:02:27+05:30"
     },
     {
       "id": "400792",
