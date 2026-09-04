@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-09-04T17:02:23+05:30",
+  "captured_at": "2026-09-04T17:32:13+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -617,6 +617,19 @@
       "consensus": "",
       "forecast": "",
       "first_seen": "2026-09-04T17:02:23+05:30"
+    },
+    {
+      "id": "400467",
+      "date": "2026-09-30",
+      "time": "12:00 PM",
+      "event": "External Debt",
+      "url": "https://tradingeconomics.com/india/external-debt",
+      "importance": null,
+      "actual": "",
+      "previous": "$762.8B",
+      "consensus": "",
+      "forecast": "",
+      "first_seen": "2026-09-04T17:32:13+05:30"
     }
   ]
 }
