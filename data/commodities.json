@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-09-04T23:31:54+05:30",
+  "captured_at": "2026-09-05T00:02:11+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -11,9 +11,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
       "source": "Trading Economics · CO1:COM",
-      "price": 95.666,
+      "price": 96.313,
       "prev_close": 95.52,
-      "change_pct": 0.15,
+      "change_pct": 0.83,
       "currency": "USD",
       "as_of": "2026-09-04"
     },
@@ -25,9 +25,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Trading Economics · XAUUSD:CUR",
-      "price": 4416.98,
-      "prev_close": 4360.33,
-      "change_pct": -1.27,
+      "price": 4424.6,
+      "prev_close": 4375.57,
+      "change_pct": -1.1,
       "currency": "USD",
       "as_of": "2026-09-04"
     },
@@ -39,9 +39,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
       "source": "Trading Economics · XAGUSD:CUR",
-      "price": 65.855,
-      "prev_close": 64.746,
-      "change_pct": -1.66,
+      "price": 65.992,
+      "prev_close": 65.02,
+      "change_pct": -1.45,
       "currency": "USD",
       "as_of": "2026-09-04"
     },
@@ -53,9 +53,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Trading Economics · HG1:COM",
-      "price": 6.5662,
-      "prev_close": 6.5554,
-      "change_pct": -0.16,
+      "price": 6.5659,
+      "prev_close": 6.5548,
+      "change_pct": -0.17,
       "currency": "USD",
       "as_of": "2026-09-04"
     },
@@ -127,7 +127,7 @@
       "prev_close": 3369.0,
       "change_pct": 1.9,
       "currency": "USD",
-      "as_of": "2026-09-04"
+      "as_of": "2026-09-05"
     },
     {
       "key": "freight",
