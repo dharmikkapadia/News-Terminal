@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-09-07T03:01:55+05:30",
+  "captured_at": "2026-09-07T03:31:47+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -15,7 +15,7 @@
       "prev_close": 95.52,
       "change_pct": 0.8,
       "currency": "USD",
-      "as_of": "2026-09-04"
+      "as_of": "2026-09-06"
     },
     {
       "key": "gold",
