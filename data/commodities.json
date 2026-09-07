@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-09-08T02:32:26+05:30",
+  "captured_at": "2026-09-08T03:01:57+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -53,9 +53,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Trading Economics · HG1:COM",
-      "price": 6.6205,
-      "prev_close": 6.597,
-      "change_pct": 0.36,
+      "price": 6.5505,
+      "prev_close": 6.504,
+      "change_pct": -0.7,
       "currency": "USD",
       "as_of": "2026-09-07"
     },
