@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-09-08T01:01:24+05:30",
+  "captured_at": "2026-09-08T01:31:54+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -67,9 +67,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/aluminum",
       "source": "Trading Economics · LMAHDS03:COM",
-      "price": 3311.4,
+      "price": 3311.45,
       "prev_close": 3292.5,
-      "change_pct": 0.57,
+      "change_pct": 0.58,
       "currency": "USD",
       "as_of": "2026-09-07"
     },
