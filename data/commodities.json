@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-09-08T05:02:13+05:30",
+  "captured_at": "2026-09-08T05:32:01+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -11,11 +11,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
       "source": "Trading Economics · CO1:COM",
-      "price": 97.223,
-      "prev_close": 96.28,
-      "change_pct": 0.98,
+      "price": 97.208,
+      "prev_close": 97.161,
+      "change_pct": 0.05,
       "currency": "USD",
-      "as_of": "2026-09-07"
+      "as_of": "2026-09-08"
     },
     {
       "key": "gold",
@@ -25,11 +25,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Trading Economics · XAUUSD:CUR",
-      "price": 4411.17,
-      "prev_close": 4389.78,
-      "change_pct": -0.48,
+      "price": 4420.94,
+      "prev_close": 4409.32,
+      "change_pct": -0.26,
       "currency": "USD",
-      "as_of": "2026-09-07"
+      "as_of": "2026-09-08"
     },
     {
       "key": "silver",
@@ -39,11 +39,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
       "source": "Trading Economics · XAGUSD:CUR",
-      "price": 66.268,
+      "price": 66.561,
       "prev_close": 65.99,
-      "change_pct": 0.42,
+      "change_pct": 0.87,
       "currency": "USD",
-      "as_of": "2026-09-07"
+      "as_of": "2026-09-08"
     },
     {
       "key": "copper",
@@ -53,11 +53,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Trading Economics · HG1:COM",
-      "price": 6.6381,
+      "price": 6.6469,
       "prev_close": 6.597,
-      "change_pct": 0.62,
+      "change_pct": 0.76,
       "currency": "USD",
-      "as_of": "2026-09-07"
+      "as_of": "2026-09-08"
     },
     {
       "key": "aluminium",
