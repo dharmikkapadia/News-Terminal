@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-09-08T08:01:53+05:30",
+  "captured_at": "2026-09-08T08:32:15+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -11,9 +11,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
       "source": "Trading Economics · CO1:COM",
-      "price": 97.146,
-      "prev_close": 97.131,
-      "change_pct": -0.02,
+      "price": 97.339,
+      "prev_close": 97.161,
+      "change_pct": 0.18,
       "currency": "USD",
       "as_of": "2026-09-08"
     },
@@ -25,9 +25,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Trading Economics · XAUUSD:CUR",
-      "price": 4424.86,
+      "price": 4423.97,
       "prev_close": 4404.98,
-      "change_pct": 0.45,
+      "change_pct": 0.43,
       "currency": "USD",
       "as_of": "2026-09-08"
     },
@@ -39,9 +39,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
       "source": "Trading Economics · XAGUSD:CUR",
-      "price": 66.737,
+      "price": 66.665,
       "prev_close": 66.14,
-      "change_pct": 0.9,
+      "change_pct": 0.79,
       "currency": "USD",
       "as_of": "2026-09-08"
     },
@@ -53,9 +53,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Trading Economics · HG1:COM",
-      "price": 6.6806,
+      "price": 6.6771,
       "prev_close": 6.6458,
-      "change_pct": 0.52,
+      "change_pct": 0.47,
       "currency": "USD",
       "as_of": "2026-09-08"
     },
@@ -81,9 +81,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/zinc",
       "source": "Trading Economics · LMZSDS03:COM",
-      "price": 4000.35,
+      "price": 4008.55,
       "prev_close": 3973.05,
-      "change_pct": 0.69,
+      "change_pct": 0.89,
       "currency": "USD",
       "as_of": "2026-09-08"
     },
