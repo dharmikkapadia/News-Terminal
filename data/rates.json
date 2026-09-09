@@ -15,39 +15,39 @@
   "exchange_rates": {
     "as_of": "As at 1.00pm of September 08, 2026",
     "source": "FBIL",
-    "inr_per_usd": 94.8108,
-    "inr_per_gbp": 128.433,
-    "inr_per_eur": 110.0722,
+    "inr_per_usd": 94.4919,
+    "inr_per_gbp": 128.0107,
+    "inr_per_eur": 109.798,
     "inr_per_100_jpy": 61.69,
     "inr_per_aed": 25.7882,
     "inr_per_10000_idr": 53.7366,
     "fx_te": {
       "inr_per_usd": {
         "label": "USD/INR",
-        "prev_close": 94.5662,
-        "change_pct": 0.26,
+        "prev_close": 94.4303,
+        "change_pct": 0.07,
         "chart_url": "https://tradingeconomics.com/currencies?quote=inr",
         "as_of": "2026-09-08",
-        "source": "Trading Economics · USDINR:CUR"
+        "source": "Yahoo Finance · USDINR=X"
       },
       "inr_per_eur": {
         "label": "EUR/INR",
-        "prev_close": 109.9104,
-        "change_pct": 0.15,
+        "prev_close": 109.651,
+        "change_pct": 0.13,
         "chart_url": "https://tradingeconomics.com/currencies?quote=inr",
         "as_of": "2026-09-08",
-        "source": "Trading Economics · EURINR:CUR"
+        "source": "Yahoo Finance · EURINR=X"
       },
       "inr_per_gbp": {
         "label": "GBP/INR",
-        "prev_close": 128.051,
-        "change_pct": 0.3,
+        "prev_close": 127.6541,
+        "change_pct": 0.28,
         "chart_url": "https://tradingeconomics.com/currencies?quote=inr",
         "as_of": "2026-09-08",
-        "source": "Trading Economics · GBPINR:CUR"
+        "source": "Yahoo Finance · GBPINR=X"
       }
     },
-    "fx_te_captured_at": "2026-09-09T05:32:00+05:30"
+    "fx_te_captured_at": "2026-09-09T06:01:41+05:30"
   },
   "lending_deposit_rates": {
     "base_rate": [
@@ -108,7 +108,7 @@
     "bonds": {
       "source": "investing.com",
       "board_url": "https://www.investing.com/rates-bonds/india-government-bonds",
-      "as_of": "2026-09-09T05:32:30+05:30",
+      "as_of": "2026-09-09T06:02:18+05:30",
       "benchmark_tenor": "10Y",
       "curve": [
         {
