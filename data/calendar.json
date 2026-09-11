@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-09-11T09:44:01+05:30",
+  "captured_at": "2026-09-11T10:01:57+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -679,6 +679,32 @@
       "consensus": "",
       "forecast": "",
       "first_seen": "2026-09-10T10:31:53+05:30"
+    },
+    {
+      "id": "419625",
+      "date": "2026-10-07",
+      "time": "04:30 AM",
+      "event": "Cash Reserve Ratio",
+      "url": "https://tradingeconomics.com/india/cash-reserve-ratio",
+      "importance": null,
+      "actual": "",
+      "previous": "3%",
+      "consensus": "",
+      "forecast": "",
+      "first_seen": "2026-09-11T10:01:57+05:30"
+    },
+    {
+      "id": "419619",
+      "date": "2026-10-07",
+      "time": "04:30 AM",
+      "event": "RBI Interest Rate Decision",
+      "url": "https://tradingeconomics.com/india/interest-rate",
+      "importance": null,
+      "actual": "",
+      "previous": "5.25%",
+      "consensus": "",
+      "forecast": "5.25%",
+      "first_seen": "2026-09-11T10:01:57+05:30"
     }
   ]
 }
