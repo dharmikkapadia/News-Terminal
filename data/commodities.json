@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-09-11T06:01:39+05:30",
+  "captured_at": "2026-09-11T06:32:01+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -11,9 +11,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
       "source": "Trading Economics · CO1:COM",
-      "price": 108.167,
+      "price": 108.313,
       "prev_close": 107.63,
-      "change_pct": 0.5,
+      "change_pct": 0.63,
       "currency": "USD",
       "as_of": "2026-09-11"
     },
@@ -25,9 +25,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Trading Economics · XAUUSD:CUR",
-      "price": 4323.67,
+      "price": 4329.78,
       "prev_close": 4317.34,
-      "change_pct": 0.15,
+      "change_pct": 0.29,
       "currency": "USD",
       "as_of": "2026-09-11"
     },
@@ -39,9 +39,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
       "source": "Trading Economics · XAGUSD:CUR",
-      "price": 63.62,
+      "price": 63.655,
       "prev_close": 63.548,
-      "change_pct": 0.11,
+      "change_pct": 0.17,
       "currency": "USD",
       "as_of": "2026-09-11"
     },
@@ -53,9 +53,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Trading Economics · HG1:COM",
-      "price": 6.448,
-      "prev_close": 6.429,
-      "change_pct": -0.29,
+      "price": 6.4619,
+      "prev_close": 6.4568,
+      "change_pct": -0.08,
       "currency": "USD",
       "as_of": "2026-09-11"
     },
@@ -81,9 +81,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/zinc",
       "source": "Trading Economics · LMZSDS03:COM",
-      "price": 3857.48,
-      "prev_close": 3839.56,
-      "change_pct": -0.46,
+      "price": 3873.13,
+      "prev_close": 3870.86,
+      "change_pct": -0.06,
       "currency": "USD",
       "as_of": "2026-09-11"
     },
@@ -141,7 +141,7 @@
       "prev_close": 3590.05,
       "change_pct": 0.0,
       "currency": "USD",
-      "as_of": "2026-09-10"
+      "as_of": "2026-09-11"
     }
   ]
 }
