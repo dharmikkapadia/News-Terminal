@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-09-11T16:33:23+05:30",
+  "captured_at": "2026-09-11T17:01:56+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -231,12 +231,12 @@
       "event": "Foreign Exchange Reserves",
       "url": "https://tradingeconomics.com/india/foreign-exchange-reserves",
       "importance": null,
-      "actual": "",
+      "actual": "$785.71B",
       "previous": "$740.8B",
       "consensus": "",
       "forecast": "",
       "first_seen": "2026-08-16T17:01:54+05:30",
-      "updated_at": "2026-09-04T17:02:23+05:30"
+      "updated_at": "2026-09-11T17:01:56+05:30"
     },
     {
       "id": "421236",
@@ -465,10 +465,11 @@
       "url": "https://tradingeconomics.com/india/foreign-exchange-reserves",
       "importance": null,
       "actual": "",
-      "previous": "",
+      "previous": "$785.71B",
       "consensus": "",
       "forecast": "",
-      "first_seen": "2026-08-23T17:01:50+05:30"
+      "first_seen": "2026-08-23T17:01:50+05:30",
+      "updated_at": "2026-09-11T17:01:56+05:30"
     },
     {
       "id": "401244",
