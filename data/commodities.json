@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-09-12T07:01:56+05:30",
+  "captured_at": "2026-09-12T07:31:40+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -127,7 +127,8 @@
       "prev_close": 3558.0,
       "change_pct": -1.01,
       "currency": "USD",
-      "as_of": "2026-09-12"
+      "as_of": "2026-09-12",
+      "stale": true
     },
     {
       "key": "freight",
