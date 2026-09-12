@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-09-12T21:31:39+05:30",
+  "captured_at": "2026-09-12T22:01:38+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -68,8 +68,8 @@
       "chart_url": "https://tradingeconomics.com/commodity/aluminum",
       "source": "Trading Economics · LMAHDS03:COM",
       "price": 3256.65,
-      "prev_close": 3233.7,
-      "change_pct": -0.7,
+      "prev_close": 3256.65,
+      "change_pct": 0.0,
       "currency": "USD",
       "as_of": "2026-09-11"
     },
@@ -82,8 +82,8 @@
       "chart_url": "https://tradingeconomics.com/commodity/zinc",
       "source": "Trading Economics · LMZSDS03:COM",
       "price": 3865.55,
-      "prev_close": 3855.7,
-      "change_pct": -0.25,
+      "prev_close": 3865.55,
+      "change_pct": 0.0,
       "currency": "USD",
       "as_of": "2026-09-11"
     },
