@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-09-13T09:31:51+05:30",
+  "captured_at": "2026-09-13T18:33:14+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -623,6 +623,19 @@
       "consensus": "",
       "forecast": "5.25%",
       "first_seen": "2026-09-11T10:01:57+05:30"
+    },
+    {
+      "id": "397022",
+      "date": "2026-10-09",
+      "time": "11:30 AM",
+      "event": "Foreign Exchange Reserves",
+      "url": "https://tradingeconomics.com/india/foreign-exchange-reserves",
+      "importance": null,
+      "actual": "",
+      "previous": "",
+      "consensus": "",
+      "forecast": "$ 710B",
+      "first_seen": "2026-09-13T18:33:14+05:30"
     }
   ]
 }
