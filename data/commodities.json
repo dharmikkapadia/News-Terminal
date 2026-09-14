@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-09-14T22:01:42+05:30",
+  "captured_at": "2026-09-14T22:31:39+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -11,9 +11,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
       "source": "Trading Economics · CO1:COM",
-      "price": 107.466,
+      "price": 105.942,
       "prev_close": 104.61,
-      "change_pct": 2.73,
+      "change_pct": 1.27,
       "currency": "USD",
       "as_of": "2026-09-14"
     },
@@ -25,9 +25,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Trading Economics · XAUUSD:CUR",
-      "price": 4300.19,
-      "prev_close": 4250.02,
-      "change_pct": -1.15,
+      "price": 4314.25,
+      "prev_close": 4278.14,
+      "change_pct": -0.83,
       "currency": "USD",
       "as_of": "2026-09-14"
     },
@@ -39,9 +39,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
       "source": "Trading Economics · XAGUSD:CUR",
-      "price": 63.415,
-      "prev_close": 62.564,
-      "change_pct": -1.32,
+      "price": 63.715,
+      "prev_close": 63.164,
+      "change_pct": -0.86,
       "currency": "USD",
       "as_of": "2026-09-14"
     },
@@ -53,9 +53,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Trading Economics · HG1:COM",
-      "price": 6.3124,
-      "prev_close": 6.1553,
-      "change_pct": -2.43,
+      "price": 6.3263,
+      "prev_close": 6.1831,
+      "change_pct": -2.21,
       "currency": "USD",
       "as_of": "2026-09-14"
     },
@@ -67,9 +67,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/aluminum",
       "source": "Trading Economics · LMAHDS03:COM",
-      "price": 3246.95,
-      "prev_close": 3237.25,
-      "change_pct": -0.3,
+      "price": 3251.5,
+      "prev_close": 3246.35,
+      "change_pct": -0.16,
       "currency": "USD",
       "as_of": "2026-09-14"
     },
@@ -109,11 +109,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/iron-ore",
       "source": "Trading Economics · SCO:COM",
-      "price": 98.02,
-      "prev_close": 97.36,
-      "change_pct": -0.67,
+      "price": 97.55,
+      "prev_close": 97.08,
+      "change_pct": -0.48,
       "currency": "USD",
-      "as_of": "2026-09-11"
+      "as_of": "2026-09-14"
     },
     {
       "key": "coffee",
@@ -123,9 +123,9 @@
       "cadence": "daily",
       "chart_url": "https://www.investing.com/commodities/london-coffee",
       "source": "investing.com · london-coffee",
-      "price": 3545.0,
+      "price": 3538.0,
       "prev_close": 3522.0,
-      "change_pct": 0.65,
+      "change_pct": 0.45,
       "currency": "USD",
       "as_of": "2026-09-14"
     },
