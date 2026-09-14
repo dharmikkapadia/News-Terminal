@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-09-14T12:01:39+05:30",
+  "captured_at": "2026-09-14T12:31:46+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -187,12 +187,12 @@
       "event": "WPI Food Index YoY",
       "url": "https://tradingeconomics.com/india/wpi-food-index-yoy",
       "importance": null,
-      "actual": "",
+      "actual": "7.05%",
       "previous": "6.65%",
       "consensus": "",
       "forecast": "6.7%",
       "first_seen": "2026-08-19T12:03:43+05:30",
-      "updated_at": "2026-08-28T16:32:15+05:30"
+      "updated_at": "2026-09-14T12:31:46+05:30"
     },
     {
       "id": "400591",
@@ -201,12 +201,12 @@
       "event": "WPI Fuel YoY",
       "url": "https://tradingeconomics.com/india/wpi-fuel-yoy",
       "importance": null,
-      "actual": "",
+      "actual": "22.93%",
       "previous": "20.05%",
       "consensus": "",
       "forecast": "15.0%",
       "first_seen": "2026-08-19T12:03:43+05:30",
-      "updated_at": "2026-08-28T16:32:15+05:30"
+      "updated_at": "2026-09-14T12:31:46+05:30"
     },
     {
       "id": "400425",
@@ -215,12 +215,12 @@
       "event": "WPI Inflation YoY",
       "url": "https://tradingeconomics.com/india/wholesale-prices-yoy",
       "importance": null,
-      "actual": "",
+      "actual": "9.92%",
       "previous": "9.78%",
       "consensus": "9.89%",
       "forecast": "10.0%",
       "first_seen": "2026-08-19T12:03:43+05:30",
-      "updated_at": "2026-09-09T14:32:37+05:30"
+      "updated_at": "2026-09-14T12:31:46+05:30"
     },
     {
       "id": "402190",
@@ -229,12 +229,12 @@
       "event": "WPI Manufacturing YoY",
       "url": "https://tradingeconomics.com/india/wpi-manufacturing-yoy",
       "importance": null,
-      "actual": "",
+      "actual": "8.37%",
       "previous": "8.29%",
       "consensus": "",
       "forecast": "8.5%",
       "first_seen": "2026-08-19T12:03:43+05:30",
-      "updated_at": "2026-08-28T16:32:15+05:30"
+      "updated_at": "2026-09-14T12:31:46+05:30"
     },
     {
       "id": "403566",
