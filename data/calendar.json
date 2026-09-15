@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-09-15T14:01:58+05:30",
+  "captured_at": "2026-09-15T14:31:58+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -239,42 +239,44 @@
     {
       "id": "400792",
       "date": "2026-09-15",
-      "time": "",
+      "time": "08:45 AM",
       "event": "Balance of Trade",
       "url": "https://tradingeconomics.com/india/balance-of-trade",
       "importance": null,
-      "actual": "",
+      "actual": "$-26.86B",
       "previous": "$-31.98B",
       "consensus": "",
       "forecast": "$-33.0B",
       "first_seen": "2026-08-20T14:32:10+05:30",
-      "updated_at": "2026-09-11T14:02:21+05:30"
+      "updated_at": "2026-09-15T14:31:58+05:30"
     },
     {
       "id": "402458",
       "date": "2026-09-15",
-      "time": "",
+      "time": "08:45 AM",
       "event": "Exports",
       "url": "https://tradingeconomics.com/india/exports",
       "importance": null,
-      "actual": "",
-      "previous": "$44.2B",
+      "actual": "$43.81B",
+      "previous": "$44.24B",
       "consensus": "",
       "forecast": "",
-      "first_seen": "2026-08-20T14:32:10+05:30"
+      "first_seen": "2026-08-20T14:32:10+05:30",
+      "updated_at": "2026-09-15T14:31:58+05:30"
     },
     {
       "id": "400485",
       "date": "2026-09-15",
-      "time": "",
+      "time": "08:45 AM",
       "event": "Imports",
       "url": "https://tradingeconomics.com/india/imports",
       "importance": null,
-      "actual": "",
-      "previous": "$76.2B",
+      "actual": "$70.67B",
+      "previous": "$76.22B",
       "consensus": "",
       "forecast": "",
-      "first_seen": "2026-08-20T14:32:10+05:30"
+      "first_seen": "2026-08-20T14:32:10+05:30",
+      "updated_at": "2026-09-15T14:31:58+05:30"
     },
     {
       "id": "400133",
@@ -594,8 +596,9 @@
       "actual": "",
       "previous": "5.25%",
       "consensus": "",
-      "forecast": "5.25%",
-      "first_seen": "2026-09-11T10:01:57+05:30"
+      "forecast": "5.5%",
+      "first_seen": "2026-09-11T10:01:57+05:30",
+      "updated_at": "2026-09-15T14:31:58+05:30"
     },
     {
       "id": "397022",
