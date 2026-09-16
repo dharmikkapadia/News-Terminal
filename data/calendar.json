@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-09-16T05:01:46+05:30",
+  "captured_at": "2026-09-16T05:32:01+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -267,16 +267,16 @@
     {
       "id": "400659",
       "date": "2026-09-16",
-      "time": "",
+      "time": "12:00 AM",
       "event": "Passenger Vehicles Sales YoY",
       "url": "https://tradingeconomics.com/india/total-vehicle-sales",
       "importance": null,
-      "actual": "",
+      "actual": "33.2%",
       "previous": "31.2%",
       "consensus": "",
       "forecast": "",
       "first_seen": "2026-08-20T05:31:53+05:30",
-      "updated_at": "2026-09-15T13:31:57+05:30"
+      "updated_at": "2026-09-16T05:32:01+05:30"
     },
     {
       "id": "396804",
