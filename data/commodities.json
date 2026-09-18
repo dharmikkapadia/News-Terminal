@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-09-18T05:31:41+05:30",
+  "captured_at": "2026-09-18T05:33:29+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -11,9 +11,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
       "source": "Trading Economics · CO1:COM",
-      "price": 103.885,
-      "prev_close": 101.94,
-      "change_pct": -1.84,
+      "price": 103.918,
+      "prev_close": 102.006,
+      "change_pct": -1.81,
       "currency": "USD",
       "as_of": "2026-09-18"
     },
@@ -25,7 +25,7 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Trading Economics · XAUUSD:CUR",
-      "price": 4343.25,
+      "price": 4343.16,
       "prev_close": 4263.77,
       "change_pct": 1.86,
       "currency": "USD",
@@ -39,11 +39,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
       "source": "Trading Economics · XAGUSD:CUR",
-      "price": 65.419,
+      "price": 65.401,
       "prev_close": 62.957,
-      "change_pct": 3.91,
+      "change_pct": 3.88,
       "currency": "USD",
-      "as_of": "2026-09-17"
+      "as_of": "2026-09-18"
     },
     {
       "key": "copper",
@@ -53,9 +53,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Trading Economics · HG1:COM",
-      "price": 6.5479,
+      "price": 6.5529,
       "prev_close": 6.4315,
-      "change_pct": 1.81,
+      "change_pct": 1.89,
       "currency": "USD",
       "as_of": "2026-09-18"
     },
@@ -81,11 +81,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/zinc",
       "source": "Trading Economics · LMZSDS03:COM",
-      "price": 3888.7,
+      "price": 3879.4,
       "prev_close": 3811.0,
-      "change_pct": 2.04,
+      "change_pct": 1.79,
       "currency": "USD",
-      "as_of": "2026-09-17"
+      "as_of": "2026-09-18"
     },
     {
       "key": "steel",
