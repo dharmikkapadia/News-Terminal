@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-09-18T16:33:10+05:30",
+  "captured_at": "2026-09-18T17:02:01+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -272,12 +272,12 @@
       "event": "Foreign Exchange Reserves",
       "url": "https://tradingeconomics.com/india/foreign-exchange-reserves",
       "importance": null,
-      "actual": "",
+      "actual": "$780.78B",
       "previous": "$785.71B",
       "consensus": "",
       "forecast": "",
       "first_seen": "2026-08-23T17:01:50+05:30",
-      "updated_at": "2026-09-11T17:01:56+05:30"
+      "updated_at": "2026-09-18T17:02:01+05:30"
     },
     {
       "id": "396804",
@@ -356,10 +356,11 @@
       "url": "https://tradingeconomics.com/india/foreign-exchange-reserves",
       "importance": null,
       "actual": "",
-      "previous": "",
+      "previous": "$780.78B",
       "consensus": "",
       "forecast": "",
-      "first_seen": "2026-08-30T17:01:52+05:30"
+      "first_seen": "2026-08-30T17:01:52+05:30",
+      "updated_at": "2026-09-18T17:02:01+05:30"
     },
     {
       "id": "401848",
@@ -621,6 +622,19 @@
       "consensus": "",
       "forecast": "8.9%",
       "first_seen": "2026-09-18T12:02:19+05:30"
+    },
+    {
+      "id": "397043",
+      "date": "2026-10-14",
+      "time": "11:30 AM",
+      "event": "M3 Money Supply YoY",
+      "url": "https://tradingeconomics.com/india/money-supply-m3",
+      "importance": null,
+      "actual": "",
+      "previous": "",
+      "consensus": "",
+      "forecast": "",
+      "first_seen": "2026-09-18T17:02:01+05:30"
     }
   ]
 }
