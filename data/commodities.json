@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-09-19T09:02:07+05:30",
+  "captured_at": "2026-09-19T09:32:29+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -95,9 +95,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/steel",
       "source": "Yahoo Finance · HRC=F",
-      "price": 1282.0,
+      "price": 1237.0,
       "prev_close": 1237.0,
-      "change_pct": 3.64,
+      "change_pct": 0.0,
       "currency": "USD",
       "as_of": "2026-09-18"
     },
@@ -137,9 +137,9 @@
       "cadence": "weekly",
       "chart_url": "https://tradingeconomics.com/commodity/containerized-freight-index",
       "source": "Trading Economics · SHSPSCFI:IND",
-      "price": 3662.18,
+      "price": 3687.83,
       "prev_close": 3662.18,
-      "change_pct": 0.0,
+      "change_pct": 0.7,
       "currency": "USD",
       "as_of": "2026-09-18"
     }
