@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-09-22T04:39:17+05:30",
+  "captured_at": "2026-09-22T05:01:25+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -11,9 +11,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
       "source": "Trading Economics · CO1:COM",
-      "price": 100.093,
-      "prev_close": 96.316,
-      "change_pct": -3.64,
+      "price": 100.345,
+      "prev_close": 96.82,
+      "change_pct": -3.39,
       "currency": "USD",
       "as_of": "2026-09-21"
     },
@@ -25,9 +25,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Trading Economics · XAUUSD:CUR",
-      "price": 4363.39,
-      "prev_close": 4343.33,
-      "change_pct": -0.46,
+      "price": 4360.97,
+      "prev_close": 4338.49,
+      "change_pct": -0.51,
       "currency": "USD",
       "as_of": "2026-09-21"
     },
@@ -39,9 +39,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
       "source": "Trading Economics · XAGUSD:CUR",
-      "price": 66.393,
+      "price": 66.297,
       "prev_close": 66.236,
-      "change_pct": 0.24,
+      "change_pct": 0.09,
       "currency": "USD",
       "as_of": "2026-09-21"
     },
@@ -53,9 +53,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Trading Economics · HG1:COM",
-      "price": 6.7213,
+      "price": 6.7156,
       "prev_close": 6.615,
-      "change_pct": 1.61,
+      "change_pct": 1.52,
       "currency": "USD",
       "as_of": "2026-09-21"
     },
@@ -127,7 +127,8 @@
       "prev_close": 3331.0,
       "change_pct": -1.91,
       "currency": "USD",
-      "as_of": "2026-09-22"
+      "as_of": "2026-09-22",
+      "stale": true
     },
     {
       "key": "freight",
