@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-09-22T08:01:39+05:30",
+  "captured_at": "2026-09-22T08:31:47+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -11,9 +11,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
       "source": "Trading Economics · CO1:COM",
-      "price": 101.087,
+      "price": 101.344,
       "prev_close": 100.34,
-      "change_pct": 0.74,
+      "change_pct": 1.0,
       "currency": "USD",
       "as_of": "2026-09-22"
     },
@@ -25,9 +25,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Trading Economics · XAUUSD:CUR",
-      "price": 4350.16,
+      "price": 4343.93,
       "prev_close": 4343.02,
-      "change_pct": 0.16,
+      "change_pct": 0.02,
       "currency": "USD",
       "as_of": "2026-09-22"
     },
@@ -39,9 +39,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
       "source": "Trading Economics · XAGUSD:CUR",
-      "price": 66.281,
+      "price": 66.105,
       "prev_close": 66.003,
-      "change_pct": 0.42,
+      "change_pct": 0.15,
       "currency": "USD",
       "as_of": "2026-09-22"
     },
@@ -53,9 +53,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Trading Economics · HG1:COM",
-      "price": 6.7408,
+      "price": 6.7545,
       "prev_close": 6.6865,
-      "change_pct": 0.81,
+      "change_pct": 1.02,
       "currency": "USD",
       "as_of": "2026-09-22"
     },
@@ -81,9 +81,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/zinc",
       "source": "Trading Economics · LMZSDS03:COM",
-      "price": 3940.48,
+      "price": 3937.2,
       "prev_close": 3931.05,
-      "change_pct": 0.24,
+      "change_pct": 0.16,
       "currency": "USD",
       "as_of": "2026-09-22"
     },
