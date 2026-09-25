@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-09-25T16:31:36+05:30",
+  "captured_at": "2026-09-25T17:01:45+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -316,12 +316,12 @@
       "event": "Foreign Exchange Reserves",
       "url": "https://tradingeconomics.com/india/foreign-exchange-reserves",
       "importance": null,
-      "actual": "",
+      "actual": "$765.9B",
       "previous": "$780.78B",
       "consensus": "",
       "forecast": "",
       "first_seen": "2026-08-30T17:01:52+05:30",
-      "updated_at": "2026-09-18T17:02:01+05:30"
+      "updated_at": "2026-09-25T17:01:45+05:30"
     },
     {
       "id": "396902",
@@ -442,10 +442,11 @@
       "url": "https://tradingeconomics.com/india/foreign-exchange-reserves",
       "importance": null,
       "actual": "",
-      "previous": "",
+      "previous": "$765.9B",
       "consensus": "",
       "forecast": "",
-      "first_seen": "2026-09-06T17:02:02+05:30"
+      "first_seen": "2026-09-06T17:02:02+05:30",
+      "updated_at": "2026-09-25T17:01:45+05:30"
     },
     {
       "id": "396968",
@@ -710,6 +711,19 @@
       "consensus": "",
       "forecast": "",
       "first_seen": "2026-09-20T17:02:15+05:30"
+    },
+    {
+      "id": "402871",
+      "date": "2026-10-21",
+      "time": "11:30 AM",
+      "event": "Infrastructure Output YoY",
+      "url": "https://tradingeconomics.com/india/construction-output",
+      "importance": null,
+      "actual": "",
+      "previous": "4.8%",
+      "consensus": "",
+      "forecast": "5.7%",
+      "first_seen": "2026-09-25T17:01:45+05:30"
     }
   ]
 }
