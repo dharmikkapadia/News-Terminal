@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-09-25T13:01:24+05:30",
+  "captured_at": "2026-09-25T13:03:16+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -11,9 +11,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
       "source": "Trading Economics · CO1:COM",
-      "price": 106.29,
-      "prev_close": 105.98,
-      "change_pct": -0.29,
+      "price": 106.183,
+      "prev_close": 105.765,
+      "change_pct": -0.39,
       "currency": "USD",
       "as_of": "2026-09-25"
     },
@@ -25,9 +25,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Trading Economics · XAUUSD:CUR",
-      "price": 4275.05,
+      "price": 4276.95,
       "prev_close": 4274.65,
-      "change_pct": 0.01,
+      "change_pct": 0.05,
       "currency": "USD",
       "as_of": "2026-09-25"
     },
@@ -53,9 +53,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Trading Economics · HG1:COM",
-      "price": 6.6525,
-      "prev_close": 6.5865,
-      "change_pct": -0.98,
+      "price": 6.6615,
+      "prev_close": 6.6045,
+      "change_pct": -0.85,
       "currency": "USD",
       "as_of": "2026-09-25"
     },
@@ -67,9 +67,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/aluminum",
       "source": "Trading Economics · LMAHDS03:COM",
-      "price": 3260.4,
+      "price": 3262.85,
       "prev_close": 3256.0,
-      "change_pct": 0.14,
+      "change_pct": 0.21,
       "currency": "USD",
       "as_of": "2026-09-25"
     },
@@ -81,9 +81,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/zinc",
       "source": "Trading Economics · LMZSDS03:COM",
-      "price": 3969.77,
-      "prev_close": 3962.69,
-      "change_pct": -0.18,
+      "price": 3971.25,
+      "prev_close": 3965.65,
+      "change_pct": -0.14,
       "currency": "USD",
       "as_of": "2026-09-25"
     },
@@ -124,11 +124,10 @@
       "chart_url": "https://www.investing.com/commodities/london-coffee",
       "source": "investing.com · london-coffee",
       "price": 3284.0,
-      "prev_close": 3306.0,
+      "prev_close": 3284.0,
       "change_pct": -0.67,
       "currency": "USD",
-      "as_of": "2026-09-24",
-      "stale": true
+      "as_of": "2026-09-25"
     },
     {
       "key": "freight",
