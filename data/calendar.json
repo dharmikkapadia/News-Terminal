@@ -1,21 +1,8 @@
 {
-  "captured_at": "2026-09-26T23:31:55+05:30",
+  "captured_at": "2026-09-27T00:01:52+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
-    {
-      "id": "421236",
-      "date": "2026-09-12",
-      "time": "",
-      "event": "BRICS Summit",
-      "url": "https://tradingeconomics.com/india/calendar",
-      "importance": null,
-      "actual": "",
-      "previous": "",
-      "consensus": "",
-      "forecast": "",
-      "first_seen": "2026-09-04T21:42:47+05:30"
-    },
     {
       "id": "421237",
       "date": "2026-09-13",
