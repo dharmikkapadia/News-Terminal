@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-09-28T00:01:28+05:30",
+  "captured_at": "2026-09-28T01:01:36+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -124,7 +124,7 @@
       "chart_url": "https://www.investing.com/commodities/london-coffee",
       "source": "investing.com · london-coffee",
       "price": 3362.0,
-      "prev_close": 3284.0,
+      "prev_close": 3362.0,
       "change_pct": 2.38,
       "currency": "USD",
       "as_of": "2026-09-28"
