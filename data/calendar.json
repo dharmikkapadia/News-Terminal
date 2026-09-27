@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-09-27T10:01:48+05:30",
+  "captured_at": "2026-09-27T10:31:58+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -698,6 +698,45 @@
       "consensus": "",
       "forecast": "5.7%",
       "first_seen": "2026-09-25T17:01:45+05:30"
+    },
+    {
+      "id": "399305",
+      "date": "2026-10-23",
+      "time": "05:00 AM",
+      "event": "HSBC Composite PMI Flash",
+      "url": "https://tradingeconomics.com/india/composite-pmi",
+      "importance": null,
+      "actual": "",
+      "previous": "",
+      "consensus": "",
+      "forecast": "",
+      "first_seen": "2026-09-27T10:31:58+05:30"
+    },
+    {
+      "id": "399280",
+      "date": "2026-10-23",
+      "time": "05:00 AM",
+      "event": "HSBC Manufacturing PMI Flash",
+      "url": "https://tradingeconomics.com/india/manufacturing-pmi",
+      "importance": null,
+      "actual": "",
+      "previous": "",
+      "consensus": "",
+      "forecast": "",
+      "first_seen": "2026-09-27T10:31:58+05:30"
+    },
+    {
+      "id": "399293",
+      "date": "2026-10-23",
+      "time": "05:00 AM",
+      "event": "HSBC Services PMI Flash",
+      "url": "https://tradingeconomics.com/india/services-pmi",
+      "importance": null,
+      "actual": "",
+      "previous": "",
+      "consensus": "",
+      "forecast": "",
+      "first_seen": "2026-09-27T10:31:58+05:30"
     }
   ]
 }
