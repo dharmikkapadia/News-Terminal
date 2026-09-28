@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-09-28T12:31:59+05:30",
+  "captured_at": "2026-09-28T13:01:46+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -306,10 +306,10 @@
       "importance": null,
       "actual": "",
       "previous": "6.7%",
-      "consensus": "6%",
+      "consensus": "6.5%",
       "forecast": "5.5%",
       "first_seen": "2026-09-02T16:11:05+05:30",
-      "updated_at": "2026-09-25T15:31:38+05:30"
+      "updated_at": "2026-09-28T13:01:46+05:30"
     },
     {
       "id": "400928",
