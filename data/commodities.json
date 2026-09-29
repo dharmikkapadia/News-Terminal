@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-09-29T05:01:25+05:30",
+  "captured_at": "2026-09-29T05:31:44+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -11,11 +11,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
       "source": "Trading Economics · CO1:COM",
-      "price": 105.976,
+      "price": 105.95,
       "prev_close": 104.32,
-      "change_pct": 1.59,
+      "change_pct": 1.56,
       "currency": "USD",
-      "as_of": "2026-09-28"
+      "as_of": "2026-09-29"
     },
     {
       "key": "gold",
@@ -25,11 +25,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Trading Economics · XAUUSD:CUR",
-      "price": 4128.91,
-      "prev_close": 3972.82,
-      "change_pct": -3.64,
+      "price": 4126.9,
+      "prev_close": 3968.8,
+      "change_pct": -3.69,
       "currency": "USD",
-      "as_of": "2026-09-28"
+      "as_of": "2026-09-29"
     },
     {
       "key": "silver",
@@ -39,11 +39,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
       "source": "Trading Economics · XAGUSD:CUR",
-      "price": 60.822,
-      "prev_close": 57.385,
-      "change_pct": -5.35,
+      "price": 60.777,
+      "prev_close": 57.295,
+      "change_pct": -5.42,
       "currency": "USD",
-      "as_of": "2026-09-28"
+      "as_of": "2026-09-29"
     },
     {
       "key": "copper",
@@ -53,11 +53,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Trading Economics · HG1:COM",
-      "price": 6.5585,
-      "prev_close": 6.4175,
-      "change_pct": -2.1,
+      "price": 6.5553,
+      "prev_close": 6.4111,
+      "change_pct": -2.15,
       "currency": "USD",
-      "as_of": "2026-09-28"
+      "as_of": "2026-09-29"
     },
     {
       "key": "aluminium",
