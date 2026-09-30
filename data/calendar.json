@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-09-30T16:01:47+05:30",
+  "captured_at": "2026-09-30T16:31:50+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -192,11 +192,12 @@
       "event": "Government Budget Value",
       "url": "https://tradingeconomics.com/india/government-budget-value",
       "importance": null,
-      "actual": "",
+      "actual": "INR -7102.5B",
       "previous": "INR-4551.4B",
       "consensus": "",
       "forecast": "INR-5700.0B",
-      "first_seen": "2026-09-04T16:02:38+05:30"
+      "first_seen": "2026-09-04T16:02:38+05:30",
+      "updated_at": "2026-09-30T16:31:50+05:30"
     },
     {
       "id": "400467",
