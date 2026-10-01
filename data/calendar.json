@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-10-01T10:01:42+05:30",
+  "captured_at": "2026-10-01T10:32:05+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -206,12 +206,12 @@
       "event": "HSBC Manufacturing PMI Final",
       "url": "https://tradingeconomics.com/india/manufacturing-pmi",
       "importance": null,
-      "actual": "",
+      "actual": "55.1",
       "previous": "52.8",
       "consensus": "55.7",
       "forecast": "55.7",
       "first_seen": "2026-09-05T10:32:02+05:30",
-      "updated_at": "2026-09-25T18:31:43+05:30"
+      "updated_at": "2026-10-01T10:32:05+05:30"
     },
     {
       "id": "396950",
