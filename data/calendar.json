@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-10-04T16:32:09+05:30",
+  "captured_at": "2026-10-04T17:01:34+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -584,6 +584,45 @@
       "consensus": "",
       "forecast": "INR -6800B",
       "first_seen": "2026-10-04T16:02:30+05:30"
+    },
+    {
+      "id": "397159",
+      "date": "2026-10-30",
+      "time": "11:30 AM",
+      "event": "Bank Loan Growth YoY",
+      "url": "https://tradingeconomics.com/india/loan-growth",
+      "importance": null,
+      "actual": "",
+      "previous": "",
+      "consensus": "",
+      "forecast": "",
+      "first_seen": "2026-10-04T17:01:34+05:30"
+    },
+    {
+      "id": "397160",
+      "date": "2026-10-30",
+      "time": "11:30 AM",
+      "event": "Deposit Growth YoY",
+      "url": "https://tradingeconomics.com/india/deposit-growth",
+      "importance": null,
+      "actual": "",
+      "previous": "",
+      "consensus": "",
+      "forecast": "",
+      "first_seen": "2026-10-04T17:01:34+05:30"
+    },
+    {
+      "id": "397158",
+      "date": "2026-10-30",
+      "time": "11:30 AM",
+      "event": "Foreign Exchange Reserves",
+      "url": "https://tradingeconomics.com/india/foreign-exchange-reserves",
+      "importance": null,
+      "actual": "",
+      "previous": "",
+      "consensus": "",
+      "forecast": "",
+      "first_seen": "2026-10-04T17:01:34+05:30"
     }
   ]
 }
