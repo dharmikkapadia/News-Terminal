@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-10-06T06:31:52+05:30",
+  "captured_at": "2026-10-06T06:46:33+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -11,9 +11,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
       "source": "Trading Economics · CO1:COM",
-      "price": 100.398,
+      "price": 100.58,
       "prev_close": 100.32,
-      "change_pct": 0.08,
+      "change_pct": 0.26,
       "currency": "USD",
       "as_of": "2026-10-06"
     },
@@ -25,9 +25,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Trading Economics · XAUUSD:CUR",
-      "price": 4150.44,
+      "price": 4149.1,
       "prev_close": 4139.75,
-      "change_pct": 0.26,
+      "change_pct": 0.23,
       "currency": "USD",
       "as_of": "2026-10-06"
     },
@@ -39,9 +39,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
       "source": "Trading Economics · XAGUSD:CUR",
-      "price": 61.172,
+      "price": 61.095,
       "prev_close": 61.055,
-      "change_pct": 0.19,
+      "change_pct": 0.07,
       "currency": "USD",
       "as_of": "2026-10-06"
     },
@@ -53,9 +53,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Trading Economics · HG1:COM",
-      "price": 6.6071,
+      "price": 6.6235,
       "prev_close": 6.5855,
-      "change_pct": 0.33,
+      "change_pct": 0.58,
       "currency": "USD",
       "as_of": "2026-10-06"
     },
@@ -81,9 +81,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/zinc",
       "source": "Trading Economics · LMZSDS03:COM",
-      "price": 3743.4,
+      "price": 3748.02,
       "prev_close": 3742.3,
-      "change_pct": 0.03,
+      "change_pct": 0.15,
       "currency": "USD",
       "as_of": "2026-10-06"
     },
