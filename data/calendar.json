@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-10-07T10:01:41+05:30",
+  "captured_at": "2026-10-07T10:32:21+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -220,12 +220,12 @@
       "event": "Cash Reserve Ratio",
       "url": "https://tradingeconomics.com/india/cash-reserve-ratio",
       "importance": null,
-      "actual": "",
+      "actual": "3%",
       "previous": "3%",
       "consensus": "3%",
       "forecast": "3.0%",
       "first_seen": "2026-09-11T10:01:57+05:30",
-      "updated_at": "2026-10-02T18:02:06+05:30"
+      "updated_at": "2026-10-07T10:32:21+05:30"
     },
     {
       "id": "419619",
@@ -234,12 +234,12 @@
       "event": "RBI Interest Rate Decision",
       "url": "https://tradingeconomics.com/india/interest-rate",
       "importance": null,
-      "actual": "",
+      "actual": "5.5%",
       "previous": "5.25%",
       "consensus": "5.5%",
       "forecast": "5.5%",
       "first_seen": "2026-09-11T10:01:57+05:30",
-      "updated_at": "2026-09-28T16:31:57+05:30"
+      "updated_at": "2026-10-07T10:32:21+05:30"
     },
     {
       "id": "397022",
@@ -611,6 +611,19 @@
       "consensus": "",
       "forecast": "",
       "first_seen": "2026-10-04T17:01:34+05:30"
+    },
+    {
+      "id": "397177",
+      "date": "2026-11-02",
+      "time": "05:00 AM",
+      "event": "HSBC Manufacturing PMI Final",
+      "url": "https://tradingeconomics.com/india/manufacturing-pmi",
+      "importance": null,
+      "actual": "",
+      "previous": "55.1",
+      "consensus": "",
+      "forecast": "",
+      "first_seen": "2026-10-07T10:32:21+05:30"
     }
   ]
 }
