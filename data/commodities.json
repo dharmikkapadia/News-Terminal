@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-10-12T03:31:53+05:30",
+  "captured_at": "2026-10-12T04:01:23+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -11,11 +11,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
       "source": "Trading Economics · CO1:COM",
-      "price": 104.43,
-      "prev_close": 104.28,
-      "change_pct": 0.14,
+      "price": 105.599,
+      "prev_close": 104.43,
+      "change_pct": 1.12,
       "currency": "USD",
-      "as_of": "2026-10-09"
+      "as_of": "2026-10-11"
     },
     {
       "key": "gold",
@@ -25,11 +25,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Trading Economics · XAUUSD:CUR",
-      "price": 4193.87,
-      "prev_close": 4133.12,
-      "change_pct": 1.47,
+      "price": 4186.07,
+      "prev_close": 4178.27,
+      "change_pct": -0.19,
       "currency": "USD",
-      "as_of": "2026-10-09"
+      "as_of": "2026-10-11"
     },
     {
       "key": "silver",
@@ -39,11 +39,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
       "source": "Trading Economics · XAGUSD:CUR",
-      "price": 60.802,
-      "prev_close": 59.175,
-      "change_pct": 2.75,
+      "price": 60.928,
+      "prev_close": 60.802,
+      "change_pct": 0.21,
       "currency": "USD",
-      "as_of": "2026-10-09"
+      "as_of": "2026-10-11"
     },
     {
       "key": "copper",
@@ -53,11 +53,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Trading Economics · HG1:COM",
-      "price": 6.663,
-      "prev_close": 6.519,
-      "change_pct": 2.21,
+      "price": 6.6541,
+      "prev_close": 6.6452,
+      "change_pct": -0.13,
       "currency": "USD",
-      "as_of": "2026-10-09"
+      "as_of": "2026-10-11"
     },
     {
       "key": "aluminium",
