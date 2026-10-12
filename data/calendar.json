@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-10-12T16:02:51+05:30",
+  "captured_at": "2026-10-12T16:33:05+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -207,11 +207,11 @@
       "url": "https://tradingeconomics.com/india/inflation-cpi",
       "importance": null,
       "actual": "5.54%",
-      "previous": "4.82%",
+      "previous": "4.83%",
       "consensus": "5.4%",
       "forecast": "5.3%",
       "first_seen": "2026-09-16T16:02:07+05:30",
-      "updated_at": "2026-10-12T16:02:51+05:30"
+      "updated_at": "2026-10-12T16:33:05+05:30"
     },
     {
       "id": "401974",
