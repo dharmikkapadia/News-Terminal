@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-10-12T23:01:21+05:30",
+  "captured_at": "2026-10-12T23:31:41+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -11,9 +11,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
       "source": "Trading Economics · CO1:COM",
-      "price": 106.837,
+      "price": 106.726,
       "prev_close": 104.72,
-      "change_pct": 2.02,
+      "change_pct": 1.92,
       "currency": "USD",
       "as_of": "2026-10-12"
     },
@@ -25,9 +25,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Trading Economics · XAUUSD:CUR",
-      "price": 4166.91,
-      "prev_close": 4139.95,
-      "change_pct": -0.64,
+      "price": 4171.56,
+      "prev_close": 4149.25,
+      "change_pct": -0.53,
       "currency": "USD",
       "as_of": "2026-10-12"
     },
@@ -39,9 +39,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
       "source": "Trading Economics · XAGUSD:CUR",
-      "price": 60.208,
-      "prev_close": 59.614,
-      "change_pct": -0.98,
+      "price": 60.277,
+      "prev_close": 59.752,
+      "change_pct": -0.86,
       "currency": "USD",
       "as_of": "2026-10-12"
     },
@@ -53,9 +53,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Trading Economics · HG1:COM",
-      "price": 6.6936,
+      "price": 6.6987,
       "prev_close": 6.6425,
-      "change_pct": 0.77,
+      "change_pct": 0.85,
       "currency": "USD",
       "as_of": "2026-10-12"
     },
@@ -95,9 +95,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/steel",
       "source": "Yahoo Finance · HRC=F",
-      "price": 1295.0,
+      "price": 1298.0,
       "prev_close": 1276.0,
-      "change_pct": 1.49,
+      "change_pct": 1.72,
       "currency": "USD",
       "as_of": "2026-10-12"
     },
