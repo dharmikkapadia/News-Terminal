@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-10-12T13:32:24+05:30",
+  "captured_at": "2026-10-12T14:01:52+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -222,8 +222,9 @@
       "actual": "",
       "previous": "7.05%",
       "consensus": "",
-      "forecast": "6.8%",
-      "first_seen": "2026-09-18T12:02:19+05:30"
+      "forecast": "7.4%",
+      "first_seen": "2026-09-18T12:02:19+05:30",
+      "updated_at": "2026-10-12T14:01:52+05:30"
     },
     {
       "id": "402621",
@@ -235,8 +236,9 @@
       "actual": "",
       "previous": "22.93%",
       "consensus": "",
-      "forecast": "20.4%",
-      "first_seen": "2026-09-18T12:02:19+05:30"
+      "forecast": "23.4%",
+      "first_seen": "2026-09-18T12:02:19+05:30",
+      "updated_at": "2026-10-12T14:01:52+05:30"
     },
     {
       "id": "402281",
@@ -247,10 +249,10 @@
       "importance": null,
       "actual": "",
       "previous": "9.92%",
-      "consensus": "10.2%",
-      "forecast": "12%",
+      "consensus": "10.18%",
+      "forecast": "10.5%",
       "first_seen": "2026-09-18T12:02:19+05:30",
-      "updated_at": "2026-10-12T00:02:08+05:30"
+      "updated_at": "2026-10-12T14:01:52+05:30"
     },
     {
       "id": "400196",
@@ -262,8 +264,9 @@
       "actual": "",
       "previous": "8.37%",
       "consensus": "",
-      "forecast": "8.9%",
-      "first_seen": "2026-09-18T12:02:19+05:30"
+      "forecast": "8.3%",
+      "first_seen": "2026-09-18T12:02:19+05:30",
+      "updated_at": "2026-10-12T14:01:52+05:30"
     },
     {
       "id": "397043",
