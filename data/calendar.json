@@ -1,36 +1,8 @@
 {
-  "captured_at": "2026-10-14T23:59:01+05:30",
+  "captured_at": "2026-10-15T00:02:00+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
-    {
-      "id": "417763",
-      "date": "2026-09-30",
-      "time": "10:30 AM",
-      "event": "Government Budget Value",
-      "url": "https://tradingeconomics.com/india/government-budget-value",
-      "importance": null,
-      "actual": "INR -7102.5B",
-      "previous": "INR-4551.4B",
-      "consensus": "",
-      "forecast": "INR-5700.0B",
-      "first_seen": "2026-09-04T16:02:38+05:30",
-      "updated_at": "2026-09-30T16:31:50+05:30"
-    },
-    {
-      "id": "400467",
-      "date": "2026-09-30",
-      "time": "12:00 PM",
-      "event": "External Debt",
-      "url": "https://tradingeconomics.com/india/external-debt",
-      "importance": null,
-      "actual": "$778.2B",
-      "previous": "$762.8B",
-      "consensus": "",
-      "forecast": "$775.0B",
-      "first_seen": "2026-09-04T17:32:13+05:30",
-      "updated_at": "2026-09-30T17:32:17+05:30"
-    },
     {
       "id": "396924",
       "date": "2026-10-01",

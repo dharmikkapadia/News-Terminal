@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-10-14T23:58:46+05:30",
+  "captured_at": "2026-10-15T00:01:47+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -11,9 +11,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
       "source": "Trading Economics · CO1:COM",
-      "price": 106.123,
+      "price": 106.081,
       "prev_close": 105.69,
-      "change_pct": 0.41,
+      "change_pct": 0.37,
       "currency": "USD",
       "as_of": "2026-10-14"
     },
@@ -25,9 +25,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Trading Economics · XAUUSD:CUR",
-      "price": 4091.88,
-      "prev_close": 4022.25,
-      "change_pct": -1.67,
+      "price": 4094.14,
+      "prev_close": 4026.77,
+      "change_pct": -1.62,
       "currency": "USD",
       "as_of": "2026-10-14"
     },
@@ -39,9 +39,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
       "source": "Trading Economics · XAGUSD:CUR",
-      "price": 55.628,
-      "prev_close": 52.086,
-      "change_pct": -5.99,
+      "price": 55.617,
+      "prev_close": 52.064,
+      "change_pct": -6.0,
       "currency": "USD",
       "as_of": "2026-10-14"
     },
@@ -53,9 +53,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Trading Economics · HG1:COM",
-      "price": 6.579,
-      "prev_close": 6.48,
-      "change_pct": -1.48,
+      "price": 6.5805,
+      "prev_close": 6.483,
+      "change_pct": -1.46,
       "currency": "USD",
       "as_of": "2026-10-14"
     },
@@ -127,7 +127,7 @@
       "prev_close": 3456.0,
       "change_pct": 0.72,
       "currency": "USD",
-      "as_of": "2026-10-14"
+      "as_of": "2026-10-15"
     },
     {
       "key": "freight",
