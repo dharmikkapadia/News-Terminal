@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-10-15T15:31:48+05:30",
+  "captured_at": "2026-10-15T16:02:04+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -290,12 +290,12 @@
       "event": "Unemployment Rate",
       "url": "https://tradingeconomics.com/india/unemployment-rate",
       "importance": null,
-      "actual": "",
+      "actual": "5%",
       "previous": "5%",
       "consensus": "5.2%",
       "forecast": "5.20%",
       "first_seen": "2026-09-19T16:02:02+05:30",
-      "updated_at": "2026-10-12T00:15:40+05:30"
+      "updated_at": "2026-10-15T16:02:04+05:30"
     },
     {
       "id": "397066",
