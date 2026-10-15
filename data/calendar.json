@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-10-15T14:31:58+05:30",
+  "captured_at": "2026-10-15T15:02:18+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -249,11 +249,11 @@
       "url": "https://tradingeconomics.com/india/balance-of-trade",
       "importance": null,
       "actual": "$-30.21B",
-      "previous": "$-43.81B",
+      "previous": "$-26.86B",
       "consensus": "",
       "forecast": "$ -29.5B",
       "first_seen": "2026-09-19T14:31:58+05:30",
-      "updated_at": "2026-10-15T14:31:58+05:30"
+      "updated_at": "2026-10-15T15:02:18+05:30"
     },
     {
       "id": "400382",
