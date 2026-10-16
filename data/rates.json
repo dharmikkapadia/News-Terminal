@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-10-16T22:28:45+05:30",
+  "captured_at": "2026-10-17T00:05:53+05:30",
   "source": "https://www.rbi.org.in/",
   "policy_rates": {
     "repo_rate": 5.5,
@@ -15,7 +15,7 @@
   "exchange_rates": {
     "as_of": "As at 1.00pm of October 16, 2026",
     "source": "FBIL",
-    "inr_per_usd": 95.221,
+    "inr_per_usd": 95.223,
     "inr_per_gbp": 126.729,
     "inr_per_eur": 106.8902,
     "inr_per_100_jpy": 60.18,
@@ -25,7 +25,7 @@
       "inr_per_usd": {
         "label": "USD/INR",
         "prev_close": 94.7525,
-        "change_pct": 0.49,
+        "change_pct": 0.5,
         "chart_url": "https://tradingeconomics.com/currencies?quote=inr",
         "as_of": "2026-10-16",
         "source": "Trading Economics · USDINR:CUR"
@@ -47,7 +47,7 @@
         "source": "Trading Economics · GBPINR:CUR"
       }
     },
-    "fx_te_captured_at": "2026-10-17T00:01:25+05:30"
+    "fx_te_captured_at": "2026-10-17T00:05:53+05:30"
   },
   "lending_deposit_rates": {
     "base_rate": [
@@ -70,7 +70,7 @@
         4.85,
         5.9
       ],
-      "as_on": "as on  October 15, 2026"
+      "as_on": "as on October 15, 2026"
     },
     "gsec_yields": [
       {
@@ -99,11 +99,11 @@
       "182_day": 6.2896,
       "364_day": 6.4891
     },
-    "gsec_tbill_as_on": "as on  October 15, 2026",
+    "gsec_tbill_as_on": "as on October 15, 2026",
     "capital_market": {
       "sensex": 74315.61,
       "nifty_50": 22997.35,
-      "as_on": "as on  October 15, 2026"
+      "as_on": "as on October 15, 2026"
     },
     "bonds": {
       "source": "investing.com",
