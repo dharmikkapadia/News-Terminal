@@ -15,9 +15,9 @@
   "exchange_rates": {
     "as_of": "As at 1.00pm of October 15, 2026",
     "source": "FBIL",
-    "inr_per_usd": 95.144,
-    "inr_per_gbp": 126.816,
-    "inr_per_eur": 107.0074,
+    "inr_per_usd": 95.163,
+    "inr_per_gbp": 126.917,
+    "inr_per_eur": 107.0982,
     "inr_per_100_jpy": 60.19,
     "inr_per_aed": 25.8839,
     "inr_per_10000_idr": 52.9448,
@@ -25,7 +25,7 @@
       "inr_per_usd": {
         "label": "USD/INR",
         "prev_close": 94.7525,
-        "change_pct": 0.41,
+        "change_pct": 0.43,
         "chart_url": "https://tradingeconomics.com/currencies?quote=inr",
         "as_of": "2026-10-16",
         "source": "Trading Economics · USDINR:CUR"
@@ -33,7 +33,7 @@
       "inr_per_eur": {
         "label": "EUR/INR",
         "prev_close": 106.3142,
-        "change_pct": 0.65,
+        "change_pct": 0.74,
         "chart_url": "https://tradingeconomics.com/currencies?quote=inr",
         "as_of": "2026-10-16",
         "source": "Trading Economics · EURINR:CUR"
@@ -41,13 +41,13 @@
       "inr_per_gbp": {
         "label": "GBP/INR",
         "prev_close": 125.787,
-        "change_pct": 0.82,
+        "change_pct": 0.9,
         "chart_url": "https://tradingeconomics.com/currencies?quote=inr",
         "as_of": "2026-10-16",
         "source": "Trading Economics · GBPINR:CUR"
       }
     },
-    "fx_te_captured_at": "2026-10-16T16:31:40+05:30"
+    "fx_te_captured_at": "2026-10-16T17:01:24+05:30"
   },
   "lending_deposit_rates": {
     "base_rate": [
@@ -108,7 +108,7 @@
     "bonds": {
       "source": "investing.com",
       "board_url": "https://www.investing.com/rates-bonds/india-government-bonds",
-      "as_of": "2026-10-16T16:31:52+05:30",
+      "as_of": "2026-10-16T17:01:34+05:30",
       "benchmark_tenor": "10Y",
       "curve": [
         {
@@ -213,9 +213,9 @@
         {
           "tenor": "10Y",
           "label": "India 10Y",
-          "yield": 7.367,
+          "yield": 7.371,
           "prev_close": 7.389,
-          "change_pct": -0.3,
+          "change_pct": -0.24,
           "years": 10.0,
           "chart_url": "https://www.investing.com/rates-bonds/india-10-year-bond-yield"
         },
