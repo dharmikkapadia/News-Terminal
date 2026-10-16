@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-10-16T17:01:35+05:30",
+  "captured_at": "2026-10-16T17:31:40+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -290,12 +290,12 @@
       "event": "Bank Loan Growth YoY",
       "url": "https://tradingeconomics.com/india/loan-growth",
       "importance": null,
-      "actual": "",
+      "actual": "19.4%",
       "previous": "18.1%",
       "consensus": "",
       "forecast": "13.3%",
       "first_seen": "2026-09-20T17:02:15+05:30",
-      "updated_at": "2026-10-02T17:32:14+05:30"
+      "updated_at": "2026-10-16T17:31:40+05:30"
     },
     {
       "id": "421026",
@@ -304,12 +304,12 @@
       "event": "Deposit Growth YoY",
       "url": "https://tradingeconomics.com/india/deposit-growth",
       "importance": null,
-      "actual": "",
+      "actual": "17.8%",
       "previous": "17.3%",
       "consensus": "",
       "forecast": "",
       "first_seen": "2026-09-20T17:02:15+05:30",
-      "updated_at": "2026-10-02T17:32:14+05:30"
+      "updated_at": "2026-10-16T17:31:40+05:30"
     },
     {
       "id": "397065",
@@ -455,10 +455,11 @@
       "url": "https://tradingeconomics.com/india/loan-growth",
       "importance": null,
       "actual": "",
-      "previous": "",
+      "previous": "19.4%",
       "consensus": "",
       "forecast": "",
-      "first_seen": "2026-10-04T17:01:34+05:30"
+      "first_seen": "2026-10-04T17:01:34+05:30",
+      "updated_at": "2026-10-16T17:31:40+05:30"
     },
     {
       "id": "397160",
@@ -468,10 +469,11 @@
       "url": "https://tradingeconomics.com/india/deposit-growth",
       "importance": null,
       "actual": "",
-      "previous": "",
+      "previous": "17.8%",
       "consensus": "",
       "forecast": "",
-      "first_seen": "2026-10-04T17:01:34+05:30"
+      "first_seen": "2026-10-04T17:01:34+05:30",
+      "updated_at": "2026-10-16T17:31:40+05:30"
     },
     {
       "id": "397158",
