@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-10-17T15:31:45+05:30",
+  "captured_at": "2026-10-17T16:01:56+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -497,6 +497,32 @@
       "consensus": "",
       "forecast": "",
       "first_seen": "2026-10-11T17:01:29+05:30"
+    },
+    {
+      "id": "401055",
+      "date": "2026-11-12",
+      "time": "10:30 AM",
+      "event": "Inflation Rate MoM",
+      "url": "https://tradingeconomics.com/india/inflation-rate-mom",
+      "importance": null,
+      "actual": "",
+      "previous": "0.69%",
+      "consensus": "",
+      "forecast": "0.4%",
+      "first_seen": "2026-10-17T16:01:56+05:30"
+    },
+    {
+      "id": "401985",
+      "date": "2026-11-12",
+      "time": "10:30 AM",
+      "event": "Inflation Rate YoY",
+      "url": "https://tradingeconomics.com/india/inflation-cpi",
+      "importance": null,
+      "actual": "",
+      "previous": "5.54%",
+      "consensus": "",
+      "forecast": "6.2%",
+      "first_seen": "2026-10-17T16:01:56+05:30"
     }
   ]
 }
