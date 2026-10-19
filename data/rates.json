@@ -15,17 +15,17 @@
   "exchange_rates": {
     "as_of": "As at 1.00pm of October 16, 2026",
     "source": "FBIL",
-    "inr_per_usd": 95.227,
-    "inr_per_gbp": 126.971,
-    "inr_per_eur": 106.8413,
+    "inr_per_usd": 95.193,
+    "inr_per_gbp": 126.935,
+    "inr_per_eur": 106.9146,
     "inr_per_100_jpy": 60.18,
     "inr_per_aed": 25.8703,
     "inr_per_10000_idr": 52.6777,
     "fx_te": {
       "inr_per_usd": {
         "label": "USD/INR",
-        "prev_close": 94.9718,
-        "change_pct": 0.27,
+        "prev_close": 94.9717,
+        "change_pct": 0.23,
         "chart_url": "https://tradingeconomics.com/currencies?quote=inr",
         "as_of": "2026-10-19",
         "source": "Trading Economics · USDINR:CUR"
@@ -33,21 +33,21 @@
       "inr_per_eur": {
         "label": "EUR/INR",
         "prev_close": 106.7217,
-        "change_pct": 0.11,
+        "change_pct": 0.18,
         "chart_url": "https://tradingeconomics.com/currencies?quote=inr",
         "as_of": "2026-10-19",
         "source": "Trading Economics · EURINR:CUR"
       },
       "inr_per_gbp": {
         "label": "GBP/INR",
-        "prev_close": 126.577,
-        "change_pct": 0.31,
+        "prev_close": 126.576,
+        "change_pct": 0.28,
         "chart_url": "https://tradingeconomics.com/currencies?quote=inr",
         "as_of": "2026-10-19",
         "source": "Trading Economics · GBPINR:CUR"
       }
     },
-    "fx_te_captured_at": "2026-10-19T17:31:40+05:30"
+    "fx_te_captured_at": "2026-10-19T18:01:27+05:30"
   },
   "lending_deposit_rates": {
     "base_rate": [
@@ -108,7 +108,7 @@
     "bonds": {
       "source": "investing.com",
       "board_url": "https://www.investing.com/rates-bonds/india-government-bonds",
-      "as_of": "2026-10-19T17:31:53+05:30",
+      "as_of": "2026-10-19T18:01:42+05:30",
       "benchmark_tenor": "10Y",
       "curve": [
         {
@@ -278,7 +278,7 @@
           "label": "India 24Y",
           "yield": 7.789,
           "prev_close": 7.789,
-          "change_pct": -0.0,
+          "change_pct": -0.38,
           "years": 24.0,
           "chart_url": "https://www.investing.com/rates-bonds/india-24-year-bond-yield"
         },
