@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-10-20T05:02:19+05:30",
+  "captured_at": "2026-10-20T05:31:39+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -11,11 +11,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
       "source": "Trading Economics · CO1:COM",
-      "price": 109.298,
-      "prev_close": 108.736,
-      "change_pct": -0.51,
+      "price": 109.146,
+      "prev_close": 108.432,
+      "change_pct": -0.65,
       "currency": "USD",
-      "as_of": "2026-10-19"
+      "as_of": "2026-10-20"
     },
     {
       "key": "gold",
@@ -25,11 +25,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Trading Economics · XAUUSD:CUR",
-      "price": 4134.93,
-      "prev_close": 4103.47,
-      "change_pct": -0.76,
+      "price": 4133.08,
+      "prev_close": 4099.77,
+      "change_pct": -0.8,
       "currency": "USD",
-      "as_of": "2026-10-19"
+      "as_of": "2026-10-20"
     },
     {
       "key": "silver",
@@ -39,11 +39,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
       "source": "Trading Economics · XAGUSD:CUR",
-      "price": 56.889,
-      "prev_close": 56.789,
+      "price": 56.884,
+      "prev_close": 56.779,
       "change_pct": -0.18,
       "currency": "USD",
-      "as_of": "2026-10-19"
+      "as_of": "2026-10-20"
     },
     {
       "key": "copper",
@@ -53,11 +53,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Trading Economics · HG1:COM",
-      "price": 6.5341,
+      "price": 6.5368,
       "prev_close": 6.531,
-      "change_pct": 0.05,
+      "change_pct": 0.09,
       "currency": "USD",
-      "as_of": "2026-10-19"
+      "as_of": "2026-10-20"
     },
     {
       "key": "aluminium",
