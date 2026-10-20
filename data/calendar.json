@@ -1,36 +1,8 @@
 {
-  "captured_at": "2026-10-20T23:32:26+05:30",
+  "captured_at": "2026-10-21T00:02:01+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
-    {
-      "id": "396968",
-      "date": "2026-10-06",
-      "time": "05:00 AM",
-      "event": "HSBC Composite PMI Final",
-      "url": "https://tradingeconomics.com/india/composite-pmi",
-      "importance": null,
-      "actual": "55.90",
-      "previous": "54.3",
-      "consensus": "56.50",
-      "forecast": "56.5",
-      "first_seen": "2026-09-10T10:31:53+05:30",
-      "updated_at": "2026-10-06T10:32:25+05:30"
-    },
-    {
-      "id": "396967",
-      "date": "2026-10-06",
-      "time": "05:00 AM",
-      "event": "HSBC Services PMI Final",
-      "url": "https://tradingeconomics.com/india/services-pmi",
-      "importance": null,
-      "actual": "55.2",
-      "previous": "54.1",
-      "consensus": "56.2",
-      "forecast": "55.8",
-      "first_seen": "2026-09-10T10:31:53+05:30",
-      "updated_at": "2026-10-06T10:32:25+05:30"
-    },
     {
       "id": "419625",
       "date": "2026-10-07",

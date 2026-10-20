@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-10-20T23:32:13+05:30",
+  "captured_at": "2026-10-21T00:01:47+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -11,9 +11,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
       "source": "Trading Economics · CO1:COM",
-      "price": 108.361,
-      "prev_close": 107.172,
-      "change_pct": -1.09,
+      "price": 108.689,
+      "prev_close": 107.828,
+      "change_pct": -0.79,
       "currency": "USD",
       "as_of": "2026-10-20"
     },
@@ -25,9 +25,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Trading Economics · XAUUSD:CUR",
-      "price": 4125.36,
-      "prev_close": 4109.82,
-      "change_pct": -0.38,
+      "price": 4124.54,
+      "prev_close": 4108.18,
+      "change_pct": -0.4,
       "currency": "USD",
       "as_of": "2026-10-20"
     },
@@ -39,7 +39,7 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
       "source": "Trading Economics · XAGUSD:CUR",
-      "price": 57.868,
+      "price": 57.869,
       "prev_close": 57.08,
       "change_pct": 1.38,
       "currency": "USD",
@@ -53,9 +53,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Trading Economics · HG1:COM",
-      "price": 6.5858,
+      "price": 6.5823,
       "prev_close": 6.538,
-      "change_pct": 0.73,
+      "change_pct": 0.68,
       "currency": "USD",
       "as_of": "2026-10-20"
     },
@@ -95,9 +95,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/steel",
       "source": "Yahoo Finance · HRC=F",
-      "price": 1328.0,
+      "price": 1327.0,
       "prev_close": 1287.0,
-      "change_pct": 3.19,
+      "change_pct": 3.11,
       "currency": "USD",
       "as_of": "2026-10-20"
     },
@@ -127,7 +127,7 @@
       "prev_close": 3488.0,
       "change_pct": -2.01,
       "currency": "USD",
-      "as_of": "2026-10-20"
+      "as_of": "2026-10-21"
     },
     {
       "key": "freight",
