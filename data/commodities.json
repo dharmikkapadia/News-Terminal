@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-10-20T09:58:05+05:30",
+  "captured_at": "2026-10-20T10:01:33+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -11,9 +11,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
       "source": "Trading Economics · CO1:COM",
-      "price": 109.714,
+      "price": 109.795,
       "prev_close": 109.55,
-      "change_pct": 0.15,
+      "change_pct": 0.22,
       "currency": "USD",
       "as_of": "2026-10-20"
     },
@@ -25,9 +25,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Trading Economics · XAUUSD:CUR",
-      "price": 4144.24,
+      "price": 4144.86,
       "prev_close": 4140.9,
-      "change_pct": 0.08,
+      "change_pct": 0.1,
       "currency": "USD",
       "as_of": "2026-10-20"
     },
@@ -39,9 +39,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
       "source": "Trading Economics · XAGUSD:CUR",
-      "price": 57.445,
+      "price": 57.44,
       "prev_close": 57.08,
-      "change_pct": 0.64,
+      "change_pct": 0.63,
       "currency": "USD",
       "as_of": "2026-10-20"
     },
@@ -53,9 +53,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Trading Economics · HG1:COM",
-      "price": 6.5407,
+      "price": 6.5382,
       "prev_close": 6.538,
-      "change_pct": 0.04,
+      "change_pct": 0.0,
       "currency": "USD",
       "as_of": "2026-10-20"
     },
@@ -81,7 +81,7 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/zinc",
       "source": "Trading Economics · LMZSDS03:COM",
-      "price": 3724.1,
+      "price": 3723.85,
       "prev_close": 3720.65,
       "change_pct": 0.09,
       "currency": "USD",
