@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-10-21T11:31:47+05:30",
+  "captured_at": "2026-10-21T12:01:53+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -560,6 +560,58 @@
       "consensus": "",
       "forecast": "5.1%",
       "first_seen": "2026-10-20T16:01:47+05:30"
+    },
+    {
+      "id": "401807",
+      "date": "2026-11-16",
+      "time": "06:30 AM",
+      "event": "WPI Food Index YoY",
+      "url": "https://tradingeconomics.com/india/wpi-food-index-yoy",
+      "importance": null,
+      "actual": "",
+      "previous": "8.66%",
+      "consensus": "",
+      "forecast": "8.5%",
+      "first_seen": "2026-10-21T12:01:53+05:30"
+    },
+    {
+      "id": "401145",
+      "date": "2026-11-16",
+      "time": "06:30 AM",
+      "event": "WPI Fuel YoY",
+      "url": "https://tradingeconomics.com/india/wpi-fuel-yoy",
+      "importance": null,
+      "actual": "",
+      "previous": "25.85%",
+      "consensus": "",
+      "forecast": "27.5%",
+      "first_seen": "2026-10-21T12:01:53+05:30"
+    },
+    {
+      "id": "401398",
+      "date": "2026-11-16",
+      "time": "06:30 AM",
+      "event": "WPI Inflation YoY",
+      "url": "https://tradingeconomics.com/india/wholesale-prices-yoy",
+      "importance": null,
+      "actual": "",
+      "previous": "11.39%",
+      "consensus": "",
+      "forecast": "13.0%",
+      "first_seen": "2026-10-21T12:01:53+05:30"
+    },
+    {
+      "id": "402913",
+      "date": "2026-11-16",
+      "time": "06:30 AM",
+      "event": "WPI Manufacturing YoY",
+      "url": "https://tradingeconomics.com/india/wpi-manufacturing-yoy",
+      "importance": null,
+      "actual": "",
+      "previous": "9.76%",
+      "consensus": "",
+      "forecast": "10.0%",
+      "first_seen": "2026-10-21T12:01:53+05:30"
     }
   ]
 }
