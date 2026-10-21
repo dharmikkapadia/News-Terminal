@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-10-21T17:01:39+05:30",
+  "captured_at": "2026-10-21T17:32:04+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -263,11 +263,11 @@
       "url": "https://tradingeconomics.com/india/construction-output",
       "importance": null,
       "actual": "7.9%",
-      "previous": "4.8%",
+      "previous": "5.9%",
       "consensus": "",
       "forecast": "5.7%",
       "first_seen": "2026-09-25T17:01:45+05:30",
-      "updated_at": "2026-10-21T17:01:39+05:30"
+      "updated_at": "2026-10-21T17:32:04+05:30"
     },
     {
       "id": "399305",
