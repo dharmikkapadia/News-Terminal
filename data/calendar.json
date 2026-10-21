@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-10-21T14:01:51+05:30",
+  "captured_at": "2026-10-21T14:31:54+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -560,6 +560,45 @@
       "consensus": "",
       "forecast": "5.1%",
       "first_seen": "2026-10-20T16:01:47+05:30"
+    },
+    {
+      "id": "402046",
+      "date": "2026-11-16",
+      "time": "",
+      "event": "Balance of Trade",
+      "url": "https://tradingeconomics.com/india/balance-of-trade",
+      "importance": null,
+      "actual": "",
+      "previous": "$-30.21B",
+      "consensus": "",
+      "forecast": "$-29.0B",
+      "first_seen": "2026-10-21T14:31:54+05:30"
+    },
+    {
+      "id": "403478",
+      "date": "2026-11-16",
+      "time": "",
+      "event": "Exports",
+      "url": "https://tradingeconomics.com/india/exports",
+      "importance": null,
+      "actual": "",
+      "previous": "$44.4B",
+      "consensus": "",
+      "forecast": "",
+      "first_seen": "2026-10-21T14:31:54+05:30"
+    },
+    {
+      "id": "401454",
+      "date": "2026-11-16",
+      "time": "",
+      "event": "Imports",
+      "url": "https://tradingeconomics.com/india/imports",
+      "importance": null,
+      "actual": "",
+      "previous": "$74.61B",
+      "consensus": "",
+      "forecast": "",
+      "first_seen": "2026-10-21T14:31:54+05:30"
     },
     {
       "id": "401807",
