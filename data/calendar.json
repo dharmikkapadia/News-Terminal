@@ -1,50 +1,8 @@
 {
-  "captured_at": "2026-10-21T23:31:59+05:30",
+  "captured_at": "2026-10-22T00:01:48+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
-    {
-      "id": "419625",
-      "date": "2026-10-07",
-      "time": "04:30 AM",
-      "event": "Cash Reserve Ratio",
-      "url": "https://tradingeconomics.com/india/cash-reserve-ratio",
-      "importance": null,
-      "actual": "3%",
-      "previous": "3%",
-      "consensus": "3%",
-      "forecast": "3.0%",
-      "first_seen": "2026-09-11T10:01:57+05:30",
-      "updated_at": "2026-10-07T10:32:21+05:30"
-    },
-    {
-      "id": "419619",
-      "date": "2026-10-07",
-      "time": "04:30 AM",
-      "event": "RBI Interest Rate Decision",
-      "url": "https://tradingeconomics.com/india/interest-rate",
-      "importance": null,
-      "actual": "5.5%",
-      "previous": "5.25%",
-      "consensus": "5.5%",
-      "forecast": "5.5%",
-      "first_seen": "2026-09-11T10:01:57+05:30",
-      "updated_at": "2026-10-07T10:32:21+05:30"
-    },
-    {
-      "id": "397022",
-      "date": "2026-10-07",
-      "time": "08:00 AM",
-      "event": "Foreign Exchange Reserves",
-      "url": "https://tradingeconomics.com/india/foreign-exchange-reserves",
-      "importance": null,
-      "actual": "$734.6B",
-      "previous": "$747.56B",
-      "consensus": "",
-      "forecast": "$ 710B",
-      "first_seen": "2026-09-13T18:34:46+05:30",
-      "updated_at": "2026-10-07T13:32:24+05:30"
-    },
     {
       "id": "401520",
       "date": "2026-10-12",
