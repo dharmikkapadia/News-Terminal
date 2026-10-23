@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-10-23T17:32:05+05:30",
+  "captured_at": "2026-10-23T18:02:05+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -284,6 +284,20 @@
       "updated_at": "2026-10-23T17:01:43+05:30"
     },
     {
+      "id": "397136",
+      "date": "2026-10-23",
+      "time": "11:30 AM",
+      "event": "M3 Money Supply YoY",
+      "url": "https://tradingeconomics.com/india/money-supply-m3",
+      "importance": null,
+      "actual": "16%",
+      "previous": "16.9%",
+      "consensus": "",
+      "forecast": "",
+      "first_seen": "2026-10-02T17:02:02+05:30",
+      "updated_at": "2026-10-23T18:02:05+05:30"
+    },
+    {
       "id": "403542",
       "date": "2026-10-28",
       "time": "10:30 AM",
@@ -308,20 +322,6 @@
       "consensus": "",
       "forecast": "8.6%",
       "first_seen": "2026-10-02T16:02:04+05:30"
-    },
-    {
-      "id": "397136",
-      "date": "2026-10-28",
-      "time": "11:30 AM",
-      "event": "M3 Money Supply YoY",
-      "url": "https://tradingeconomics.com/india/money-supply-m3",
-      "importance": null,
-      "actual": "",
-      "previous": "16.9%",
-      "consensus": "",
-      "forecast": "",
-      "first_seen": "2026-10-02T17:02:02+05:30",
-      "updated_at": "2026-10-12T18:04:26+05:30"
     },
     {
       "id": "417764",
@@ -623,10 +623,11 @@
       "url": "https://tradingeconomics.com/india/money-supply-m3",
       "importance": null,
       "actual": "",
-      "previous": "",
+      "previous": "16%",
       "consensus": "",
       "forecast": "",
-      "first_seen": "2026-10-23T17:32:05+05:30"
+      "first_seen": "2026-10-23T17:32:05+05:30",
+      "updated_at": "2026-10-23T18:02:05+05:30"
     }
   ]
 }
