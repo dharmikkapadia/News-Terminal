@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-10-23T17:01:43+05:30",
+  "captured_at": "2026-10-23T17:32:05+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -614,6 +614,19 @@
       "consensus": "",
       "forecast": "10.0%",
       "first_seen": "2026-10-21T12:01:53+05:30"
+    },
+    {
+      "id": "397277",
+      "date": "2026-11-18",
+      "time": "11:30 AM",
+      "event": "M3 Money Supply YoY",
+      "url": "https://tradingeconomics.com/india/money-supply-m3",
+      "importance": null,
+      "actual": "",
+      "previous": "",
+      "consensus": "",
+      "forecast": "",
+      "first_seen": "2026-10-23T17:32:05+05:30"
     }
   ]
 }
