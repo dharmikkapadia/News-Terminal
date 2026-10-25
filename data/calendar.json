@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-10-25T16:38:41+05:30",
+  "captured_at": "2026-10-25T17:01:48+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -628,6 +628,32 @@
       "forecast": "",
       "first_seen": "2026-10-23T17:32:05+05:30",
       "updated_at": "2026-10-23T18:02:05+05:30"
+    },
+    {
+      "id": "397354",
+      "date": "2026-11-20",
+      "time": "11:30 AM",
+      "event": "Foreign Exchange Reserves",
+      "url": "https://tradingeconomics.com/india/foreign-exchange-reserves",
+      "importance": null,
+      "actual": "",
+      "previous": "",
+      "consensus": "",
+      "forecast": "",
+      "first_seen": "2026-10-25T17:01:48+05:30"
+    },
+    {
+      "id": "400721",
+      "date": "2026-11-20",
+      "time": "11:30 AM",
+      "event": "Infrastructure Output YoY",
+      "url": "https://tradingeconomics.com/india/construction-output",
+      "importance": null,
+      "actual": "",
+      "previous": "7.9%",
+      "consensus": "",
+      "forecast": "",
+      "first_seen": "2026-10-25T17:01:48+05:30"
     }
   ]
 }
