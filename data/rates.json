@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-10-29T02:30:29+05:30",
+  "captured_at": "2026-10-29T20:22:23+05:30",
   "source": "https://www.rbi.org.in/",
   "policy_rates": {
     "repo_rate": 5.5,
@@ -13,19 +13,19 @@
     "slr": 18.0
   },
   "exchange_rates": {
-    "as_of": "As at 1.00pm of October 28, 2026",
+    "as_of": "As at 1.00pm of October 29, 2026",
     "source": "FBIL",
-    "inr_per_usd": 95.207,
+    "inr_per_usd": 95.164,
     "inr_per_gbp": 126.954,
     "inr_per_eur": 106.1655,
-    "inr_per_100_jpy": 60.31,
-    "inr_per_aed": 25.9273,
-    "inr_per_10000_idr": 52.3782,
+    "inr_per_100_jpy": 60.42,
+    "inr_per_aed": 25.9656,
+    "inr_per_10000_idr": 52.5834,
     "fx_te": {
       "inr_per_usd": {
         "label": "USD/INR",
-        "prev_close": 95.2052,
-        "change_pct": 0.0,
+        "prev_close": 95.1227,
+        "change_pct": -0.04,
         "chart_url": "https://tradingeconomics.com/currencies?quote=inr",
         "as_of": "2026-10-29",
         "source": "Trading Economics · USDINR:CUR"
@@ -47,7 +47,7 @@
         "source": "Trading Economics · GBPINR:CUR"
       }
     },
-    "fx_te_captured_at": "2026-10-29T20:01:21+05:30"
+    "fx_te_captured_at": "2026-10-29T20:22:24+05:30"
   },
   "lending_deposit_rates": {
     "base_rate": [
@@ -68,30 +68,30 @@
     "money_market": {
       "call_rate": [
         4.3,
-        5.9
+        5.85
       ],
-      "as_on": "as on  October 27, 2026"
+      "as_on": "as on October 28, 2026"
     },
     "gsec_yields": [
       {
         "security": "6.20% GS 2029",
-        "yield": 7.0112
+        "yield": 7.1553
       },
       {
         "security": "6.36% GS 2031",
-        "yield": 7.1827
+        "yield": 7.2013
       },
       {
         "security": "6.94% GS 2036",
-        "yield": 7.4533
+        "yield": 7.4389
       },
       {
         "security": "7.06% GS 2041",
-        "yield": 7.6163
+        "yield": 7.6075
       },
       {
         "security": "7.63% GS 2056",
-        "yield": 7.8742
+        "yield": 7.8736
       }
     ],
     "tbill_yields": {
@@ -99,11 +99,11 @@
       "182_day": 6.5493,
       "364_day": 6.69
     },
-    "gsec_tbill_as_on": "as on  October 27, 2026",
+    "gsec_tbill_as_on": "as on October 28, 2026",
     "capital_market": {
-      "sensex": 73598.67,
-      "nifty_50": 22749.75,
-      "as_on": "as on  October 27, 2026"
+      "sensex": 73246.03,
+      "nifty_50": 22698.85,
+      "as_on": "as on October 28, 2026"
     },
     "bonds": {
       "source": "investing.com",
