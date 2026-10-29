@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-10-29T23:31:29+05:30",
+  "captured_at": "2026-10-30T00:01:26+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -11,9 +11,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
       "source": "Trading Economics · CO1:COM",
-      "price": 114.661,
-      "prev_close": 114.002,
-      "change_pct": -0.57,
+      "price": 114.79,
+      "prev_close": 114.26,
+      "change_pct": -0.46,
       "currency": "USD",
       "as_of": "2026-10-29"
     },
@@ -25,9 +25,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Trading Economics · XAUUSD:CUR",
-      "price": 4007.93,
-      "prev_close": 3948.08,
-      "change_pct": -1.47,
+      "price": 4007.39,
+      "prev_close": 3947.0,
+      "change_pct": -1.48,
       "currency": "USD",
       "as_of": "2026-10-29"
     },
@@ -39,9 +39,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
       "source": "Trading Economics · XAGUSD:CUR",
-      "price": 52.018,
-      "prev_close": 50.088,
-      "change_pct": -3.58,
+      "price": 52.01,
+      "prev_close": 50.072,
+      "change_pct": -3.59,
       "currency": "USD",
       "as_of": "2026-10-29"
     },
@@ -53,9 +53,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Trading Economics · HG1:COM",
-      "price": 6.5703,
-      "prev_close": 6.4946,
-      "change_pct": -1.14,
+      "price": 6.5707,
+      "prev_close": 6.4954,
+      "change_pct": -1.13,
       "currency": "USD",
       "as_of": "2026-10-29"
     },
@@ -67,9 +67,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/aluminum",
       "source": "Trading Economics · LMAHDS03:COM",
-      "price": 3074.65,
-      "prev_close": 3070.8,
-      "change_pct": -0.13,
+      "price": 3071.25,
+      "prev_close": 3064.0,
+      "change_pct": -0.24,
       "currency": "USD",
       "as_of": "2026-10-29"
     },
@@ -127,7 +127,7 @@
       "prev_close": 3237.5,
       "change_pct": 0.86,
       "currency": "USD",
-      "as_of": "2026-10-29"
+      "as_of": "2026-10-30"
     },
     {
       "key": "freight",
