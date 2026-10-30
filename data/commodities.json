@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-10-31T02:01:44+05:30",
+  "captured_at": "2026-10-31T02:31:27+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -11,9 +11,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
       "source": "Trading Economics · CO1:COM",
-      "price": 112.378,
+      "price": 112.347,
       "prev_close": 110.8,
-      "change_pct": 1.42,
+      "change_pct": 1.4,
       "currency": "USD",
       "as_of": "2026-10-30"
     },
@@ -25,9 +25,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Trading Economics · XAUUSD:CUR",
-      "price": 3879.69,
-      "prev_close": 3738.07,
-      "change_pct": -3.52,
+      "price": 3874.08,
+      "prev_close": 3726.85,
+      "change_pct": -3.66,
       "currency": "USD",
       "as_of": "2026-10-30"
     },
@@ -39,9 +39,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
       "source": "Trading Economics · XAGUSD:CUR",
-      "price": 49.153,
-      "prev_close": 46.162,
-      "change_pct": -5.74,
+      "price": 49.12,
+      "prev_close": 46.096,
+      "change_pct": -5.8,
       "currency": "USD",
       "as_of": "2026-10-30"
     },
@@ -53,9 +53,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Trading Economics · HG1:COM",
-      "price": 6.4624,
-      "prev_close": 6.3438,
-      "change_pct": -1.8,
+      "price": 6.4898,
+      "prev_close": 6.3986,
+      "change_pct": -1.39,
       "currency": "USD",
       "as_of": "2026-10-30"
     },
@@ -95,9 +95,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/steel",
       "source": "Yahoo Finance · HRC=F",
-      "price": 1406.0,
+      "price": 1402.0,
       "prev_close": 1342.0,
-      "change_pct": 4.77,
+      "change_pct": 4.47,
       "currency": "USD",
       "as_of": "2026-10-30"
     },
@@ -137,9 +137,9 @@
       "cadence": "weekly",
       "chart_url": "https://tradingeconomics.com/commodity/containerized-freight-index",
       "source": "Trading Economics · SHSPSCFI:IND",
-      "price": 3687.35,
-      "prev_close": 3681.33,
-      "change_pct": 0.16,
+      "price": 3681.34,
+      "prev_close": 3681.34,
+      "change_pct": 0.0,
       "currency": "USD",
       "as_of": "2026-10-30"
     }
