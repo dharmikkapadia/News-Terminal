@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-10-30T16:31:37+05:30",
+  "captured_at": "2026-10-30T17:01:35+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -178,12 +178,12 @@
       "event": "Bank Loan Growth YoY",
       "url": "https://tradingeconomics.com/india/loan-growth",
       "importance": null,
-      "actual": "",
+      "actual": "18.2%",
       "previous": "19.4%",
       "consensus": "",
       "forecast": "",
       "first_seen": "2026-10-04T17:01:34+05:30",
-      "updated_at": "2026-10-16T17:31:40+05:30"
+      "updated_at": "2026-10-30T17:01:35+05:30"
     },
     {
       "id": "397160",
@@ -206,12 +206,12 @@
       "event": "Foreign Exchange Reserves",
       "url": "https://tradingeconomics.com/india/foreign-exchange-reserves",
       "importance": null,
-      "actual": "",
+      "actual": "$719.75B",
       "previous": "$721.02B",
       "consensus": "",
       "forecast": "",
       "first_seen": "2026-10-04T17:01:34+05:30",
-      "updated_at": "2026-10-23T17:01:43+05:30"
+      "updated_at": "2026-10-30T17:01:35+05:30"
     },
     {
       "id": "397177",
@@ -263,10 +263,11 @@
       "url": "https://tradingeconomics.com/india/foreign-exchange-reserves",
       "importance": null,
       "actual": "",
-      "previous": "",
+      "previous": "$719.75B",
       "consensus": "",
       "forecast": "",
-      "first_seen": "2026-10-11T17:01:29+05:30"
+      "first_seen": "2026-10-11T17:01:29+05:30",
+      "updated_at": "2026-10-30T17:01:35+05:30"
     },
     {
       "id": "401055",
@@ -302,10 +303,11 @@
       "url": "https://tradingeconomics.com/india/loan-growth",
       "importance": null,
       "actual": "",
-      "previous": "",
+      "previous": "18.2%",
       "consensus": "",
       "forecast": "",
-      "first_seen": "2026-10-18T17:31:49+05:30"
+      "first_seen": "2026-10-18T17:31:49+05:30",
+      "updated_at": "2026-10-30T17:01:35+05:30"
     },
     {
       "id": "397306",
@@ -528,6 +530,19 @@
       "consensus": "",
       "forecast": "",
       "first_seen": "2026-10-28T10:31:55+05:30"
+    },
+    {
+      "id": "397370",
+      "date": "2026-11-25",
+      "time": "11:30 AM",
+      "event": "M3 Money Supply YoY",
+      "url": "https://tradingeconomics.com/india/money-supply-m3",
+      "importance": null,
+      "actual": "",
+      "previous": "",
+      "consensus": "",
+      "forecast": "",
+      "first_seen": "2026-10-30T17:01:35+05:30"
     }
   ]
 }
