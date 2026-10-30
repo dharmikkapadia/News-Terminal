@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-10-30T17:01:35+05:30",
+  "captured_at": "2026-10-30T17:31:49+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -192,12 +192,12 @@
       "event": "Deposit Growth YoY",
       "url": "https://tradingeconomics.com/india/deposit-growth",
       "importance": null,
-      "actual": "",
+      "actual": "16.7%",
       "previous": "17.8%",
       "consensus": "",
       "forecast": "",
       "first_seen": "2026-10-04T17:01:34+05:30",
-      "updated_at": "2026-10-16T17:31:40+05:30"
+      "updated_at": "2026-10-30T17:31:49+05:30"
     },
     {
       "id": "397158",
@@ -317,10 +317,11 @@
       "url": "https://tradingeconomics.com/india/deposit-growth",
       "importance": null,
       "actual": "",
-      "previous": "",
+      "previous": "16.7%",
       "consensus": "",
       "forecast": "",
-      "first_seen": "2026-10-18T17:31:49+05:30"
+      "first_seen": "2026-10-18T17:31:49+05:30",
+      "updated_at": "2026-10-30T17:31:49+05:30"
     },
     {
       "id": "397304",
