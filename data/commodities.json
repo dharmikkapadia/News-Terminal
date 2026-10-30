@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-10-30T09:31:30+05:30",
+  "captured_at": "2026-10-30T10:01:36+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -11,9 +11,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
       "source": "Trading Economics · CO1:COM",
-      "price": 112.138,
+      "price": 112.047,
       "prev_close": 110.8,
-      "change_pct": 1.21,
+      "change_pct": 1.13,
       "currency": "USD",
       "as_of": "2026-10-30"
     },
@@ -25,8 +25,8 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Trading Economics · XAUUSD:CUR",
-      "price": 3993.45,
-      "prev_close": 3965.59,
+      "price": 3993.76,
+      "prev_close": 3966.21,
       "change_pct": -0.69,
       "currency": "USD",
       "as_of": "2026-10-30"
@@ -39,9 +39,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
       "source": "Trading Economics · XAGUSD:CUR",
-      "price": 51.29,
-      "prev_close": 51.24,
-      "change_pct": -0.1,
+      "price": 51.44,
+      "prev_close": 51.34,
+      "change_pct": 0.19,
       "currency": "USD",
       "as_of": "2026-10-30"
     },
@@ -53,9 +53,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Trading Economics · HG1:COM",
-      "price": 6.5308,
-      "prev_close": 6.4806,
-      "change_pct": -0.76,
+      "price": 6.5375,
+      "prev_close": 6.494,
+      "change_pct": -0.66,
       "currency": "USD",
       "as_of": "2026-10-30"
     },
@@ -81,9 +81,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/zinc",
       "source": "Trading Economics · LMZSDS03:COM",
-      "price": 3874.4,
-      "prev_close": 3870.07,
-      "change_pct": -0.11,
+      "price": 3880.6,
+      "prev_close": 3878.73,
+      "change_pct": 0.05,
       "currency": "USD",
       "as_of": "2026-10-30"
     },
