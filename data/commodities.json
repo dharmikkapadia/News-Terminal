@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-10-31T23:01:28+05:30",
+  "captured_at": "2026-10-31T23:31:28+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -137,9 +137,9 @@
       "cadence": "weekly",
       "chart_url": "https://tradingeconomics.com/commodity/containerized-freight-index",
       "source": "Trading Economics · SHSPSCFI:IND",
-      "price": 3687.35,
-      "prev_close": 3681.33,
-      "change_pct": 0.16,
+      "price": 3681.34,
+      "prev_close": 3681.34,
+      "change_pct": 0.0,
       "currency": "USD",
       "as_of": "2026-10-30"
     }
