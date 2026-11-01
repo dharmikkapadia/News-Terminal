@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-11-01T22:13:45+05:30",
+  "captured_at": "2026-11-01T22:31:49+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -180,10 +180,10 @@
       "importance": null,
       "actual": "",
       "previous": "55.1",
-      "consensus": "54.7",
+      "consensus": "54.8",
       "forecast": "54.9",
       "first_seen": "2026-10-07T10:32:21+05:30",
-      "updated_at": "2026-10-28T20:32:39+05:30"
+      "updated_at": "2026-11-01T22:31:49+05:30"
     },
     {
       "id": "397211",
