@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-11-02T06:31:35+05:30",
+  "captured_at": "2026-11-02T06:55:17+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -11,9 +11,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
       "source": "Trading Economics · CO1:COM",
-      "price": 111.231,
-      "prev_close": 109.032,
-      "change_pct": -1.94,
+      "price": 111.365,
+      "prev_close": 109.3,
+      "change_pct": -1.82,
       "currency": "USD",
       "as_of": "2026-11-02"
     },
@@ -25,9 +25,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Trading Economics · XAUUSD:CUR",
-      "price": 3900.98,
+      "price": 3905.0,
       "prev_close": 3875.84,
-      "change_pct": 0.65,
+      "change_pct": 0.75,
       "currency": "USD",
       "as_of": "2026-11-02"
     },
@@ -39,9 +39,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
       "source": "Trading Economics · XAGUSD:CUR",
-      "price": 49.891,
+      "price": 49.881,
       "prev_close": 48.903,
-      "change_pct": 2.02,
+      "change_pct": 2.0,
       "currency": "USD",
       "as_of": "2026-11-02"
     },
@@ -53,9 +53,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Trading Economics · HG1:COM",
-      "price": 6.4927,
+      "price": 6.489,
       "prev_close": 6.4585,
-      "change_pct": 0.53,
+      "change_pct": 0.47,
       "currency": "USD",
       "as_of": "2026-11-02"
     },
@@ -81,11 +81,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/zinc",
       "source": "Trading Economics · LMZSDS03:COM",
-      "price": 3837.55,
-      "prev_close": 3796.37,
-      "change_pct": -1.06,
+      "price": 3833.7,
+      "prev_close": 3829.85,
+      "change_pct": -0.1,
       "currency": "USD",
-      "as_of": "2026-10-30"
+      "as_of": "2026-11-02"
     },
     {
       "key": "steel",
