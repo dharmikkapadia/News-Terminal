@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-11-05T01:33:40+05:30",
+  "captured_at": "2026-11-05T02:32:58+05:30",
   "source": "https://www.rbi.org.in/",
   "policy_rates": {
     "repo_rate": 5.5,
@@ -47,7 +47,7 @@
         "source": "Trading Economics · GBPINR:CUR"
       }
     },
-    "fx_te_captured_at": "2026-11-05T02:31:30+05:30"
+    "fx_te_captured_at": "2026-11-05T02:32:58+05:30"
   },
   "lending_deposit_rates": {
     "base_rate": [
@@ -70,7 +70,7 @@
         4.3,
         5.65
       ],
-      "as_on": "as on  November 03, 2026"
+      "as_on": "as on November 03, 2026"
     },
     "gsec_yields": [
       {
@@ -99,11 +99,11 @@
       "182_day": 6.5493,
       "364_day": 6.6485
     },
-    "gsec_tbill_as_on": "as on  November 03, 2026",
+    "gsec_tbill_as_on": "as on November 03, 2026",
     "capital_market": {
       "sensex": 76917.85,
       "nifty_50": 23810.85,
-      "as_on": "as on  November 03, 2026"
+      "as_on": "as on November 03, 2026"
     },
     "bonds": {
       "source": "investing.com",
