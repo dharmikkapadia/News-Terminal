@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-11-04T11:01:45+05:30",
+  "captured_at": "2026-11-04T11:31:49+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -487,10 +487,11 @@
       "url": "https://tradingeconomics.com/india/services-pmi",
       "importance": null,
       "actual": "",
-      "previous": "",
+      "previous": "55.8",
       "consensus": "",
       "forecast": "",
-      "first_seen": "2026-10-28T10:31:55+05:30"
+      "first_seen": "2026-10-28T10:31:55+05:30",
+      "updated_at": "2026-11-04T11:31:49+05:30"
     },
     {
       "id": "397370",
