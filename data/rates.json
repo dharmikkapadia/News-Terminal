@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-11-07T23:22:09+05:30",
+  "captured_at": "2026-11-08T00:44:42+05:30",
   "source": "https://www.rbi.org.in/",
   "policy_rates": {
     "repo_rate": 5.5,
@@ -15,7 +15,7 @@
   "exchange_rates": {
     "as_of": "As at 1.00pm of November 06, 2026",
     "source": "FBIL",
-    "inr_per_usd": 94.0468,
+    "inr_per_usd": 94.125,
     "inr_per_gbp": 125.668,
     "inr_per_eur": 104.8713,
     "inr_per_100_jpy": 59.62,
@@ -24,8 +24,8 @@
     "fx_te": {
       "inr_per_usd": {
         "label": "USD/INR",
-        "prev_close": 93.6051,
-        "change_pct": -0.47,
+        "prev_close": 94.0467,
+        "change_pct": 0.08,
         "chart_url": "https://tradingeconomics.com/currencies?quote=inr",
         "as_of": "2026-11-06",
         "source": "Trading Economics · USDINR:CUR"
@@ -47,7 +47,7 @@
         "source": "Trading Economics · GBPINR:CUR"
       }
     },
-    "fx_te_captured_at": "2026-11-08T00:31:22+05:30"
+    "fx_te_captured_at": "2026-11-08T00:44:42+05:30"
   },
   "lending_deposit_rates": {
     "base_rate": [
@@ -70,7 +70,7 @@
         4.3,
         5.75
       ],
-      "as_on": "as on  November 05, 2026"
+      "as_on": "as on November 05, 2026"
     },
     "gsec_yields": [
       {
@@ -99,11 +99,11 @@
       "182_day": 6.5493,
       "364_day": 6.6485
     },
-    "gsec_tbill_as_on": "as on  November 05, 2026",
+    "gsec_tbill_as_on": "as on November 05, 2026",
     "capital_market": {
       "sensex": 79310.01,
       "nifty_50": 24536.6,
-      "as_on": "as on  November 05, 2026"
+      "as_on": "as on November 05, 2026"
     },
     "bonds": {
       "source": "investing.com",
