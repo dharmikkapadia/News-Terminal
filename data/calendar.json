@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-11-08T16:31:37+05:30",
+  "captured_at": "2026-11-08T17:01:36+05:30",
   "source": "Trading Economics",
   "calendar_url": "https://tradingeconomics.com/india/calendar",
   "events": [
@@ -596,6 +596,19 @@
       "consensus": "",
       "forecast": "",
       "first_seen": "2026-11-08T10:01:38+05:30"
+    },
+    {
+      "id": "397487",
+      "date": "2026-12-04",
+      "time": "11:30 AM",
+      "event": "Foreign Exchange Reserves",
+      "url": "https://tradingeconomics.com/india/foreign-exchange-reserves",
+      "importance": null,
+      "actual": "",
+      "previous": "",
+      "consensus": "",
+      "forecast": "",
+      "first_seen": "2026-11-08T17:01:36+05:30"
     }
   ]
 }
