@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-11-09T01:56:23+05:30",
+  "captured_at": "2026-11-09T23:37:22+05:30",
   "source": "https://www.rbi.org.in/",
   "policy_rates": {
     "repo_rate": 5.5,
@@ -13,18 +13,18 @@
     "slr": 18.0
   },
   "exchange_rates": {
-    "as_of": "As at 1.00pm of November 06, 2026",
+    "as_of": "As at 1.00pm of November 09, 2026",
     "source": "FBIL",
-    "inr_per_usd": 93.836,
-    "inr_per_gbp": 125.841,
-    "inr_per_eur": 105.0765,
-    "inr_per_100_jpy": 59.62,
-    "inr_per_aed": 25.6313,
-    "inr_per_10000_idr": 51.902,
+    "inr_per_usd": 93.839,
+    "inr_per_gbp": 125.938,
+    "inr_per_eur": 105.1169,
+    "inr_per_100_jpy": 59.31,
+    "inr_per_aed": 25.554,
+    "inr_per_10000_idr": 51.826,
     "fx_te": {
       "inr_per_usd": {
         "label": "USD/INR",
-        "prev_close": 93.6252,
+        "prev_close": 93.6312,
         "change_pct": -0.22,
         "chart_url": "https://tradingeconomics.com/currencies?quote=inr",
         "as_of": "2026-11-09",
@@ -32,22 +32,22 @@
       },
       "inr_per_eur": {
         "label": "EUR/INR",
-        "prev_close": 104.8716,
-        "change_pct": 0.2,
+        "prev_close": 104.8715,
+        "change_pct": 0.23,
         "chart_url": "https://tradingeconomics.com/currencies?quote=inr",
         "as_of": "2026-11-09",
         "source": "Trading Economics · EURINR:CUR"
       },
       "inr_per_gbp": {
         "label": "GBP/INR",
-        "prev_close": 125.603,
-        "change_pct": 0.19,
+        "prev_close": 125.604,
+        "change_pct": 0.27,
         "chart_url": "https://tradingeconomics.com/currencies?quote=inr",
         "as_of": "2026-11-09",
         "source": "Trading Economics · GBPINR:CUR"
       }
     },
-    "fx_te_captured_at": "2026-11-09T23:31:36+05:30"
+    "fx_te_captured_at": "2026-11-09T23:37:23+05:30"
   },
   "lending_deposit_rates": {
     "base_rate": [
@@ -70,28 +70,28 @@
         4.3,
         5.75
       ],
-      "as_on": "as on  November 05, 2026"
+      "as_on": "as on November 08, 2026"
     },
     "gsec_yields": [
       {
         "security": "6.20% GS 2029",
-        "yield": 6.9581
+        "yield": 6.8812
       },
       {
         "security": "6.53% GS 2031",
-        "yield": 7.0231
+        "yield": 6.9753
       },
       {
         "security": "6.94% GS 2036",
-        "yield": 7.162
+        "yield": 7.193
       },
       {
         "security": "7.06% GS 2041",
-        "yield": 7.3432
+        "yield": 7.3759
       },
       {
         "security": "7.63% GS 2056",
-        "yield": 7.6191
+        "yield": 7.6764
       }
     ],
     "tbill_yields": {
@@ -99,11 +99,11 @@
       "182_day": 6.5493,
       "364_day": 6.6485
     },
-    "gsec_tbill_as_on": "as on  November 05, 2026",
+    "gsec_tbill_as_on": "as on November 06, 2026",
     "capital_market": {
-      "sensex": 79310.01,
-      "nifty_50": 24536.6,
-      "as_on": "as on  November 05, 2026"
+      "sensex": 80999.4,
+      "nifty_50": 24986.4,
+      "as_on": "as on November 08, 2026"
     },
     "bonds": {
       "source": "investing.com",
