@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-11-09T23:37:22+05:30",
+  "captured_at": "2026-11-10T00:28:21+05:30",
   "source": "https://www.rbi.org.in/",
   "policy_rates": {
     "repo_rate": 5.5,
@@ -70,7 +70,7 @@
         4.3,
         5.75
       ],
-      "as_on": "as on November 08, 2026"
+      "as_on": "as on  November 08, 2026"
     },
     "gsec_yields": [
       {
@@ -99,11 +99,11 @@
       "182_day": 6.5493,
       "364_day": 6.6485
     },
-    "gsec_tbill_as_on": "as on November 06, 2026",
+    "gsec_tbill_as_on": "as on  November 06, 2026",
     "capital_market": {
       "sensex": 80999.4,
       "nifty_50": 24986.4,
-      "as_on": "as on November 08, 2026"
+      "as_on": "as on  November 08, 2026"
     },
     "bonds": {
       "source": "investing.com",
