@@ -15,25 +15,25 @@
   "exchange_rates": {
     "as_of": "As at 1.00pm of November 06, 2026",
     "source": "FBIL",
-    "inr_per_usd": 93.926,
-    "inr_per_gbp": 126.103,
-    "inr_per_eur": 105.1855,
+    "inr_per_usd": 93.882,
+    "inr_per_gbp": 125.975,
+    "inr_per_eur": 105.0764,
     "inr_per_100_jpy": 59.62,
     "inr_per_aed": 25.6313,
     "inr_per_10000_idr": 51.902,
     "fx_te": {
       "inr_per_usd": {
         "label": "USD/INR",
-        "prev_close": 93.8052,
-        "change_pct": -0.13,
+        "prev_close": 93.7172,
+        "change_pct": -0.18,
         "chart_url": "https://tradingeconomics.com/currencies?quote=inr",
         "as_of": "2026-11-09",
         "source": "Trading Economics · USDINR:CUR"
       },
       "inr_per_eur": {
         "label": "EUR/INR",
-        "prev_close": 104.8715,
-        "change_pct": 0.3,
+        "prev_close": 104.8716,
+        "change_pct": 0.2,
         "chart_url": "https://tradingeconomics.com/currencies?quote=inr",
         "as_of": "2026-11-09",
         "source": "Trading Economics · EURINR:CUR"
@@ -41,13 +41,13 @@
       "inr_per_gbp": {
         "label": "GBP/INR",
         "prev_close": 125.603,
-        "change_pct": 0.4,
+        "change_pct": 0.3,
         "chart_url": "https://tradingeconomics.com/currencies?quote=inr",
         "as_of": "2026-11-09",
         "source": "Trading Economics · GBPINR:CUR"
       }
     },
-    "fx_te_captured_at": "2026-11-09T17:31:35+05:30"
+    "fx_te_captured_at": "2026-11-09T18:01:23+05:30"
   },
   "lending_deposit_rates": {
     "base_rate": [
@@ -108,7 +108,7 @@
     "bonds": {
       "source": "investing.com",
       "board_url": "https://www.investing.com/rates-bonds/india-government-bonds",
-      "as_of": "2026-11-09T17:31:48+05:30",
+      "as_of": "2026-11-09T18:01:38+05:30",
       "benchmark_tenor": "10Y",
       "curve": [
         {
@@ -233,7 +233,7 @@
           "label": "India 12Y",
           "yield": 7.23,
           "prev_close": 7.23,
-          "change_pct": 0.0,
+          "change_pct": 0.24,
           "years": 12.0,
           "chart_url": "https://www.investing.com/rates-bonds/india-12-year-bond-yield"
         },
