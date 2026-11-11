@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-11-11T07:31:32+05:30",
+  "captured_at": "2026-11-11T08:01:20+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -11,9 +11,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
       "source": "Trading Economics · CO1:COM",
-      "price": 91.819,
+      "price": 92.304,
       "prev_close": 91.49,
-      "change_pct": 0.36,
+      "change_pct": 0.89,
       "currency": "USD",
       "as_of": "2026-11-11"
     },
@@ -25,9 +25,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Trading Economics · XAUUSD:CUR",
-      "price": 4045.67,
+      "price": 4042.61,
       "prev_close": 4032.38,
-      "change_pct": 0.33,
+      "change_pct": 0.25,
       "currency": "USD",
       "as_of": "2026-11-11"
     },
@@ -39,9 +39,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
       "source": "Trading Economics · XAGUSD:CUR",
-      "price": 52.276,
-      "prev_close": 51.502,
-      "change_pct": 1.5,
+      "price": 52.2,
+      "prev_close": 51.501,
+      "change_pct": 1.36,
       "currency": "USD",
       "as_of": "2026-11-11"
     },
@@ -53,9 +53,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Trading Economics · HG1:COM",
-      "price": 6.2873,
+      "price": 6.2844,
       "prev_close": 6.2195,
-      "change_pct": 1.09,
+      "change_pct": 1.04,
       "currency": "USD",
       "as_of": "2026-11-11"
     },
@@ -81,9 +81,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/zinc",
       "source": "Trading Economics · LMZSDS03:COM",
-      "price": 3743.9,
+      "price": 3745.2,
       "prev_close": 3709.0,
-      "change_pct": 0.94,
+      "change_pct": 0.98,
       "currency": "USD",
       "as_of": "2026-11-11"
     },
