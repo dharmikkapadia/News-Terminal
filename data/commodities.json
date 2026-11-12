@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-11-12T06:01:34+05:30",
+  "captured_at": "2026-11-12T06:31:40+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -11,9 +11,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
       "source": "Trading Economics · CO1:COM",
-      "price": 92.355,
-      "prev_close": 91.949,
-      "change_pct": -0.44,
+      "price": 92.238,
+      "prev_close": 91.716,
+      "change_pct": -0.56,
       "currency": "USD",
       "as_of": "2026-11-12"
     },
@@ -25,9 +25,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Trading Economics · XAUUSD:CUR",
-      "price": 3983.03,
-      "prev_close": 3978.22,
-      "change_pct": -0.12,
+      "price": 3994.45,
+      "prev_close": 3987.84,
+      "change_pct": 0.17,
       "currency": "USD",
       "as_of": "2026-11-12"
     },
@@ -39,9 +39,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
       "source": "Trading Economics · XAGUSD:CUR",
-      "price": 51.489,
-      "prev_close": 51.314,
-      "change_pct": -0.34,
+      "price": 51.829,
+      "prev_close": 51.664,
+      "change_pct": 0.32,
       "currency": "USD",
       "as_of": "2026-11-12"
     },
@@ -53,9 +53,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Trading Economics · HG1:COM",
-      "price": 6.2326,
-      "prev_close": 6.1907,
-      "change_pct": -0.67,
+      "price": 6.2461,
+      "prev_close": 6.2177,
+      "change_pct": -0.45,
       "currency": "USD",
       "as_of": "2026-11-12"
     },
@@ -141,7 +141,7 @@
       "prev_close": 3633.45,
       "change_pct": 0.0,
       "currency": "USD",
-      "as_of": "2026-11-11"
+      "as_of": "2026-11-12"
     }
   ]
 }
