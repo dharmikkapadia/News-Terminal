@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-11-13T20:31:46+05:30",
+  "captured_at": "2026-11-13T21:01:38+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -10,10 +10,10 @@
       "category": "Energy",
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
-      "source": "Trading Economics · CO1:COM",
-      "price": 96.818,
+      "source": "Yahoo Finance · BZ=F",
+      "price": 96.7,
       "prev_close": 95.82,
-      "change_pct": 1.04,
+      "change_pct": 0.92,
       "currency": "USD",
       "as_of": "2026-11-13"
     },
@@ -24,10 +24,10 @@
       "category": "Precious",
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
-      "source": "Trading Economics · XAUUSD:CUR",
-      "price": 3890.5,
-      "prev_close": 3876.43,
-      "change_pct": 0.36,
+      "source": "Yahoo Finance · GC=F",
+      "price": 3887.8999,
+      "prev_close": 3885.3,
+      "change_pct": 0.07,
       "currency": "USD",
       "as_of": "2026-11-13"
     },
@@ -38,10 +38,10 @@
       "category": "Precious",
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
-      "source": "Trading Economics · XAGUSD:CUR",
-      "price": 49.825,
-      "prev_close": 49.635,
-      "change_pct": -0.38,
+      "source": "Yahoo Finance · SI=F",
+      "price": 49.23,
+      "prev_close": 49.972,
+      "change_pct": -1.48,
       "currency": "USD",
       "as_of": "2026-11-13"
     },
@@ -52,10 +52,10 @@
       "category": "Base Metals",
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
-      "source": "Trading Economics · HG1:COM",
-      "price": 6.1225,
-      "prev_close": 6.0625,
-      "change_pct": -0.97,
+      "source": "Yahoo Finance · HG=F",
+      "price": 6.12,
+      "prev_close": 6.1825,
+      "change_pct": -1.01,
       "currency": "USD",
       "as_of": "2026-11-13"
     },
@@ -66,10 +66,10 @@
       "category": "Base Metals",
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/aluminum",
-      "source": "Trading Economics · LMAHDS03:COM",
-      "price": 2994.55,
-      "prev_close": 2970.2,
-      "change_pct": -0.81,
+      "source": "Yahoo Finance · ALI=F",
+      "price": 3114.25,
+      "prev_close": 3160.25,
+      "change_pct": -1.46,
       "currency": "USD",
       "as_of": "2026-11-13"
     },
@@ -85,7 +85,8 @@
       "prev_close": 3674.55,
       "change_pct": -0.65,
       "currency": "USD",
-      "as_of": "2026-11-13"
+      "as_of": "2026-11-13",
+      "stale": true
     },
     {
       "key": "steel",
@@ -95,9 +96,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/steel",
       "source": "Yahoo Finance · HRC=F",
-      "price": 1433.0,
+      "price": 1430.0,
       "prev_close": 1352.0,
-      "change_pct": 5.99,
+      "change_pct": 5.77,
       "currency": "USD",
       "as_of": "2026-11-13"
     },
@@ -108,9 +109,9 @@
       "category": "Base Metals",
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/iron-ore",
-      "source": "Trading Economics · SCO:COM",
+      "source": "Yahoo Finance · TIO=F",
       "price": 91.6,
-      "prev_close": 91.05,
+      "prev_close": 92.15,
       "change_pct": -0.6,
       "currency": "USD",
       "as_of": "2026-11-12"
@@ -123,9 +124,9 @@
       "cadence": "daily",
       "chart_url": "https://www.investing.com/commodities/london-coffee",
       "source": "investing.com · london-coffee",
-      "price": 3208.0,
+      "price": 3197.0,
       "prev_close": 3192.0,
-      "change_pct": 0.5,
+      "change_pct": 0.16,
       "currency": "USD",
       "as_of": "2026-11-13"
     },
@@ -141,7 +142,8 @@
       "prev_close": 3511.21,
       "change_pct": -1.68,
       "currency": "USD",
-      "as_of": "2026-11-13"
+      "as_of": "2026-11-13",
+      "stale": true
     }
   ]
 }
