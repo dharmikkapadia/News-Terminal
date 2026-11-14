@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-11-14T02:39:54+05:30",
+  "captured_at": "2026-11-14T20:11:46+05:30",
   "source": "https://www.rbi.org.in/",
   "policy_rates": {
     "repo_rate": 5.5,
@@ -47,7 +47,7 @@
         "source": "Yahoo Finance · GBPINR=X"
       }
     },
-    "fx_te_captured_at": "2026-11-14T20:01:25+05:30"
+    "fx_te_captured_at": "2026-11-14T20:11:47+05:30"
   },
   "lending_deposit_rates": {
     "base_rate": [
