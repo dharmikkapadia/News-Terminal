@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-11-14T07:32:05+05:30",
+  "captured_at": "2026-11-14T07:40:56+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -110,11 +110,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/iron-ore",
       "source": "Yahoo Finance · TIO=F",
-      "price": 91.6,
-      "prev_close": 92.15,
-      "change_pct": -0.6,
+      "price": 91.48,
+      "prev_close": 91.6,
+      "change_pct": -0.13,
       "currency": "USD",
-      "as_of": "2026-11-12"
+      "as_of": "2026-11-13"
     },
     {
       "key": "coffee",
