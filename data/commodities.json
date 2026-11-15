@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-11-15T10:01:49+05:30",
+  "captured_at": "2026-11-15T10:31:47+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -39,9 +39,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
       "source": "Yahoo Finance · SI=F",
-      "price": 49.031,
+      "price": 49.121,
       "prev_close": 49.972,
-      "change_pct": -1.88,
+      "change_pct": -1.7,
       "currency": "USD",
       "as_of": "2026-11-13"
     },
@@ -53,9 +53,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Yahoo Finance · HG=F",
-      "price": 6.0795,
+      "price": 6.0905,
       "prev_close": 6.1825,
-      "change_pct": -1.67,
+      "change_pct": -1.49,
       "currency": "USD",
       "as_of": "2026-11-13"
     },
@@ -67,9 +67,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/aluminum",
       "source": "Yahoo Finance · ALI=F",
-      "price": 3133.25,
+      "price": 3120.0,
       "prev_close": 3160.25,
-      "change_pct": -0.85,
+      "change_pct": -1.27,
       "currency": "USD",
       "as_of": "2026-11-13"
     },
@@ -96,9 +96,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/steel",
       "source": "Yahoo Finance · HRC=F",
-      "price": 1353.0,
+      "price": 1402.0,
       "prev_close": 1352.0,
-      "change_pct": 0.07,
+      "change_pct": 3.7,
       "currency": "USD",
       "as_of": "2026-11-13"
     },
