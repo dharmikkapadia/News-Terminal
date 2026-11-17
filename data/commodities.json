@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-11-18T00:31:40+05:30",
+  "captured_at": "2026-11-18T01:01:42+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -11,9 +11,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
       "source": "Yahoo Finance · BZ=F",
-      "price": 93.53,
+      "price": 93.1,
       "prev_close": 92.44,
-      "change_pct": 1.18,
+      "change_pct": 0.71,
       "currency": "USD",
       "as_of": "2026-11-17"
     },
@@ -25,9 +25,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Yahoo Finance · GC=F",
-      "price": 3858.2,
+      "price": 3860.0,
       "prev_close": 3853.0,
-      "change_pct": 0.13,
+      "change_pct": 0.18,
       "currency": "USD",
       "as_of": "2026-11-17"
     },
@@ -39,9 +39,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
       "source": "Yahoo Finance · SI=F",
-      "price": 47.295,
+      "price": 47.385,
       "prev_close": 46.785,
-      "change_pct": 1.09,
+      "change_pct": 1.28,
       "currency": "USD",
       "as_of": "2026-11-17"
     },
@@ -53,9 +53,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Yahoo Finance · HG=F",
-      "price": 5.9935,
+      "price": 5.9965,
       "prev_close": 5.9975,
-      "change_pct": -0.07,
+      "change_pct": -0.02,
       "currency": "USD",
       "as_of": "2026-11-17"
     },
@@ -67,9 +67,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/aluminum",
       "source": "Yahoo Finance · ALI=F",
-      "price": 3003.75,
+      "price": 3006.0,
       "prev_close": 3124.5,
-      "change_pct": -3.86,
+      "change_pct": -3.79,
       "currency": "USD",
       "as_of": "2026-11-17"
     },
