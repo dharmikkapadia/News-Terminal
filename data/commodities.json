@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-11-18T14:31:46+05:30",
+  "captured_at": "2026-11-18T15:01:33+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -11,9 +11,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
       "source": "Yahoo Finance · BZ=F",
-      "price": 88.73,
+      "price": 89.23,
       "prev_close": 93.14,
-      "change_pct": -4.73,
+      "change_pct": -4.2,
       "currency": "USD",
       "as_of": "2026-11-18"
     },
@@ -25,9 +25,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Yahoo Finance · GC=F",
-      "price": 3771.3,
+      "price": 3769.2,
       "prev_close": 3864.2,
-      "change_pct": -2.4,
+      "change_pct": -2.46,
       "currency": "USD",
       "as_of": "2026-11-18"
     },
@@ -39,9 +39,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
       "source": "Yahoo Finance · SI=F",
-      "price": 45.635,
+      "price": 45.64,
       "prev_close": 47.288,
-      "change_pct": -3.5,
+      "change_pct": -3.49,
       "currency": "USD",
       "as_of": "2026-11-18"
     },
@@ -53,9 +53,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Yahoo Finance · HG=F",
-      "price": 5.745,
+      "price": 5.733,
       "prev_close": 5.976,
-      "change_pct": -3.87,
+      "change_pct": -4.07,
       "currency": "USD",
       "as_of": "2026-11-18"
     },
@@ -124,9 +124,9 @@
       "cadence": "daily",
       "chart_url": "https://www.investing.com/commodities/london-coffee",
       "source": "investing.com · london-coffee",
-      "price": 3039.0,
+      "price": 3058.0,
       "prev_close": 3069.0,
-      "change_pct": -0.98,
+      "change_pct": -0.36,
       "currency": "USD",
       "as_of": "2026-11-18"
     },
