@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-11-18T09:01:46+05:30",
+  "captured_at": "2026-11-18T09:31:49+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -11,9 +11,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
       "source": "Yahoo Finance · BZ=F",
-      "price": 92.85,
+      "price": 92.44,
       "prev_close": 93.14,
-      "change_pct": -0.31,
+      "change_pct": -0.75,
       "currency": "USD",
       "as_of": "2026-11-18"
     },
@@ -25,9 +25,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Yahoo Finance · GC=F",
-      "price": 3787.7,
+      "price": 3794.5,
       "prev_close": 3864.2,
-      "change_pct": -1.98,
+      "change_pct": -1.8,
       "currency": "USD",
       "as_of": "2026-11-18"
     },
@@ -39,9 +39,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
       "source": "Yahoo Finance · SI=F",
-      "price": 45.72,
+      "price": 45.99,
       "prev_close": 47.288,
-      "change_pct": -3.32,
+      "change_pct": -2.74,
       "currency": "USD",
       "as_of": "2026-11-18"
     },
@@ -53,9 +53,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Yahoo Finance · HG=F",
-      "price": 5.894,
+      "price": 5.897,
       "prev_close": 5.976,
-      "change_pct": -1.37,
+      "change_pct": -1.32,
       "currency": "USD",
       "as_of": "2026-11-18"
     },
@@ -67,11 +67,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/aluminum",
       "source": "Yahoo Finance · ALI=F",
-      "price": 3003.25,
-      "prev_close": 3124.5,
-      "change_pct": -3.88,
+      "price": 2974.75,
+      "prev_close": 3040.75,
+      "change_pct": -2.17,
       "currency": "USD",
-      "as_of": "2026-11-17"
+      "as_of": "2026-11-18"
     },
     {
       "key": "zinc",
