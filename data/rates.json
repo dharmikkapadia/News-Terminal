@@ -16,8 +16,8 @@
     "as_of": "As at 1.00pm of November 18, 2026",
     "source": "FBIL",
     "inr_per_usd": 93.29,
-    "inr_per_gbp": 122.6764,
-    "inr_per_eur": 102.563,
+    "inr_per_gbp": 122.7206,
+    "inr_per_eur": 102.6191,
     "inr_per_100_jpy": 58.6,
     "inr_per_aed": 25.4177,
     "inr_per_10000_idr": 51.1046,
@@ -33,7 +33,7 @@
       "inr_per_eur": {
         "label": "EUR/INR",
         "prev_close": 102.673,
-        "change_pct": -0.11,
+        "change_pct": -0.05,
         "chart_url": "https://tradingeconomics.com/currencies?quote=inr",
         "as_of": "2026-11-19",
         "source": "Yahoo Finance · EURINR=X"
@@ -41,13 +41,13 @@
       "inr_per_gbp": {
         "label": "GBP/INR",
         "prev_close": 123.4515,
-        "change_pct": -0.63,
+        "change_pct": -0.59,
         "chart_url": "https://tradingeconomics.com/currencies?quote=inr",
         "as_of": "2026-11-19",
         "source": "Yahoo Finance · GBPINR=X"
       }
     },
-    "fx_te_captured_at": "2026-11-19T15:37:24+05:30"
+    "fx_te_captured_at": "2026-11-19T16:08:18+05:30"
   },
   "lending_deposit_rates": {
     "base_rate": [
@@ -108,7 +108,7 @@
     "bonds": {
       "source": "investing.com",
       "board_url": "https://www.investing.com/rates-bonds/india-government-bonds",
-      "as_of": "2026-11-19T15:37:46+05:30",
+      "as_of": "2026-11-19T16:08:38+05:30",
       "benchmark_tenor": "10Y",
       "curve": [
         {
