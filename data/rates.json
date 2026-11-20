@@ -15,39 +15,39 @@
   "exchange_rates": {
     "as_of": "As at 1.00pm of November 19, 2026",
     "source": "FBIL",
-    "inr_per_usd": 93.28,
-    "inr_per_gbp": 122.0741,
-    "inr_per_eur": 102.345,
+    "inr_per_usd": 93.4746,
+    "inr_per_gbp": 123.4515,
+    "inr_per_eur": 102.673,
     "inr_per_100_jpy": 58.52,
     "inr_per_aed": 25.4151,
     "inr_per_10000_idr": 51.1244,
     "fx_te": {
       "inr_per_usd": {
         "label": "USD/INR",
-        "prev_close": 93.4746,
-        "change_pct": -0.21,
+        "prev_close": 93.9631,
+        "change_pct": -0.52,
         "chart_url": "https://tradingeconomics.com/currencies?quote=inr",
-        "as_of": "2026-11-19",
+        "as_of": "2026-11-18",
         "source": "Yahoo Finance · USDINR=X"
       },
       "inr_per_eur": {
         "label": "EUR/INR",
-        "prev_close": 102.673,
-        "change_pct": -0.32,
+        "prev_close": 103.23,
+        "change_pct": -0.54,
         "chart_url": "https://tradingeconomics.com/currencies?quote=inr",
-        "as_of": "2026-11-19",
+        "as_of": "2026-11-18",
         "source": "Yahoo Finance · EURINR=X"
       },
       "inr_per_gbp": {
         "label": "GBP/INR",
-        "prev_close": 123.4515,
-        "change_pct": -1.12,
+        "prev_close": 123.8842,
+        "change_pct": -0.35,
         "chart_url": "https://tradingeconomics.com/currencies?quote=inr",
-        "as_of": "2026-11-19",
+        "as_of": "2026-11-18",
         "source": "Yahoo Finance · GBPINR=X"
       }
     },
-    "fx_te_captured_at": "2026-11-20T05:01:34+05:30"
+    "fx_te_captured_at": "2026-11-20T05:31:33+05:30"
   },
   "lending_deposit_rates": {
     "base_rate": [
@@ -108,7 +108,7 @@
     "bonds": {
       "source": "investing.com",
       "board_url": "https://www.investing.com/rates-bonds/india-government-bonds",
-      "as_of": "2026-11-20T05:01:56+05:30",
+      "as_of": "2026-11-20T05:31:54+05:30",
       "benchmark_tenor": "10Y",
       "curve": [
         {
