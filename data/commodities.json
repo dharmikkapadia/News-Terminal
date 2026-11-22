@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-11-23T04:31:43+05:30",
+  "captured_at": "2026-11-23T05:00:06+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -11,11 +11,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
       "source": "Yahoo Finance · BZ=F",
-      "price": 89.95,
-      "prev_close": 91.98,
-      "change_pct": -2.21,
+      "price": 89.19,
+      "prev_close": 92.57,
+      "change_pct": -3.65,
       "currency": "USD",
-      "as_of": "2026-11-20"
+      "as_of": "2026-11-23"
     },
     {
       "key": "gold",
@@ -25,11 +25,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Yahoo Finance · GC=F",
-      "price": 3515.3999,
-      "prev_close": 3685.5,
-      "change_pct": -4.62,
+      "price": 3578.8,
+      "prev_close": 3515.3999,
+      "change_pct": 1.8,
       "currency": "USD",
-      "as_of": "2026-11-20"
+      "as_of": "2026-11-23"
     },
     {
       "key": "silver",
@@ -39,11 +39,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
       "source": "Yahoo Finance · SI=F",
-      "price": 41.07,
-      "prev_close": 44.318,
-      "change_pct": -7.33,
+      "price": 42.12,
+      "prev_close": 41.035,
+      "change_pct": 2.64,
       "currency": "USD",
-      "as_of": "2026-11-20"
+      "as_of": "2026-11-23"
     },
     {
       "key": "copper",
@@ -53,11 +53,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Yahoo Finance · HG=F",
-      "price": 5.485,
-      "prev_close": 5.625,
-      "change_pct": -2.49,
+      "price": 5.565,
+      "prev_close": 5.477,
+      "change_pct": 1.61,
       "currency": "USD",
-      "as_of": "2026-11-20"
+      "as_of": "2026-11-23"
     },
     {
       "key": "aluminium",
@@ -100,7 +100,7 @@
       "prev_close": 1352.0,
       "change_pct": 4.14,
       "currency": "USD",
-      "as_of": "2026-11-20"
+      "as_of": "2026-11-23"
     },
     {
       "key": "iron",
