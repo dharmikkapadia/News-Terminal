@@ -47,7 +47,7 @@
         "source": "Yahoo Finance · GBPINR=X"
       }
     },
-    "fx_te_captured_at": "2026-11-23T17:32:54+05:30"
+    "fx_te_captured_at": "2026-11-23T18:02:09+05:30"
   },
   "lending_deposit_rates": {
     "base_rate": [
@@ -108,7 +108,7 @@
     "bonds": {
       "source": "investing.com",
       "board_url": "https://www.investing.com/rates-bonds/india-government-bonds",
-      "as_of": "2026-11-23T17:33:15+05:30",
+      "as_of": "2026-11-23T18:02:21+05:30",
       "benchmark_tenor": "10Y",
       "curve": [
         {
@@ -242,7 +242,7 @@
           "label": "India 13Y",
           "yield": 7.286,
           "prev_close": 7.286,
-          "change_pct": -0.0,
+          "change_pct": -0.71,
           "years": 13.0,
           "chart_url": "https://www.investing.com/rates-bonds/india-13-year-bond-yield"
         },
