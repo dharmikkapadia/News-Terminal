@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-11-24T07:31:46+05:30",
+  "captured_at": "2026-11-24T08:01:42+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -11,9 +11,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
       "source": "Yahoo Finance · BZ=F",
-      "price": 86.29,
-      "prev_close": 92.57,
-      "change_pct": -6.78,
+      "price": 86.37,
+      "prev_close": 89.37,
+      "change_pct": -3.36,
       "currency": "USD",
       "as_of": "2026-11-24"
     },
@@ -25,9 +25,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Yahoo Finance · GC=F",
-      "price": 3665.0,
-      "prev_close": 3515.3999,
-      "change_pct": 4.26,
+      "price": 3655.2,
+      "prev_close": 3651.3999,
+      "change_pct": 0.1,
       "currency": "USD",
       "as_of": "2026-11-24"
     },
@@ -39,9 +39,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
       "source": "Yahoo Finance · SI=F",
-      "price": 43.32,
-      "prev_close": 41.035,
-      "change_pct": 5.57,
+      "price": 43.085,
+      "prev_close": 43.147,
+      "change_pct": -0.14,
       "currency": "USD",
       "as_of": "2026-11-24"
     },
@@ -53,9 +53,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Yahoo Finance · HG=F",
-      "price": 5.5705,
-      "prev_close": 5.477,
-      "change_pct": 1.71,
+      "price": 5.562,
+      "prev_close": 5.627,
+      "change_pct": -1.16,
       "currency": "USD",
       "as_of": "2026-11-24"
     },
@@ -111,10 +111,10 @@
       "chart_url": "https://tradingeconomics.com/commodity/iron-ore",
       "source": "Yahoo Finance · TIO=F",
       "price": 90.67,
-      "prev_close": 90.86,
-      "change_pct": -0.21,
+      "prev_close": 90.67,
+      "change_pct": 0.0,
       "currency": "USD",
-      "as_of": "2026-11-20"
+      "as_of": "2026-11-23"
     },
     {
       "key": "coffee",
