@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-11-24T01:13:44+05:30",
+  "captured_at": "2026-11-24T07:28:58+05:30",
   "source": "https://www.rbi.org.in/",
   "policy_rates": {
     "repo_rate": 5.5,
@@ -15,7 +15,7 @@
   "exchange_rates": {
     "as_of": "As at 1.00pm of November 23, 2026",
     "source": "FBIL",
-    "inr_per_usd": 92.673,
+    "inr_per_usd": 92.9,
     "inr_per_gbp": 121.0898,
     "inr_per_eur": 101.3613,
     "inr_per_100_jpy": 58.39,
@@ -24,10 +24,10 @@
     "fx_te": {
       "inr_per_usd": {
         "label": "USD/INR",
-        "prev_close": 93.295,
-        "change_pct": -0.67,
+        "prev_close": 92.673,
+        "change_pct": 0.24,
         "chart_url": "https://tradingeconomics.com/currencies?quote=inr",
-        "as_of": "2026-11-23",
+        "as_of": "2026-11-24",
         "source": "Yahoo Finance · USDINR=X"
       },
       "inr_per_eur": {
@@ -47,7 +47,7 @@
         "source": "Yahoo Finance · GBPINR=X"
       }
     },
-    "fx_te_captured_at": "2026-11-24T07:01:40+05:30"
+    "fx_te_captured_at": "2026-11-24T07:28:59+05:30"
   },
   "lending_deposit_rates": {
     "base_rate": [
