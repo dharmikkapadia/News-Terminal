@@ -15,9 +15,9 @@
   "exchange_rates": {
     "as_of": "As at 1.00pm of November 23, 2026",
     "source": "FBIL",
-    "inr_per_usd": 92.6075,
-    "inr_per_gbp": 121.214,
-    "inr_per_eur": 101.3496,
+    "inr_per_usd": 92.4525,
+    "inr_per_gbp": 121.0143,
+    "inr_per_eur": 101.2012,
     "inr_per_100_jpy": 58.39,
     "inr_per_aed": 25.2656,
     "inr_per_10000_idr": 51.0,
@@ -25,7 +25,7 @@
       "inr_per_usd": {
         "label": "USD/INR",
         "prev_close": 92.9152,
-        "change_pct": -0.33,
+        "change_pct": -0.5,
         "chart_url": "https://tradingeconomics.com/currencies?quote=inr",
         "as_of": "2026-11-25",
         "source": "Yahoo Finance · USDINR=X"
@@ -33,7 +33,7 @@
       "inr_per_eur": {
         "label": "EUR/INR",
         "prev_close": 101.268,
-        "change_pct": 0.08,
+        "change_pct": -0.07,
         "chart_url": "https://tradingeconomics.com/currencies?quote=inr",
         "as_of": "2026-11-25",
         "source": "Yahoo Finance · EURINR=X"
@@ -41,13 +41,13 @@
       "inr_per_gbp": {
         "label": "GBP/INR",
         "prev_close": 121.0932,
-        "change_pct": 0.1,
+        "change_pct": -0.07,
         "chart_url": "https://tradingeconomics.com/currencies?quote=inr",
         "as_of": "2026-11-25",
         "source": "Yahoo Finance · GBPINR=X"
       }
     },
-    "fx_te_captured_at": "2026-11-25T10:31:53+05:30"
+    "fx_te_captured_at": "2026-11-25T11:01:39+05:30"
   },
   "lending_deposit_rates": {
     "base_rate": [
@@ -108,7 +108,7 @@
     "bonds": {
       "source": "investing.com",
       "board_url": "https://www.investing.com/rates-bonds/india-government-bonds",
-      "as_of": "2026-11-25T10:32:05+05:30",
+      "as_of": "2026-11-25T11:02:01+05:30",
       "benchmark_tenor": "10Y",
       "curve": [
         {
@@ -168,9 +168,9 @@
         {
           "tenor": "5Y",
           "label": "India 5Y",
-          "yield": 7.089,
+          "yield": 7.085,
           "prev_close": 7.087,
-          "change_pct": 0.03,
+          "change_pct": -0.03,
           "years": 5.0,
           "chart_url": "https://www.investing.com/rates-bonds/india-5-year-bond-yield"
         },
@@ -204,18 +204,18 @@
         {
           "tenor": "9Y",
           "label": "India 9Y",
-          "yield": 7.171,
+          "yield": 7.157,
           "prev_close": 7.15,
-          "change_pct": 0.29,
+          "change_pct": 0.1,
           "years": 9.0,
           "chart_url": "https://www.investing.com/rates-bonds/india-9-year-bond-yield"
         },
         {
           "tenor": "10Y",
           "label": "India 10Y",
-          "yield": 7.21,
+          "yield": 7.201,
           "prev_close": 7.203,
-          "change_pct": 0.1,
+          "change_pct": -0.03,
           "years": 10.0,
           "chart_url": "https://www.investing.com/rates-bonds/india-10-year-bond-yield"
         },
@@ -249,18 +249,18 @@
         {
           "tenor": "14Y",
           "label": "India 14Y",
-          "yield": 7.195,
+          "yield": 7.192,
           "prev_close": 7.198,
-          "change_pct": -0.04,
+          "change_pct": -0.08,
           "years": 14.0,
           "chart_url": "https://www.investing.com/rates-bonds/india-14-year-bond-yield"
         },
         {
           "tenor": "15Y",
           "label": "India 15Y",
-          "yield": 7.384,
+          "yield": 7.38,
           "prev_close": 7.395,
-          "change_pct": -0.15,
+          "change_pct": -0.2,
           "years": 15.0,
           "chart_url": "https://www.investing.com/rates-bonds/india-15-year-bond-yield"
         },
@@ -285,18 +285,18 @@
         {
           "tenor": "30Y",
           "label": "India 30Y",
-          "yield": 7.717,
+          "yield": 7.699,
           "prev_close": 7.699,
-          "change_pct": 0.23,
+          "change_pct": 0.0,
           "years": 30.0,
           "chart_url": "https://www.investing.com/rates-bonds/india-30-year-bond-yield"
         },
         {
           "tenor": "40Y",
           "label": "India 40Y",
-          "yield": 7.752,
+          "yield": 7.75,
           "prev_close": 7.755,
-          "change_pct": -0.04,
+          "change_pct": -0.06,
           "years": 40.0,
           "chart_url": "https://www.investing.com/rates-bonds/india-40-year-bond-yield"
         }

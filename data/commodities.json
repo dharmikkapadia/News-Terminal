@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-11-25T10:31:53+05:30",
+  "captured_at": "2026-11-25T11:01:39+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -11,11 +11,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
       "source": "Yahoo Finance · BZ=F",
-      "price": 91.4,
-      "prev_close": 89.37,
-      "change_pct": 2.27,
+      "price": 87.4,
+      "prev_close": 91.4,
+      "change_pct": -4.38,
       "currency": "USD",
-      "as_of": "2026-11-24"
+      "as_of": "2026-11-25"
     },
     {
       "key": "gold",
@@ -25,11 +25,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Yahoo Finance · GC=F",
-      "price": 3561.8999,
-      "prev_close": 3651.3999,
-      "change_pct": -2.45,
+      "price": 3547.8,
+      "prev_close": 3561.8999,
+      "change_pct": -0.4,
       "currency": "USD",
-      "as_of": "2026-11-24"
+      "as_of": "2026-11-25"
     },
     {
       "key": "silver",
@@ -39,11 +39,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
       "source": "Yahoo Finance · SI=F",
-      "price": 40.76,
-      "prev_close": 43.147,
-      "change_pct": -5.53,
+      "price": 40.565,
+      "prev_close": 40.76,
+      "change_pct": -0.48,
       "currency": "USD",
-      "as_of": "2026-11-24"
+      "as_of": "2026-11-25"
     },
     {
       "key": "copper",
@@ -53,11 +53,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Yahoo Finance · HG=F",
-      "price": 5.3625,
-      "prev_close": 5.627,
-      "change_pct": -4.7,
+      "price": 5.4505,
+      "prev_close": 5.3625,
+      "change_pct": 1.64,
       "currency": "USD",
-      "as_of": "2026-11-24"
+      "as_of": "2026-11-25"
     },
     {
       "key": "aluminium",
