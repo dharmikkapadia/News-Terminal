@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-11-26T06:31:45+05:30",
+  "captured_at": "2026-11-26T07:01:23+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -11,9 +11,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
       "source": "Yahoo Finance · BZ=F",
-      "price": 90.67,
+      "price": 90.98,
       "prev_close": 91.4,
-      "change_pct": -0.8,
+      "change_pct": -0.46,
       "currency": "USD",
       "as_of": "2026-11-26"
     },
@@ -25,9 +25,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/gold",
       "source": "Yahoo Finance · GC=F",
-      "price": 3592.8999,
+      "price": 3603.6001,
       "prev_close": 3561.8999,
-      "change_pct": 0.87,
+      "change_pct": 1.17,
       "currency": "USD",
       "as_of": "2026-11-26"
     },
@@ -39,9 +39,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/silver",
       "source": "Yahoo Finance · SI=F",
-      "price": 41.52,
+      "price": 41.865,
       "prev_close": 40.76,
-      "change_pct": 1.86,
+      "change_pct": 2.71,
       "currency": "USD",
       "as_of": "2026-11-26"
     },
@@ -53,9 +53,9 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/copper",
       "source": "Yahoo Finance · HG=F",
-      "price": 5.486,
+      "price": 5.509,
       "prev_close": 5.3625,
-      "change_pct": 2.3,
+      "change_pct": 2.73,
       "currency": "USD",
       "as_of": "2026-11-26"
     },
@@ -96,11 +96,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/steel",
       "source": "Yahoo Finance · HRC=F",
-      "price": 1431.0,
+      "price": 1435.0,
       "prev_close": 1352.0,
-      "change_pct": 5.84,
+      "change_pct": 6.14,
       "currency": "USD",
-      "as_of": "2026-11-25"
+      "as_of": "2026-11-26"
     },
     {
       "key": "iron",
