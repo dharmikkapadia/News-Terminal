@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-11-28T07:31:59+05:30",
+  "captured_at": "2026-11-28T08:01:54+05:30",
   "source": "Trading Economics (primary) + Yahoo Finance (fallback) + investing.com (coffee)",
   "chart_links": "Trading Economics (tradingeconomics.com/commodity/…); coffee: investing.com",
   "commodities": [
@@ -15,7 +15,7 @@
       "prev_close": 94.61,
       "change_pct": -3.98,
       "currency": "USD",
-      "as_of": "2026-11-28"
+      "as_of": "2026-11-27"
     },
     {
       "key": "gold",
@@ -29,7 +29,7 @@
       "prev_close": 3535.8,
       "change_pct": 3.75,
       "currency": "USD",
-      "as_of": "2026-11-28"
+      "as_of": "2026-11-27"
     },
     {
       "key": "silver",
@@ -43,7 +43,7 @@
       "prev_close": 40.052,
       "change_pct": 9.11,
       "currency": "USD",
-      "as_of": "2026-11-28"
+      "as_of": "2026-11-27"
     },
     {
       "key": "copper",
@@ -57,7 +57,7 @@
       "prev_close": 5.3325,
       "change_pct": 5.03,
       "currency": "USD",
-      "as_of": "2026-11-28"
+      "as_of": "2026-11-27"
     },
     {
       "key": "aluminium",
@@ -110,11 +110,11 @@
       "cadence": "daily",
       "chart_url": "https://tradingeconomics.com/commodity/iron-ore",
       "source": "Yahoo Finance · TIO=F",
-      "price": 90.64,
-      "prev_close": 90.67,
-      "change_pct": -0.03,
+      "price": 90.69,
+      "prev_close": 90.64,
+      "change_pct": 0.06,
       "currency": "USD",
-      "as_of": "2026-11-25"
+      "as_of": "2026-11-27"
     },
     {
       "key": "coffee",
